@@ -70,31 +70,30 @@ Decisions made during scaffold development are recorded below.
 
 ---
 
-#### 2025-01-25: Two-Phase Pre-Commit Quality Gates
+#### 2025-01-25: Git Pre-Commit Hook for Quality Gates
 
-**Context**: The scaffold has `.claude/hooks/pre-commit-check.sh` running on Claude's Stop event, but no git-level pre-commit hook. This leaves a gap if commits bypass the Claude workflow.
+**Context**: Quality gates need to run before code is committed. Initially considered a Claude Stop hook, but this would run on every response (including simple questions), causing unnecessary latency.
 
-**Decision**: Implement belt-and-suspenders quality gates at both layers.
+**Decision**: Use git pre-commit hook as the single enforcement point.
 
 **Implementation**:
-| Phase | Hook | Trigger | Purpose |
-|-------|------|---------|---------|
-| Phase 1 | `.claude/hooks/pre-commit-check.sh` | Claude Stop event | Early feedback during Claude workflow |
-| Phase 2 | `_scripts/pre-commit` | `git commit` | Final enforcement regardless of commit source |
+| Hook | Location | Trigger | Purpose |
+|------|----------|---------|---------|
+| pre-commit | `_scripts/pre-commit` | `git commit` | Runs test, lint, typecheck before commit |
 
-**Installation** (required for Phase 2):
+**Installation** (required after cloning):
 ```bash
 cp _scripts/pre-commit .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 ```
 
 **Rationale**:
-- Claude's Stop hook provides early feedback during the `/implement` → `/review` → `/commit` cycle
-- Git's pre-commit hook ensures quality gates run even for manual commits
-- Same checks (test, lint, typecheck) run at both layers for consistency
-- Defense-in-depth: if one layer is bypassed, the other catches issues
+- Git commit is the correct enforcement boundary—nothing commits without passing
+- Avoids unnecessary checks on non-commit operations (`/dev`, `/next`, Q&A)
+- Single source of truth for quality gate logic
+- Works regardless of commit source (Claude or human)
 
-**Trade-off**: Checks may run twice during `/commit` (once at Stop, once at git commit). Accepted as minor overhead for increased reliability.
+**Alternative Rejected**: Claude Stop hook running on every response. This caused 10-30s delays after every interaction, even simple questions.
 
 ---
 
@@ -109,13 +108,12 @@ This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Ke
 | Structured subagent output | All agents define exact output format |
 | Test immutability | Triple enforcement: rule + hook + agent instruction |
 | Append-only memory | progress.md and decisions.md |
-| Hook-based quality gates | Advisory (PostToolUse) + Strict (Stop) |
+| Hook-based quality gates | Advisory (PostToolUse) + Git pre-commit |
 
 ## Known Gaps and Future Improvements
 
 Items identified for potential enhancement:
 
-- [ ] Scope pre-commit-check.sh to workflow boundaries only
 - [ ] Extract initializer subagent from /init command
 - [ ] Add CLAUDE.local.md template for personal overrides
 - [ ] Document context clearing strategy for long sessions
