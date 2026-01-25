@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "project": "Project Name",
+    "created": "YYYY-MM-DD",
+    "version": "1.0.0"
+  },
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "priority": 1,
+      "category": "setup",
+      "description": "Initialize project with TypeScript and Jest configuration",
+      "steps": [
+        "Create package.json with required dependencies",
+        "Configure TypeScript (tsconfig.json)",
+        "Configure Jest for TypeScript",
+        "Create initial directory structure",
+        "Verify 'npm run test' executes successfully"
+      ],
+      "blockedBy": [],
+      "status": "pending",
+      "completedAt": null
+    },
+    {
+      "id": "TASK-002",
+      "priority": 2,
+      "category": "example",
+      "description": "Example task - replace with actual tasks",
+      "steps": [
+        "Step 1: [action]",
+        "Step 2: [action]",
+        "Step 3: [verification]"
+      ],
+      "blockedBy": ["TASK-001"],
+      "status": "pending",
+      "completedAt": null
+    }
+  ],
+  "_schema": {
+    "id": "Unique task identifier (do not modify)",
+    "priority": "Numeric priority, 1 = highest (do not modify)",
+    "category": "Task category: setup, feature, bugfix, refactor, docs (do not modify)",
+    "description": "Task description (do not modify)",
+    "steps": "Acceptance criteria (do not modify)",
+    "blockedBy": "Array of task IDs that must complete first (do not modify)",
+    "status": "pending | in-progress | complete (may modify)",
+    "completedAt": "ISO 8601 timestamp when completed (may modify)"
+  }
+}
