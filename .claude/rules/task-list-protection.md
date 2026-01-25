@@ -6,27 +6,48 @@ paths:
 
 # Task List Protection Rules
 
-The task list is an immutable contract defining project scope.
+The task list is the authoritative source for project work items. It must remain stable to ensure reliable progress tracking across sessions.
 
-## Allowed Modifications
-- `status`: May change to `"in-progress"` or `"complete"`
-- `completedAt`: May set to ISO 8601 timestamp when completing
+## Immutable Fields
 
-## Prohibited Modifications
-- NEVER modify `id`, `description`, `priority`, `category`, or `steps`
-- NEVER remove tasks from the list
-- NEVER add new tasks without explicit user approval
-- NEVER reorder tasks
+NEVER modify these fields on any task:
+- `id`: Task identifier
+- `title`: Task name
+- `description`: Task details
+- `priority`: Task ordering
+- `acceptanceCriteria`: Definition of done
+- `blockedBy`: Dependency list
 
-## Rationale
-Task definitions represent agreed requirements. Changing them mid-implementation obscures scope changes and breaks traceability.
+## Mutable Fields
 
-## If Modification Seems Necessary
-Stop and ask the user:
+ONLY these fields may be modified:
+- `status`: One of "pending", "in-progress", "complete"
+- `completedAt`: ISO timestamp when status becomes "complete"
+
+## Allowed Operations
+
+| Operation | Permitted | Actor |
+|-----------|-----------|-------|
+| Read task list | Yes | Any agent |
+| Update status field | Yes | Orchestrator, memory-updater |
+| Update completedAt field | Yes | memory-updater |
+| Add new task | No | User only (manual edit) |
+| Remove task | No | User only (manual edit) |
+| Modify task details | No | User only (manual edit) |
+
+## Status Transitions
+
 ```
-The task [ID] may need modification because [reason].
-Current: [current value]
-Proposed: [proposed change]
-
-Approve this change? (yes/no)
+pending → in-progress    (via /next command)
+in-progress → complete   (via /commit command)
+in-progress → pending    (only if task is abandoned, requires user approval)
 ```
+
+## Validation
+
+Before any write to task-list.json:
+1. Parse existing JSON
+2. Identify changed fields
+3. Reject if immutable field modified
+4. Reject if status transition invalid
+5. Proceed only if changes are permitted

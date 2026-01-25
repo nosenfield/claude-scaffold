@@ -1,45 +1,102 @@
 # Implement Task
 
-Implement code to pass the written tests.
+Write code to pass the tests for the current task.
 
 ## Prerequisites
-- Tests must be written (run `/test` first)
-- Tests should be failing (no implementation yet)
+
+- A task must be in-progress
+- An implementation plan must be approved
+- Tests must be written
+
+If tests don't exist, run `/test` first.
 
 ## Steps
 
-1. Verify tests exist:
-   - If no tests in context, instruct user to run `/test`
+1. **Verify Prerequisites**
+   Confirm session context contains:
+   - `currentTask`: The in-progress task
+   - `implementationPlan`: The approved plan
+   - `testFiles`: List of test file paths
+   
+   If missing, instruct user to run earlier commands.
 
-2. Load implementation context:
-   - Approved implementation plan
-   - Test file locations and expectations
-   - Architecture constraints from `/_docs/architecture.md`
+2. **Determine Mode**
+   Check session context for `reviewFeedback`:
+   - If absent: `mode = "INITIAL"`
+   - If present: `mode = "ADDRESS_REVIEW_FEEDBACK"`
 
-3. Spawn `implementer` subagent:
-   - Provide implementation plan
-   - Provide test locations
-   - Provide architecture constraints
-
-4. Monitor implementation:
-   - Subagent implements incrementally
-   - Runs tests after each change
-   - Continues until all tests pass
-
-5. Verify completion:
-   ```bash
-   npm run test
-   npm run typecheck
+3. **Prepare Handoff Payload**
+   
+   For INITIAL mode:
+   ```
+   taskId: [currentTask.id]
+   taskTitle: [currentTask.title]
+   implementationPlan: [full plan with affected files and steps]
+   testFiles: [list of test file paths]
+   mode: "INITIAL"
+   ```
+   
+   For ADDRESS_REVIEW_FEEDBACK mode:
+   ```
+   taskId: [currentTask.id]
+   taskTitle: [currentTask.title]
+   implementationPlan: [full plan]
+   testFiles: [list of test file paths]
+   mode: "ADDRESS_REVIEW_FEEDBACK"
+   reviewFeedback: [blocking issues from code review]
    ```
 
-6. Report implementation status:
-   - **Files Modified**: [list]
-   - **Tests**: [all passing / X failing]
-   - **Type Check**: [pass / errors]
+4. **Spawn implementer Subagent**
+   Invoke the `implementer` agent with the payload.
+   
+   The subagent will:
+   - Read tests to understand expected behavior
+   - Implement code incrementally
+   - Run tests after each change
+   - Report completion status
 
-7. On all tests passing:
-   - Recommend: "Run `/review` for code review."
+5. **Receive Implementation Results**
+   Confirm the response includes:
+   - Files modified
+   - Test results (all passing)
+   - Decisions made
+   - Any deviations from plan
 
-8. On failures:
-   - Display failing tests
-   - Continue implementation or request guidance
+6. **Validate Implementation**
+   Run full test suite:
+   ```bash
+   npm run test
+   ```
+   
+   If tests fail, report failure and allow retry.
+
+7. **Present Implementation Summary**
+   ```
+   ## Implementation Complete
+
+   [Display summary from subagent]
+
+   **Test Results**: [X] passing, [Y] failing
+
+   ### Decisions Made
+   [List decisions for memory bank]
+
+   ---
+
+   Ready for code review. Run `/review` to continue.
+   ```
+
+8. **Store Implementation Information**
+   Update session context:
+   - `filesModified`: List of changed files
+   - `decisions`: List of implementation decisions
+   - Clear `reviewFeedback` if present
+
+## State Management
+
+Session context after this stage:
+- `currentTask`: Full task object
+- `implementationPlan`: Approved plan
+- `testFiles`: List of test file paths
+- `filesModified`: List of changed files
+- `decisions`: Implementation decisions for memory bank

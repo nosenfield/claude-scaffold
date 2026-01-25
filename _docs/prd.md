@@ -2,56 +2,71 @@
 
 ## Overview
 
-<!-- 
-Brief description of the product/project.
-What problem does it solve? Who is it for?
--->
+[Brief description of the product and its purpose]
+
+## Problem Statement
+
+[What problem does this product solve? Who experiences this problem?]
 
 ## Goals
 
-<!--
-Primary objectives for this project.
-What does success look like?
--->
+1. [Primary goal]
+2. [Secondary goal]
+3. [Tertiary goal]
+
+## Non-Goals
+
+- [What this product explicitly will not do]
+- [Out of scope items]
+
+## User Personas
+
+### [Persona 1 Name]
+- **Role**: [Job title or role]
+- **Goals**: [What they want to achieve]
+- **Pain Points**: [Current frustrations]
+
+### [Persona 2 Name]
+- **Role**: [Job title or role]
+- **Goals**: [What they want to achieve]
+- **Pain Points**: [Current frustrations]
 
 ## Features
 
-<!--
-List key features with brief descriptions.
-Prioritize: must-have vs nice-to-have.
--->
+### Feature 1: [Feature Name]
+**Priority**: High | Medium | Low
+**Description**: [What this feature does]
+**Acceptance Criteria**:
+- [Criterion 1]
+- [Criterion 2]
+- [Criterion 3]
 
-### Must Have
-
-1. **[Feature Name]**: [Description]
-
-### Nice to Have
-
-1. **[Feature Name]**: [Description]
-
-## User Stories
-
-<!--
-Format: As a [user type], I want [action] so that [benefit].
--->
-
-1. As a [user], I want [action] so that [benefit].
-
-## Constraints
-
-<!--
-Technical, business, or regulatory constraints.
--->
+### Feature 2: [Feature Name]
+**Priority**: High | Medium | Low
+**Description**: [What this feature does]
+**Acceptance Criteria**:
+- [Criterion 1]
+- [Criterion 2]
 
 ## Success Metrics
 
-<!--
-How will you measure if the project succeeded?
--->
+| Metric | Target | Measurement Method |
+|--------|--------|-------------------|
+| [Metric 1] | [Target value] | [How to measure] |
+| [Metric 2] | [Target value] | [How to measure] |
 
-## Out of Scope
+## Constraints
 
-<!--
-Explicitly list what this project will NOT include.
-Prevents scope creep.
--->
+- [Technical constraint]
+- [Business constraint]
+- [Timeline constraint]
+
+## Dependencies
+
+- [External dependency 1]
+- [External dependency 2]
+
+## Open Questions
+
+- [ ] [Question 1]
+- [ ] [Question 2]

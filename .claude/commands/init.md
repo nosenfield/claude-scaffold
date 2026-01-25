@@ -1,45 +1,84 @@
 # Initialize Project
 
-Initialize project environment and memory bank for development.
+Set up project environment and memory bank for development.
+
+## Prerequisites
+
+Verify core documentation exists:
+- `/_docs/prd.md`
+- `/_docs/architecture.md`
+- `/_docs/task-list.json`
+- `/_docs/best-practices.md`
+
+If any are missing, stop and report which files are required.
 
 ## Steps
 
-1. Verify core documentation exists:
-   - `/_docs/prd.md`
-   - `/_docs/architecture.md`
-   - `/_docs/task-list.json`
-   - `/_docs/best-practices.md`
+1. **Validate Core Documentation**
+   ```bash
+   ls -la _docs/
+   ```
+   Confirm all four files exist and are non-empty.
 
-2. Read and validate each document:
-   - PRD contains project overview and features
-   - Architecture contains tech stack and structure
-   - Task list is valid JSON with required fields
-   - Best practices contains project conventions
+2. **Parse Task List**
+   Read `/_docs/task-list.json` and validate JSON structure.
+   Confirm it contains a `tasks` array with at least one task.
 
-3. Run environment setup:
+3. **Run Environment Setup**
+   Read `/_docs/architecture.md` for setup commands.
+   Execute the documented setup steps:
    ```bash
    npm install
    ```
 
-4. Initialize memory bank:
-   - Create `progress.md` if not exists
-   - Create `decisions.md` if not exists
-   - Add initialization entry to progress.md
-
-5. Verify "hello world" state:
+4. **Verify Working State**
+   Run basic validation:
    ```bash
    npm run build
    npm run test
    ```
+   If either fails, report the error and stop.
 
-6. Report initialization status:
-   - Environment: [ready/issues found]
-   - Documentation: [complete/missing files]
-   - Build: [success/failure]
-   - Tests: [passing/failing]
+5. **Initialize Memory Bank**
+   Create `progress.md` if it doesn't exist:
+   ```markdown
+   # Progress Log
 
-## Success Criteria
-- All core documentation present and valid
-- Dependencies installed
-- Project builds without errors
-- Base tests pass
+   ## [TIMESTAMP] - Project Initialized
+
+   **Status**: Environment ready
+
+   **Core Documentation**:
+   - prd.md: Present
+   - architecture.md: Present
+   - task-list.json: Present ([N] tasks)
+   - best-practices.md: Present
+
+   **Environment**: Verified (build and tests pass)
+
+   ---
+   ```
+
+   Create `decisions.md` if it doesn't exist:
+   ```markdown
+   # Decision Log
+
+   Architecture and implementation decisions are recorded here.
+
+   ---
+   ```
+
+   Create `/_docs/backlog.json` if it doesn't exist:
+   ```json
+   {
+     "items": []
+   }
+   ```
+
+6. **Report Status**
+   Summarize:
+   - Core documentation status
+   - Environment setup result
+   - Number of tasks in task list
+   - Number of tasks pending vs complete
+   - Recommended next action: `/dev` to start development session

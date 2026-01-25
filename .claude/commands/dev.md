@@ -1,45 +1,47 @@
 # Start Development Session
 
-Start or resume a development session.
+Resume development workflow and establish session context.
 
 ## Steps
 
-1. Confirm working directory:
+1. **Confirm Working Directory**
    ```bash
    pwd
    ```
+   Verify you are in the project root.
 
-2. Load session context:
-   - Read `progress.md` for previous session summary
-   - Read `/_docs/task-list.json` for current task status
+2. **Load Previous Context**
+   Read `progress.md` to understand:
+   - Last completed task
+   - Last session summary
+   - Any in-progress work
 
-3. Check git status:
+3. **Check Repository State**
    ```bash
    git status
    git log --oneline -5
    ```
+   Note any uncommitted changes or recent commits.
 
-4. Run environment setup:
+4. **Load Task State**
+   Read `/_docs/task-list.json`:
+   - Count tasks by status (pending, in-progress, complete)
+   - Identify any task marked in-progress
+
+5. **Verify Environment**
+   Run quick validation:
    ```bash
-   npm install
-   npm run build
+   npm run build --silent
+   npm run test --silent
    ```
+   If either fails, report the issue before proceeding.
 
-5. Verify working state:
-   ```bash
-   npm run test
-   ```
-
-6. Report session status:
-   - **Last Session**: [summary from progress.md]
-   - **Current Branch**: [git branch]
-   - **Uncommitted Changes**: [yes/no]
-   - **Tasks Completed**: [count]
-   - **Tasks Remaining**: [count]
-   - **Build Status**: [success/failure]
-   - **Test Status**: [passing/failing]
-
-7. Recommend next action:
-   - If tests failing: "Address failing tests before new work"
-   - If uncommitted changes: "Review and commit pending changes"
-   - Otherwise: "Run `/next` to select next task"
+6. **Report Session Status**
+   Summarize:
+   - Repository state (clean/dirty)
+   - Last completed task
+   - Current in-progress task (if any)
+   - Next pending task
+   - Recommended action:
+     - If in-progress task exists: "Continue with `/plan` or `/implement`"
+     - If clean state: "Select next task with `/next`"

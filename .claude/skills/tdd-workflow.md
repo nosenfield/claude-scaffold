@@ -6,82 +6,80 @@ description: You MUST use this when implementing any feature or fixing any bug
 # Test-Driven Development Workflow
 
 ## Core Principle
-Tests define requirements. Write tests first, then implement.
 
-## Workflow Sequence
+Tests are written BEFORE implementation. Tests define the contract. Implementation satisfies the contract.
 
-### 1. Understand Requirements
-- Read task definition completely
-- Identify acceptance criteria
-- Clarify ambiguities before writing code
+## The TDD Cycle
 
-### 2. Write Failing Tests
+```
+1. RED    → Write a failing test
+2. GREEN  → Write minimal code to pass
+3. REFACTOR → Improve code, keep tests passing
+```
+
+## Workflow Steps
+
+### Step 1: Understand Requirements
+- Read task acceptance criteria
+- Identify expected behaviors
+- List edge cases and error conditions
+
+### Step 2: Write Tests First
 - Create test file before implementation file
-- Write tests that define expected behavior
-- Cover: happy path, edge cases, error conditions
-- Run tests; confirm they fail for the right reason
+- Write tests for expected behaviors
+- Include happy path, edge cases, and error handling
+- Run tests → they should FAIL (no implementation exists)
 
-### 3. Implement Minimally
-- Write only enough code to pass tests
-- Do not add functionality beyond test coverage
+### Step 3: Implement Incrementally
+- Write minimal code to pass ONE test
 - Run tests after each change
+- Do not write more code than necessary to pass current tests
+- Repeat until all tests pass
 
-### 4. Refactor
-- Clean up code while keeping tests green
-- Extract common patterns
-- Improve naming and structure
+### Step 4: Refactor
+- Improve code structure and readability
+- Run tests after each refactor
+- Tests must remain passing
+- Do not add functionality during refactor
 
-### 5. Verify
-- All tests pass
-- Type check passes
-- Lint passes
+## Rules
+
+### Test Immutability
+- NEVER modify test assertions to make tests pass
+- NEVER delete tests to avoid failures
+- If a test seems wrong, report as blocker
+- Tests can only be modified by test-writer during /test phase
+
+### Test Quality
+- Each test should test ONE behavior
+- Tests should be independent (no shared state)
+- Use descriptive test names
+- Follow Arrange-Act-Assert pattern
+
+### Implementation Constraints
+- Only write code that makes a test pass
+- Do not write code "for later"
+- Do not optimize prematurely
+- Keep functions small and focused
 
 ## Anti-Patterns to Avoid
 
-### Writing Tests After Implementation
-- Leads to tests that verify what code does, not what it should do
-- Misses edge cases
-- Creates false confidence
+### Testing Anti-Patterns
+- Writing tests after implementation
+- Testing implementation details instead of behavior
+- Tests that depend on execution order
+- Mocking everything (test real integrations when possible)
 
-### Modifying Tests to Pass
-- If implementation doesn't match test, implementation is wrong
-- Changing assertions hides bugs
-- Breaks the contract
+### Implementation Anti-Patterns
+- Writing all code before running tests
+- Modifying tests to match incorrect implementation
+- Skipping edge case tests
+- Ignoring failing tests
 
-### Testing Implementation Details
-- Test behavior, not internal structure
-- Tests should survive refactoring
-- Focus on inputs and outputs
+## Benefits
 
-### Skipping Edge Cases
-- Null/undefined handling
-- Empty collections
-- Boundary values
-- Error conditions
-
-## Test Structure
-
-```typescript
-describe('[Unit/Feature]', () => {
-  describe('[method/scenario]', () => {
-    it('should [expected behavior] when [condition]', () => {
-      // Arrange
-      const input = ...;
-      
-      // Act
-      const result = doThing(input);
-      
-      // Assert
-      expect(result).toEqual(expected);
-    });
-  });
-});
-```
-
-## When Tests Fail
-
-1. Read the error message completely
-2. Identify which assertion failed
-3. Determine if test or implementation is wrong
-4. If test is wrong: get approval before modifying
-5. If implementation is wrong: fix implementation
+1. **Clear Requirements**: Tests document expected behavior
+2. **Confidence**: Changes are validated immediately
+3. **Design**: TDD encourages modular, testable code
+4. **Regression Prevention**: Existing tests catch breaks
+5. **Progress Tracking**: Test pass count shows progress

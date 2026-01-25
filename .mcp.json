@@ -4,42 +4,51 @@
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"],
-      "_comment": "Documentation search and retrieval"
+      "description": "Documentation search and retrieval for libraries and frameworks",
+      "enabled": false
     },
     "puppeteer": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@anthropic/mcp-puppeteer"],
-      "_comment": "Browser automation for E2E testing"
+      "description": "Browser automation for end-to-end testing",
+      "enabled": false
     },
     "github": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@anthropic/mcp-github"],
+      "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
       },
-      "_comment": "GitHub issue and PR management"
+      "description": "GitHub issue and PR management",
+      "enabled": false
     },
     "postgres": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@anthropic/mcp-postgres"],
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
       "env": {
         "DATABASE_URL": "${DATABASE_URL}"
       },
-      "_comment": "PostgreSQL database access (if applicable)"
+      "description": "PostgreSQL database access",
+      "enabled": false
+    },
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${PROJECT_ROOT}"
+      ],
+      "description": "Extended filesystem access",
+      "enabled": false
     }
   },
-  "_instructions": {
-    "setup": [
-      "1. Remove any servers you don't need",
-      "2. Set required environment variables",
-      "3. Run 'claude --mcp-debug' to verify connections"
-    ],
-    "environment_variables": {
-      "GITHUB_TOKEN": "Personal access token with repo scope",
-      "DATABASE_URL": "PostgreSQL connection string"
-    }
+  "_readme": {
+    "usage": "Set 'enabled: true' for servers you want to activate",
+    "environment": "Replace ${VAR} placeholders with actual values or set in environment",
+    "debug": "Run 'claude --mcp-debug' to troubleshoot connection issues"
   }
 }

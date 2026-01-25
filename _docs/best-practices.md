@@ -2,42 +2,35 @@
 
 ## Code Style
 
-### TypeScript
-
-- Use strict mode (`"strict": true` in tsconfig.json)
-- Prefer `interface` over `type` for object shapes
-- Use explicit return types on exported functions
-- Avoid `any`; use `unknown` when type is truly unknown
-- Use `readonly` for immutable properties
+### General Principles
+- Write self-documenting code with clear naming
+- Keep functions small and focused (single responsibility)
+- Prefer composition over inheritance
+- Avoid premature optimization
 
 ### Naming Conventions
-
 | Element | Convention | Example |
 |---------|------------|---------|
 | Files | kebab-case | `user-service.ts` |
 | Classes | PascalCase | `UserService` |
 | Functions | camelCase | `getUserById` |
-| Constants | SCREAMING_SNAKE | `MAX_RETRY_COUNT` |
-| Interfaces | PascalCase with I prefix (optional) | `User` or `IUser` |
+| Constants | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
+| Interfaces | PascalCase with I prefix (optional) | `IUserRepository` or `UserRepository` |
+| Types | PascalCase | `UserResponse` |
 
-### File Organization
-
-- One class/component per file
-- Co-locate tests with source files or in `__tests__` directory
-- Group related functionality in directories
-- Index files for public exports only
+### TypeScript Guidelines
+- Enable strict mode
+- Avoid `any` type; use `unknown` if type is truly unknown
+- Prefer interfaces for object shapes
+- Use type inference where obvious; explicit types for function signatures
+- Use readonly where mutation is not intended
 
 ## Testing
 
 ### Test Structure
-
 ```typescript
-describe('[Unit/Feature]', () => {
-  beforeEach(() => {
-    // Setup
-  });
-
-  describe('[method/scenario]', () => {
+describe('[Unit under test]', () => {
+  describe('[method or scenario]', () => {
     it('should [expected behavior] when [condition]', () => {
       // Arrange
       // Act
@@ -48,29 +41,68 @@ describe('[Unit/Feature]', () => {
 ```
 
 ### Test Naming
+- Use descriptive names that explain the scenario
+- Format: `should [expected behavior] when [condition]`
+- Example: `should return 401 when credentials are invalid`
 
-- `should [expected behavior] when [condition]`
-- Be specific: "should return null when user not found"
-- Not vague: "should work correctly"
+### Test Coverage
+- Aim for meaningful coverage, not 100% coverage
+- Prioritize: business logic > integration points > utilities
+- Every bug fix should include a regression test
 
-### Coverage Targets
-
-- Unit tests: 80%+ line coverage
-- Critical paths: 100% coverage
-- Edge cases: explicitly tested
+### Test Independence
+- Tests should not depend on execution order
+- Each test sets up its own state
+- Clean up after tests that modify shared resources
 
 ## Error Handling
 
+### Error Types
 - Use custom error classes for domain errors
-- Always catch and handle async errors
-- Log errors with context (user ID, request ID, etc.)
-- Return meaningful error messages to clients
+- Include error codes for programmatic handling
+- Provide helpful error messages for debugging
 
+### Error Pattern
 ```typescript
-class NotFoundError extends Error {
-  constructor(resource: string, id: string) {
-    super(`${resource} not found: ${id}`);
-    this.name = 'NotFoundError';
+class DomainError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly statusCode: number = 500
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+```
+
+### Error Responses
+- Never expose internal errors to clients
+- Log full error details server-side
+- Return consistent error response format
+
+## API Design
+
+### REST Conventions
+- Use nouns for resources, not verbs
+- Use HTTP methods semantically (GET, POST, PUT, DELETE)
+- Return appropriate status codes
+- Version APIs when breaking changes are needed
+
+### Response Format
+```typescript
+// Success
+{
+  "data": { ... },
+  "meta": { "timestamp": "...", "requestId": "..." }
+}
+
+// Error
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Human readable message",
+    "details": [ ... ]
   }
 }
 ```
@@ -78,34 +110,53 @@ class NotFoundError extends Error {
 ## Git Practices
 
 ### Commit Messages
-
-Format: `type(scope): description`
+Format: `<type>(<scope>): <description> (<task-id>)`
 
 Types:
 - `feat`: New feature
 - `fix`: Bug fix
 - `refactor`: Code change that neither fixes a bug nor adds a feature
-- `test`: Adding or updating tests
-- `docs`: Documentation changes
+- `docs`: Documentation only changes
+- `test`: Adding or modifying tests
 - `chore`: Maintenance tasks
 
-### Branch Naming
+Example: `feat(auth): implement JWT token refresh (TASK-005)`
 
-- `feature/[task-id]-short-description`
-- `fix/[task-id]-short-description`
-- `refactor/[task-id]-short-description`
+### Branch Strategy
+- `main`: Production-ready code
+- `feature/*`: Feature development
+- `fix/*`: Bug fixes
 
 ## Security
 
-- Never commit secrets or credentials
-- Use environment variables for configuration
-- Validate all external input
-- Use parameterized queries for database access
-- Sanitize output to prevent XSS
+### Input Validation
+- Validate all input at system boundaries
+- Use schema validation (e.g., Zod, Joi)
+- Sanitize data before storage or display
+
+### Authentication
+- Use secure token storage
+- Implement token expiration
+- Hash passwords with bcrypt (cost factor 12+)
+
+### Sensitive Data
+- Never log sensitive data
+- Use environment variables for secrets
+- Never commit secrets to version control
 
 ## Performance
 
+### Database
+- Use indexes for frequently queried fields
 - Avoid N+1 queries
-- Use pagination for list endpoints
+- Use connection pooling
+
+### Caching
 - Cache expensive computations
-- Profile before optimizing
+- Set appropriate TTLs
+- Invalidate cache on data changes
+
+### Async Operations
+- Use async/await consistently
+- Handle promise rejections
+- Consider timeouts for external calls

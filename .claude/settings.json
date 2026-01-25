@@ -19,7 +19,19 @@
           {
             "type": "command",
             "command": ".claude/hooks/pre-commit-check.sh",
-            "timeout": 120
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/test-file-guard.sh",
+            "timeout": 10
           }
         ]
       }
@@ -29,9 +41,12 @@
     "allow": [
       "Bash(npm run *)",
       "Bash(git *)",
-      "Read",
-      "Glob",
-      "Grep"
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(pwd)",
+      "Bash(echo *)"
     ],
     "deny": [
       "Bash(rm -rf *)",

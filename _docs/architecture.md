@@ -1,91 +1,137 @@
 # Architecture Document
 
+## System Overview
+
+[High-level description of the system architecture]
+
 ## Tech Stack
 
-| Layer | Technology | Version |
-|-------|------------|---------|
-| Runtime | Node.js | 20.x |
-| Language | TypeScript | 5.x |
-| Framework | [Framework] | [Version] |
-| Database | [Database] | [Version] |
-| Testing | Jest | 29.x |
+| Layer | Technology | Rationale |
+|-------|------------|-----------|
+| Runtime | Node.js 20 | [Why chosen] |
+| Language | TypeScript 5.x | [Why chosen] |
+| Framework | [Framework] | [Why chosen] |
+| Database | [Database] | [Why chosen] |
+| Testing | Jest | [Why chosen] |
 
 ## Project Structure
 
 ```
 project-root/
 ├── src/
-│   ├── index.ts           # Application entry point
-│   ├── config/            # Configuration management
-│   ├── routes/            # API route handlers
-│   ├── services/          # Business logic layer
-│   ├── repositories/      # Data access layer
-│   ├── models/            # Type definitions
-│   └── utils/             # Shared utilities
+│   ├── routes/          # API route handlers
+│   ├── services/        # Business logic
+│   ├── repositories/    # Data access layer
+│   ├── models/          # Data models/types
+│   ├── middleware/      # Express middleware
+│   ├── utils/           # Shared utilities
+│   └── index.ts         # Application entry point
 ├── tests/
-│   ├── unit/              # Unit tests
-│   ├── integration/       # Integration tests
-│   └── e2e/               # End-to-end tests
-├── _docs/                 # Project documentation
-└── .claude/               # Claude Code configuration
+│   ├── unit/            # Unit tests
+│   ├── integration/     # Integration tests
+│   └── e2e/             # End-to-end tests
+├── _docs/               # Project documentation
+├── .claude/             # Claude Code configuration
+└── package.json
 ```
 
 ## Architecture Principles
 
-1. **[Principle Name]**: [Description]
+1. **[Principle 1]**: [Description and rationale]
+2. **[Principle 2]**: [Description and rationale]
+3. **[Principle 3]**: [Description and rationale]
 
-## Component Overview
+## Component Design
 
-### [Component Name]
-- **Purpose**: [What it does]
-- **Location**: [File path]
-- **Dependencies**: [What it depends on]
-- **Dependents**: [What depends on it]
+### [Component 1 Name]
+**Responsibility**: [What this component does]
+**Dependencies**: [What it depends on]
+**Interface**:
+```typescript
+interface [ComponentInterface] {
+  [method signature]
+}
+```
+
+### [Component 2 Name]
+**Responsibility**: [What this component does]
+**Dependencies**: [What it depends on]
 
 ## Data Flow
 
-<!--
-Describe how data flows through the system.
-Include diagrams if helpful.
--->
+```
+[Request] → [Route] → [Service] → [Repository] → [Database]
+                ↓
+           [Response]
+```
 
 ## API Design
 
-<!--
-API patterns, authentication, error handling conventions.
--->
+### Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/[resource] | [Description] |
+| POST | /api/[resource] | [Description] |
+| PUT | /api/[resource]/:id | [Description] |
+| DELETE | /api/[resource]/:id | [Description] |
+
+### Authentication
+
+[Describe authentication approach]
+
+### Error Handling
+
+[Describe error handling patterns]
+
+## Database Schema
+
+### [Table/Collection 1]
+| Field | Type | Constraints |
+|-------|------|-------------|
+| id | UUID | Primary key |
+| [field] | [type] | [constraints] |
 
 ## Environment Setup
 
+### Prerequisites
+- Node.js 20+
+- npm 10+
+- [Other prerequisites]
+
+### Installation
 ```bash
-# Install dependencies
+git clone [repository]
+cd [project]
 npm install
+```
 
-# Set up environment variables
+### Configuration
+```bash
 cp .env.example .env
+# Edit .env with your values
+```
 
-# Run database migrations (if applicable)
-npm run db:migrate
-
-# Start development server
+### Running Locally
+```bash
 npm run dev
 ```
 
-## Build and Deploy
-
+### Running Tests
 ```bash
-# Build for production
-npm run build
-
-# Run production build
-npm start
+npm run test
 ```
 
-## Critical Constraints
+## Deployment
 
-<!--
-Non-negotiable architectural rules.
-Things that must NOT be done.
--->
+[Describe deployment process and environments]
 
-- NEVER [constraint]
+## Security Considerations
+
+- [Security consideration 1]
+- [Security consideration 2]
+
+## Performance Considerations
+
+- [Performance consideration 1]
+- [Performance consideration 2]

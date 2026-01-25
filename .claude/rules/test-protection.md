@@ -1,48 +1,72 @@
 ---
 paths:
   - "**/*.test.ts"
-  - "**/*.spec.ts"
   - "**/*.test.tsx"
+  - "**/*.spec.ts"
   - "**/*.spec.tsx"
   - "**/*.test.js"
+  - "**/*.test.jsx"
   - "**/*.spec.js"
-  - "__tests__/**"
-  - "tests/**"
+  - "**/*.spec.jsx"
+  - "**/__tests__/**"
+  - "**/tests/**"
 ---
 
 # Test File Protection Rules
 
-Tests define acceptance criteria. Implementation must satisfy tests, not the reverse.
+Tests are contracts that define expected behavior. They must remain immutable during implementation to preserve TDD integrity.
 
 ## Core Principle
-Tests are contracts. When a test fails, the implementation is wrong.
 
-## Allowed Modifications
-- Adding new test cases
-- Adding new test files
-- Improving test descriptions for clarity
-- Fixing test setup/teardown that has bugs (not assertions)
+Tests define the contract. Implementation satisfies the contract. Never modify the contract to match a faulty implementation.
 
-## Prohibited Modifications
-- NEVER change assertions to make tests pass
-- NEVER delete tests to avoid failures
-- NEVER weaken test conditions (e.g., changing `toBe` to `toContain`)
-- NEVER comment out failing tests
+## Immutable Elements
 
-## If Test Seems Wrong
-Stop and ask the user:
-```
-Test [name] in [file] may have incorrect expectations:
+During implementation (`/implement` command), NEVER modify:
+- Test assertions (`expect()`, `assert()`, etc.)
+- Test descriptions (`it()`, `test()`, `describe()` strings)
+- Expected values in assertions
+- Mock return values that define expected behavior
 
-Current assertion: [assertion]
-Actual behavior: [what code does]
+## Permitted Operations by Stage
 
-Options:
-1. Fix implementation to match test
-2. Confirm test should be modified (requires approval)
+| Stage | Create Tests | Modify Tests | Delete Tests |
+|-------|--------------|--------------|--------------|
+| /test (test-writer) | Yes | N/A (new files) | No |
+| /implement (implementer) | No | No | No |
+| /review (code-reviewer) | No | No | No |
+| Manual (user) | Yes | Yes | Yes |
 
-Which approach?
-```
+## When Tests Seem Wrong
+
+If tests assert incorrect behavior:
+
+1. **Do NOT modify the test**
+2. Report as blocker to orchestrator:
+   ```
+   BLOCKER: Test assertion appears incorrect
+   File: [test file path]
+   Line: [line number]
+   Issue: [description of apparent error]
+   Expected behavior: [what implementation should do]
+   Test expects: [what test asserts]
+   ```
+3. Wait for user resolution
+4. User may manually fix test or confirm test is correct
+
+## Permitted Test Additions
+
+The test-writer subagent MAY:
+- Create new test files
+- Add new test cases to existing files
+- Add helper functions and fixtures
+
+These additions must not modify existing assertions.
 
 ## Rationale
-Modifying tests to pass defeats TDD. Tests encode requirements; changing them changes requirements.
+
+Test immutability ensures:
+- Acceptance criteria remain stable
+- Regressions are caught, not hidden
+- Implementation matches specification
+- Progress is measurable (tests passing)

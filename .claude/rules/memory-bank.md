@@ -2,52 +2,92 @@
 paths:
   - "progress.md"
   - "decisions.md"
+  - "CLAUDE.md"
 ---
 
 # Memory Bank Rules
 
-Memory bank files preserve context across sessions. Maintain their integrity.
+Memory bank files provide persistent context across sessions. They must be maintained carefully to preserve project history.
 
-## progress.md
+## File Purposes
 
-### Structure
+| File | Purpose | Update Frequency |
+|------|---------|------------------|
+| progress.md | Session history, completed work | After each task completion |
+| decisions.md | Architecture and implementation decisions | When significant decisions made |
+| CLAUDE.md | Project context for Claude Code | Rarely, when project structure changes |
+
+## progress.md Rules
+
+**Structure**: Append-only log with newest entries at bottom.
+
+**Entry Format**:
 ```markdown
-# Progress Log
+## [YYYY-MM-DD HH:MM] - Task [ID]: [Title]
 
-## [ISO Date] - Session [N]
-- **Task**: [ID or "Session start"]
-- **Outcome**: [summary]
-- **Files Modified**: [list]
-- **Next Steps**: [recommendation]
+**Status**: [Complete/Partial/Blocked]
+
+**Changes**:
+- [file path]: [what changed]
+
+**Outcome**: [one-sentence summary]
+
+---
 ```
 
-### Rules
-- ALWAYS append new entries; never overwrite
-- Use ISO 8601 dates (YYYY-MM-DD)
-- Keep entries concise (3-5 bullet points)
-- Include file paths for traceability
+**Operations**:
+- APPEND new entries: Yes
+- Modify existing entries: No
+- Delete entries: No
+- Reorder entries: No
 
-## decisions.md
+## decisions.md Rules
 
-### Structure
+**Structure**: Append-only log of architectural decisions.
+
+**Entry Format**:
 ```markdown
-# Decision Log
+## [YYYY-MM-DD] - [Decision Title]
 
-## [ISO Date] - [Decision Title]
-- **Context**: [why decision was needed]
-- **Options Considered**: [alternatives]
-- **Decision**: [what was chosen]
-- **Rationale**: [why]
-- **Implications**: [consequences]
+**Context**: [why decision was needed]
+
+**Decision**: [what was decided]
+
+**Alternatives Considered**:
+- [option]: [why rejected]
+
+**Consequences**: [implications]
+
+---
 ```
 
-### Rules
-- Document decisions that affect architecture or approach
-- Do not document trivial implementation choices
-- Link to relevant files or tasks
-- Append only; preserve history
+**Operations**:
+- APPEND new decisions: Yes
+- Modify existing decisions: No (decisions are historical record)
+- Delete decisions: No
+- Add follow-up notes: Yes (as new entry referencing original)
 
-## General Rules
-- Never delete historical entries
-- Correct errors by appending corrections, not editing
-- Keep language factual and neutral
+## CLAUDE.md Rules
+
+**Structure**: Project configuration and context for Claude Code.
+
+**Sections**:
+- Project overview
+- Commands (build, test, run)
+- Architecture summary
+- Critical constraints
+
+**Operations**:
+- Update commands when they change: Yes
+- Update architecture summary after major changes: Yes
+- Add new constraints: Yes
+- Remove constraints: Only with user approval
+- Keep under 60 lines: Yes (per best practices)
+
+## General Principles
+
+1. **Append, don't overwrite**: History is valuable
+2. **Timestamps matter**: Always include date/time
+3. **Reference tasks**: Link entries to task IDs
+4. **Be concise**: Memory files load into context
+5. **File paths**: Include for traceability

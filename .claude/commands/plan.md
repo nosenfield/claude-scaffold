@@ -1,43 +1,67 @@
 # Plan Task Implementation
 
-Plan implementation for the current task.
+Generate an implementation plan for the current in-progress task.
+
+## Prerequisites
+
+A task must be in-progress. If not, run `/next` first.
 
 ## Steps
 
-1. Identify current task:
-   - Read `/_docs/task-list.json`
-   - Find task with status `"in-progress"`
-   - If none, instruct user to run `/next` first
+1. **Identify Current Task**
+   Read `/_docs/task-list.json`.
+   Find the task with `status: "in-progress"`.
+   If none found, stop and instruct user to run `/next`.
 
-2. Gather context for planning:
-   - Task definition and acceptance criteria
-   - Relevant sections from `/_docs/architecture.md`
-   - Related code patterns from existing codebase
-
-3. Spawn `task-planner` subagent:
-   - Provide task definition
-   - Provide architecture context
-   - Request implementation plan
-
-4. Review returned plan:
-   - Verify steps are concrete and actionable
-   - Verify affected files are identified
-   - Verify test scenarios cover acceptance criteria
-
-5. Present plan for approval:
+2. **Prepare Handoff Payload**
+   Extract from the task:
    ```
-   ## Implementation Plan for [Task ID]
+   taskId: [task.id]
+   taskTitle: [task.title]
+   taskDescription: [task.description]
+   acceptanceCriteria: [task.acceptanceCriteria]
+   ```
+
+3. **Spawn task-planner Subagent**
+   Invoke the `task-planner` agent with the payload.
    
-   [Plan content from subagent]
+   The subagent will:
+   - Read architecture and best practices
+   - Explore the codebase
+   - Return a structured implementation plan
+
+4. **Receive and Validate Plan**
+   Confirm the plan includes:
+   - Affected files list
+   - Implementation steps
+   - Test scenarios
+   - Risk assessment
+
+5. **Present Plan for Approval**
+   Display the complete implementation plan.
    
+   ```
+   ## Implementation Plan Ready
+
+   [Display full plan from subagent]
+
    ---
-   Approve this plan? (yes/no/revise)
+   
+   **Approve this plan?**
+   - Reply "approve" to proceed to test writing
+   - Reply with feedback to request plan changes
    ```
 
-6. On approval:
-   - Store plan in working memory
-   - Recommend: "Run `/test` to write tests for this plan."
+6. **Store Plan**
+   On approval, retain the implementation plan for subsequent stages.
+   
+   Recommend next action:
+   ```
+   Plan approved. Run `/test` to write tests.
+   ```
 
-7. On revision request:
-   - Gather feedback
-   - Re-run planning with additional constraints
+## State Management
+
+Store in session context:
+- `currentTask`: Full task object
+- `implementationPlan`: Approved plan from subagent

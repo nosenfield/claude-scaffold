@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "project": "[PROJECT_NAME]",
+    "createdAt": "[ISO_TIMESTAMP]",
+    "description": "Deferred non-blocking issues from code reviews"
+  },
+  "items": [],
+  "_schema": {
+    "item": {
+      "id": "string - Unique identifier (BACKLOG-NNN format)",
+      "sourceTask": "string - Task ID that generated this item",
+      "category": "string - One of: security, performance, maintainability, convention",
+      "description": "string - Issue description",
+      "file": "string - File path where issue exists",
+      "line": "number - Line number in file",
+      "effort": "string - One of: low, medium, high",
+      "createdAt": "string - ISO timestamp when deferred",
+      "resolvedAt": "string|null - ISO timestamp when resolved",
+      "resolvedBy": "string|null - Task ID or 'manual' that resolved this"
+    }
+  }
+}

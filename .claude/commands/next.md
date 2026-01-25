@@ -1,38 +1,54 @@
 # Select Next Task
 
-Select and display the next task to implement.
+Identify and display the highest-priority unblocked task.
 
 ## Steps
 
-1. Read `/_docs/task-list.json`
+1. **Load Task List**
+   Read `/_docs/task-list.json`.
 
-2. Filter tasks:
-   - Status is `"pending"` or `"in-progress"`
-   - No unmet dependencies (all `blockedBy` tasks are `"complete"`)
+2. **Filter Candidates**
+   Select tasks where:
+   - `status` is "pending"
+   - `blockedBy` array is empty OR all blocking tasks have `status: "complete"`
 
-3. Sort by priority:
-   - Primary: `priority` field (ascending, 1 is highest)
-   - Secondary: `id` field (ascending)
+3. **Sort by Priority**
+   Order candidates by `priority` field (lower number = higher priority).
 
-4. Select first available task
+4. **Select Task**
+   Choose the first task after sorting.
 
-5. Display task details:
-   - **Task ID**: [id]
-   - **Priority**: [priority]
-   - **Category**: [category]
-   - **Description**: [description]
-   - **Acceptance Criteria**: [steps]
-   - **Dependencies**: [blockedBy]
+5. **Display Task Details**
+   Present the selected task:
 
-6. Update task status to `"in-progress"` in task-list.json
-
-7. Recommend next action:
    ```
-   Run `/plan` to create implementation plan for this task.
+   ## Next Task
+
+   **ID**: [taskId]
+   **Title**: [title]
+   **Priority**: [priority]
+
+   ### Description
+   [description]
+
+   ### Acceptance Criteria
+   - [criterion 1]
+   - [criterion 2]
+   - [criterion 3]
+
+   ### Dependencies
+   [blockedBy list or "None"]
    ```
 
-## If No Tasks Available
+6. **Update Task Status**
+   In `/_docs/task-list.json`, set the selected task's status to "in-progress".
 
-Report completion status:
-- All tasks complete: "Project complete. All tasks finished."
-- Blocked tasks exist: "Remaining tasks are blocked. Review dependencies."
+7. **Recommend Next Action**
+   ```
+   Ready to plan implementation. Run `/plan` to continue.
+   ```
+
+## Edge Cases
+
+- **No pending tasks**: Report "All tasks complete" and summarize completion status.
+- **All pending tasks blocked**: List blocked tasks and their blockers.

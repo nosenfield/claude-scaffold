@@ -9,41 +9,109 @@ model: sonnet
 
 Update persistent documentation to reflect completed work.
 
-## Input Context
-- Completed task information
-- Implementation decisions made
-- Any deviations from original plan
+## Input Payload
 
-## Files to Update
+The orchestrator provides:
+- **taskId**: Task identifier
+- **taskTitle**: Task name
+- **status**: Completion status ("complete" or "partial")
+- **commitSha**: Git commit hash
+- **filesModified**: List of files changed with descriptions
+- **decisions**: List of implementation decisions, each containing:
+  - decision: What was decided
+  - rationale: Why this choice was made
+- **notes**: Any additional context from implementation
 
-### progress.md
-Append session entry with:
-- Timestamp
-- Task ID and summary
-- Files modified
-- Key outcomes
+Access via the prompt context. Do not assume information not provided.
 
-### decisions.md
-Document significant decisions with:
-- Decision context
-- Options considered
-- Rationale for choice
-- Implications
+## Memory Bank Files
 
-### task-list.json
-Update completed task:
-- Set `status` to `"complete"`
-- Set `completedAt` to current ISO timestamp
-- Do NOT modify any other fields
+| File | Purpose | Update Pattern |
+|------|---------|----------------|
+| progress.md | Session history and completed work | Append new entry |
+| decisions.md | Significant implementation decisions | Append if decisions were made |
+| /_docs/task-list.json | Task completion status | Update status field only |
 
-## Rules
-- Append to progress.md; do not overwrite existing entries
-- Only modify status fields in task-list.json
-- Keep entries concise and factual
-- Include file paths for reference
-- Use ISO 8601 format for timestamps
+## Process
+
+1. Read current progress.md
+2. Append new progress entry with:
+   - Timestamp
+   - Task ID and summary
+   - Files modified
+   - Key outcomes
+3. If significant decisions were made:
+   - Read current decisions.md
+   - Append decision record
+4. Update task-list.json:
+   - Set task status to "complete"
+   - Set completedAt timestamp
+   - Do NOT modify any other fields
+
+## Progress Entry Format
+
+```markdown
+## [YYYY-MM-DD HH:MM] - Task [ID]: [Title]
+
+**Status**: Complete
+
+**Changes**:
+- [file path]: [what changed]
+- [file path]: [what changed]
+
+**Outcome**: [one-sentence summary]
+
+---
+```
+
+## Decision Entry Format
+
+```markdown
+## [YYYY-MM-DD] - [Decision Title]
+
+**Context**: [why decision was needed]
+
+**Decision**: [what was decided]
+
+**Alternatives Considered**:
+- [option]: [why rejected]
+
+**Consequences**: [implications of this decision]
+
+---
+```
+
+## Task Status Update
+
+Only modify these fields in task-list.json:
+```json
+{
+  "status": "complete",
+  "completedAt": "[ISO timestamp]"
+}
+```
 
 ## Output Format
 
-- **Files Updated**: [list of modified files]
-- **Summary**: [what was recorded]
+```
+## Memory Bank Updated
+
+### Files Modified
+
+- progress.md: Added entry for task [ID]
+- decisions.md: [Added N entries / No updates needed]
+- /_docs/task-list.json: Marked task [ID] complete
+
+### Summary
+
+[One sentence describing what was recorded]
+```
+
+## Rules
+
+- APPEND to progress.md; never overwrite existing entries
+- APPEND to decisions.md; never overwrite existing entries
+- In task-list.json, ONLY modify status and completedAt fields
+- Never modify task descriptions, priorities, or acceptance criteria
+- Keep entries concise and factual
+- Include file paths for traceability

@@ -1,61 +1,103 @@
-# Commit Changes
+# Commit Task
 
-Commit completed work and update memory bank.
+Commit completed work and update the memory bank.
 
 ## Prerequisites
+
+- Implementation must be complete
 - Code review must be approved
+- All tests must be passing
+
+If review isn't approved, run `/review` first.
 
 ## Steps
 
-1. Verify clean state:
-   ```bash
-   npm run test
-   npm run lint
-   npm run typecheck
-   ```
-   - All must pass before committing
+1. **Verify Prerequisites**
+   Confirm:
+   - Tests pass: `npm run test`
+   - Lint passes: `npm run lint`
+   - Types check: `npm run typecheck`
+   
+   If any fail, stop and report the issue.
 
-2. Stage changes:
+2. **Stage Changes**
    ```bash
    git add -A
+   git status
    ```
+   Review staged files match expected `filesModified`.
 
-3. Generate commit message:
-   - Format: `feat(scope): description`
-   - Include task ID in body
-   - Reference affected areas
-
-   Example:
-   ```
-   feat(auth): implement user login flow
+3. **Generate Commit Message**
+   Format: `<type>(<scope>): <description> (<taskId>)`
    
-   Task: TASK-001
+   Derive from task:
+   - type: feat, fix, refactor, docs, test (based on task category)
+   - scope: primary module affected
+   - description: task title (lowercase, imperative)
+   - taskId: task identifier
    
-   - Add login form component
-   - Implement authentication service
-   - Add session management
-   ```
+   Example: `feat(auth): implement login endpoint (TASK-001)`
 
-4. Execute commit:
+4. **Execute Commit**
    ```bash
-   git commit -m "[message]"
+   git commit -m "[generated message]"
+   ```
+   Capture the commit SHA.
+
+5. **Prepare Memory Update Payload**
+   ```
+   taskId: [currentTask.id]
+   taskTitle: [currentTask.title]
+   status: "complete"
+   commitSha: [captured SHA]
+   filesModified: [list with descriptions]
+   decisions: [accumulated decisions from implementation]
+   notes: [any additional context]
    ```
 
-5. Spawn `memory-updater` subagent:
-   - Provide task completion details
-   - Provide implementation decisions
-   - Update progress.md and decisions.md
+6. **Spawn memory-updater Subagent**
+   Invoke the `memory-updater` agent with the payload.
+   
+   The subagent will:
+   - Append entry to progress.md
+   - Append decisions to decisions.md
+   - Update task status in task-list.json
 
-6. Mark task complete:
-   - Update `/_docs/task-list.json`
-   - Set status to `"complete"`
-   - Set completedAt to current timestamp
+7. **Receive Update Confirmation**
+   Confirm memory bank files were updated.
 
-7. Report completion:
-   - **Commit**: [hash]
-   - **Task**: [id] marked complete
-   - **Memory Bank**: updated
+8. **Clear Session Context**
+   Remove task-specific state:
+   - `currentTask`
+   - `implementationPlan`
+   - `testFiles`
+   - `filesModified`
+   - `decisions`
+   - `reviewFeedback`
+   - `previousReviewIssues`
 
-8. Recommend next action:
-   - "Run `/next` to select next task."
-   - Or if session ending: "Run `/dev` to resume later."
+9. **Report Completion**
+   ```
+   ## Task Complete
+
+   **Task**: [taskId] - [taskTitle]
+   **Commit**: [SHA]
+   **Status**: Complete
+
+   ### Memory Bank Updated
+   - progress.md: Entry added
+   - decisions.md: [N] decisions recorded
+   - task-list.json: Task marked complete
+
+   ---
+
+   Run `/next` to select the next task, or `/dev` to see project status.
+   ```
+
+## Post-Commit Verification
+
+Optionally verify clean state:
+```bash
+git status
+npm run test
+```

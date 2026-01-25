@@ -1,42 +1,88 @@
 # Write Tests
 
-Write tests for the planned task before implementation.
+Generate tests for the current task before implementation.
 
 ## Prerequisites
-- Implementation plan must be approved (run `/plan` first)
+
+- A task must be in-progress
+- An implementation plan must be approved
+
+If no plan exists, run `/plan` first.
 
 ## Steps
 
-1. Verify plan exists:
-   - If no approved plan in context, instruct user to run `/plan`
+1. **Verify Prerequisites**
+   Confirm session context contains:
+   - `currentTask`: The in-progress task
+   - `implementationPlan`: The approved plan
+   
+   If missing, instruct user to run `/plan` first.
 
-2. Load test context:
-   - Implementation plan with test scenarios
-   - Existing test patterns from codebase
-   - Test conventions from `/_docs/best-practices.md`
-
-3. Spawn `test-writer` subagent:
-   - Provide implementation plan
-   - Provide test scenarios
-   - Provide existing test patterns
-
-4. Verify test creation:
+2. **Enable Test-Writing Mode**
+   Create marker file to allow test file modifications:
    ```bash
-   npm run test -- --testPathPattern="[new test files]"
+   touch .claude/.test-writing-mode
+   ```
+   This signals to the test-file-guard hook that test writes are permitted.
+
+3. **Prepare Handoff Payload**
+   ```
+   taskId: [currentTask.id]
+   taskTitle: [currentTask.title]
+   implementationPlan: [full plan including affected files and test scenarios]
+   acceptanceCriteria: [currentTask.acceptanceCriteria]
    ```
 
-5. Confirm tests fail appropriately:
-   - Tests should fail because implementation doesn't exist
-   - Tests should NOT fail due to syntax errors or missing imports
+4. **Spawn test-writer Subagent**
+   Invoke the `test-writer` agent with the payload.
+   
+   The subagent will:
+   - Explore existing test patterns
+   - Create test files with failing tests
+   - Verify tests fail for expected reasons
 
-6. Report test status:
-   - **Tests Created**: [list of files]
-   - **Test Count**: [number]
-   - **Status**: [failing as expected / errors found]
+5. **Receive Test Results**
+   Confirm the response includes:
+   - List of created test files
+   - Test count
+   - Coverage summary
+   - Verification that tests fail (no implementation yet)
 
-7. On success:
-   - Recommend: "Run `/implement` to write code that passes these tests."
+6. **Disable Test-Writing Mode**
+   Remove marker file to re-enable test protection:
+   ```bash
+   rm -f .claude/.test-writing-mode
+   ```
+   This ensures tests cannot be modified during implementation.
 
-8. On errors:
-   - Display error details
-   - Fix test setup issues before proceeding
+7. **Validate Test Creation**
+   Run the test suite to confirm tests exist and fail:
+   ```bash
+   npm run test
+   ```
+   
+   Expected: Tests fail because implementation doesn't exist.
+
+8. **Present Test Summary**
+   ```
+   ## Tests Created
+
+   [Display test summary from subagent]
+
+   **Test Execution**: [X] failing (expected - no implementation yet)
+
+   ---
+
+   Tests define the acceptance criteria. Run `/implement` to make them pass.
+   ```
+
+9. **Store Test Information**
+   Add to session context:
+   - `testFiles`: List of created test file paths
+
+## State Management
+
+Session context after this stage:
+- `currentTask`: Full task object
+- `implementationPlan`: Approved plan
+- `testFiles`: List of test file paths
