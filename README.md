@@ -70,31 +70,30 @@ Decisions made during scaffold development are recorded below.
 
 ---
 
-#### 2025-01-25: Two-Phase Pre-Commit Quality Gates
+#### 2025-01-25: Two-Layer Quality Gate System
 
-**Context**: The scaffold has `.claude/hooks/pre-commit-check.sh` running on Claude's Stop event, but no git-level pre-commit hook. This leaves a gap if commits bypass the Claude workflow.
+**Context**: Need quality enforcement during development and at commit time without redundant or overly-broad hook triggers.
 
-**Decision**: Implement belt-and-suspenders quality gates at both layers.
+**Decision**: Implement a two-layer system: advisory feedback during edits, blocking enforcement at git commit.
 
 **Implementation**:
-| Phase | Hook | Trigger | Purpose |
-|-------|------|---------|---------|
-| Phase 1 | `.claude/hooks/pre-commit-check.sh` | Claude Stop event | Early feedback during Claude workflow |
-| Phase 2 | `_scripts/pre-commit` | `git commit` | Final enforcement regardless of commit source |
+| Layer | Hook | Trigger | Mode | Checks |
+|-------|------|---------|------|--------|
+| Advisory | `.claude/hooks/quality-gate.sh` | PostToolUse (Write/Edit) | Warning | lint, typecheck |
+| Blocking | `_scripts/pre-commit` | `git commit` | Blocking | tests, lint, typecheck |
 
-**Installation** (required for Phase 2):
+**Installation** (required):
 ```bash
 cp _scripts/pre-commit .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 ```
 
 **Rationale**:
-- Claude's Stop hook provides early feedback during the `/implement` → `/review` → `/commit` cycle
-- Git's pre-commit hook ensures quality gates run even for manual commits
-- Same checks (test, lint, typecheck) run at both layers for consistency
-- Defense-in-depth: if one layer is bypassed, the other catches issues
+- Advisory layer gives fast feedback during iteration (no slow test runs)
+- Git hook enforces full validation at the actual commit boundary
+- Avoids redundant checks that would run on every Claude Stop event
 
-**Trade-off**: Checks may run twice during `/commit` (once at Stop, once at git commit). Accepted as minor overhead for increased reliability.
+**Supersedes**: Removed `pre-commit-check.sh` (Stop hook) which ran full checks too broadly on every session end rather than at workflow boundaries.
 
 ---
 
@@ -109,13 +108,13 @@ This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Ke
 | Structured subagent output | All agents define exact output format |
 | Test immutability | Triple enforcement: rule + hook + agent instruction |
 | Append-only memory | progress.md and decisions.md |
-| Hook-based quality gates | Advisory (PostToolUse) + Strict (Stop) |
+| Hook-based quality gates | Advisory (PostToolUse) + Git pre-commit |
 
 ## Known Gaps and Future Improvements
 
 Items identified for potential enhancement:
 
-- [ ] Scope pre-commit-check.sh to workflow boundaries only
+- [x] ~~Scope pre-commit-check.sh to workflow boundaries only~~ Resolved: removed in favor of git pre-commit hook
 - [ ] Extract initializer subagent from /init command
 - [ ] Add CLAUDE.local.md template for personal overrides
 - [ ] Document context clearing strategy for long sessions

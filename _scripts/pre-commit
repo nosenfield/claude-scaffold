@@ -1,0 +1,71 @@
+#!/bin/bash
+# Git Pre-Commit Hook
+# Mirrors the quality checks from .claude/hooks/pre-commit-check.sh
+# Ensures quality gates run regardless of commit source (Claude or human)
+#
+# Installation:
+#   cp _scripts/pre-commit .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+#
+# Or configure git to use _scripts as hooks directory:
+#   git config core.hooksPath _scripts
+
+set -o pipefail
+
+echo "=== Git Pre-Commit Quality Check ==="
+echo ""
+
+# Track failures
+FAILED=0
+
+# Run test suite
+if [ -f "package.json" ] && grep -q '"test"' package.json 2>/dev/null; then
+    echo "Running tests..."
+    if ! npm run test --silent 2>&1; then
+        echo "ERROR: Tests failed" >&2
+        FAILED=1
+    else
+        echo "Tests passed"
+    fi
+fi
+
+# Run linter
+if [ -f "package.json" ] && grep -q '"lint"' package.json 2>/dev/null; then
+    echo "Running lint..."
+    if ! npm run lint --silent 2>&1; then
+        echo "ERROR: Lint failed" >&2
+        FAILED=1
+    else
+        echo "Lint passed"
+    fi
+fi
+
+# Run type check
+if [ -f "package.json" ] && grep -q '"typecheck"' package.json 2>/dev/null; then
+    echo "Running typecheck..."
+    if ! npm run typecheck --silent 2>&1; then
+        echo "ERROR: Type check failed" >&2
+        FAILED=1
+    else
+        echo "Type check passed"
+    fi
+elif [ -f "tsconfig.json" ]; then
+    echo "Running tsc..."
+    if ! npx tsc --noEmit 2>&1; then
+        echo "ERROR: Type check failed" >&2
+        FAILED=1
+    else
+        echo "Type check passed"
+    fi
+fi
+
+# Exit with failure if any check failed
+if [ $FAILED -ne 0 ]; then
+    echo ""
+    echo "Pre-commit checks failed. Fix issues before committing." >&2
+    exit 1
+fi
+
+echo ""
+echo "All pre-commit checks passed"
+exit 0
