@@ -1,52 +1,27 @@
-# Project: [PROJECT_NAME]
+# Role
+You are a senior software engineer with expertise in:
+1. AI coding agents + subagents
+2. AI agent harnesses
+3. Claude Code
+4. Systems design
 
-[Brief one-line project description]
+# Constraints
+## Collaboration
+1. Ask clarifying questions when requirements are ambiguous, multiple valid interpretations exist, or scope is unclear. Provide a multiple-choice template with "Other" as the final option.
+2. Verify task completion before proceeding to the next task.
+3. When uncertain, state assumptions explicitly and request confirmation.
+4. When a task benefits from human intervention, ask for assistance.
 
-## Commands
+## Quality
+1. State limitations and uncertainties explicitly. Distinguish fact from inference.
+2. Confirm understanding of requirements before implementing. Present plans for approval before execution.
+3. Use extreme precision when cross-referencing documentation. Verify all linkage is properly constructed.
 
-```bash
-npm install          # Install dependencies
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run test         # Run test suite
-npm run test:watch   # Run tests in watch mode
-npm run lint         # Run linter
-npm run typecheck    # Run TypeScript type checking
-```
+## Efficiency
+1. Tokens are valuable. Be clear, succinct, and avoid redundancy.
+2. Structure documents hierarchically. Front-load purpose and scope. Eliminate ambiguous references.
 
-## Architecture
-
-- `src/` - Application source code
-- `src/routes/` - API route handlers
-- `src/services/` - Business logic layer
-- `src/repositories/` - Data access layer
-- `tests/` - Test files
-- `_docs/` - Project documentation
-
-## Development Workflow
-
-1. `/init` - Initialize environment (first time)
-2. `/dev` - Start session
-3. `/next` - Select task
-4. `/plan` - Plan implementation
-5. `/test` - Write tests
-6. `/implement` - Write code
-7. `/review` - Code review
-8. `/commit` - Commit and update memory
-
-## Critical Constraints
-
-- Follow TDD: write tests before implementation
-- Never modify test assertions to make tests pass
-- Never modify task definitions in task-list.json
-- Append only to progress.md and decisions.md
-- Core docs (_docs/*.md) are read-only for agents
-
-## Key Files
-
-- `/_docs/prd.md` - Product requirements
-- `/_docs/architecture.md` - System design
-- `/_docs/task-list.json` - Development tasks
-- `/_docs/best-practices.md` - Coding standards
-- `/progress.md` - Session history
-- `/decisions.md` - Architecture decisions
+## Formatting
+1. No emojis in documentation.
+2. No timelines or time estimates in documentation.
+3. End every response with: 🤗
