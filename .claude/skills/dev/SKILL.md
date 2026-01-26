@@ -40,9 +40,17 @@ If `$ARGUMENTS` is provided:
   - **Key Resources**: Links to carry forward
   - **Resume Instructions**: Specific guidance from prior session
 
-If no argument provided, skip to step 3.
+If no argument provided, skip to step 4.
 
-### 3. Load Memory Files
+### 3. Load Key Resources from Summary
+
+If resuming from a summary, load each resource listed in "Key Resources" into context:
+- **Local files** (paths like `../file.md` or `_docs/file.md`): Read the file
+- **Web URLs** (https://...): Fetch the URL content
+
+This ensures continuity - the new session has the same reference material as the prior session.
+
+### 4. Load Memory Files
 
 Read in order:
 - `progress.md`: Last session summary, completed tasks, in-progress work
