@@ -40,7 +40,7 @@ scaffold/
 ## Development Workflow
 
 1. `/init` - Initialize environment (first time)
-2. `/dev` - Start development session (load context)
+2. `/dev` - Start development session (loads progress.md, decisions.md, task-list.json)
 3. `/next` - Select next task
 4. `/plan` - Plan implementation
 5. `/test` - Write failing tests
@@ -110,13 +110,34 @@ This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Ke
 | Append-only memory | progress.md and decisions.md |
 | Hook-based quality gates | Advisory (PostToolUse) + Git pre-commit |
 
+## Personal Overrides (CLAUDE.local.md)
+
+Create a `CLAUDE.local.md` file in the project root for personal project-specific preferences. Claude Code automatically adds this file to .gitignore.
+
+**Appropriate content:**
+- Sandbox URLs and local environment endpoints
+- Preferred test data and fixtures
+- Personal workflow preferences
+- Local tool paths or configurations
+
+**Alternative for git worktrees:** Import from home directory instead, which works better across multiple worktrees:
+```markdown
+# In CLAUDE.md
+@~/.claude/my-project-preferences.md
+```
+
+**Inappropriate content:**
+- Project architecture decisions (use CLAUDE.md)
+- Code style rules (use linters and hooks)
+- Task-specific instructions (use path-scoped rules)
+
 ## Known Gaps and Future Improvements
 
 Items identified for potential enhancement:
 
 - [ ] Extract initializer subagent from /init command
-- [ ] Add CLAUDE.local.md template for personal overrides
-- [ ] Document context clearing strategy for long sessions
+- [x] ~~Add CLAUDE.local.md template for personal overrides~~ (documented above)
+- [x] ~~Document context clearing strategy~~ (consolidated into /dev; removed /catchup)
 - [ ] Integrate Explore subagent for read-only context gathering
 - [ ] Add end-to-end testing guidance with puppeteer MCP
 
