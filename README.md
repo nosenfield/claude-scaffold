@@ -18,7 +18,7 @@ This scaffold provides a structured workflow for greenfield project development 
 scaffold/
 ├── .claude/
 │   ├── agents/          # Specialized subagents
-│   ├── commands/        # Workflow commands (/init, /next, /plan, etc.)
+│   ├── commands/        # Workflow commands (/next, /plan, etc.)
 │   ├── hooks/           # Quality gate scripts
 │   ├── rules/           # File protection policies
 │   ├── skills/          # Extended capabilities
@@ -42,14 +42,15 @@ scaffold/
 
 ## Development Workflow
 
-1. `/init` - Initialize environment (first time)
-2. `/dev [summary]` - Start development session (optionally resume from summary)
-3. `/next` - Select next task
-4. `/plan` - Plan implementation
-5. `/test` - Write failing tests
-6. `/implement` - Make tests pass
-7. `/review` - Code review
-8. `/commit` - Commit and update memory
+1. `/dev [summary]` - Start development session (optionally resume from summary)
+2. `/next` - Select next task
+3. `/plan` - Plan implementation
+4. `/test` - Write failing tests
+5. `/implement` - Make tests pass
+6. `/review` - Code review
+7. `/commit` - Commit and update memory
+
+**Note**: Environment setup (documentation validation, dependency installation, memory bank initialization) is handled through the first tasks in `task-list.json`, not a separate initialization command.
 
 ## Context Management
 
@@ -132,6 +133,27 @@ chmod +x .git/hooks/pre-commit
 
 ---
 
+#### 2026-01-26: Environment Setup via Task List
+
+**Context**: Evaluated whether to extract `/init` into a dedicated initializer subagent (R5 from scaffold evaluation).
+
+**Decision**: Remove `/init` command; handle environment setup through standard task list.
+
+**Implementation**:
+- `/dev` skill now handles fresh project state gracefully
+- `task-list.json` template includes setup tasks (TASK-001 through TASK-003)
+- Setup flows through standard development loop: /next → /plan → /implement → /review
+
+**Rationale**:
+- Anthropic's "initializer agent" pattern (from long-running agents article) was designed for autonomous spec-to-feature decomposition
+- Our workflow has human-provided documentation; setup is validation, not generation
+- Single workflow for all tasks is simpler than special-casing initialization
+- Setup tasks get same tracking and review as feature tasks
+
+**Alternative Rejected**: Extracting initializer to subagent. This would add complexity without capability gain since our setup is validation-based, not generative.
+
+---
+
 ## Best Practices Alignment
 
 This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Key alignments:
@@ -170,7 +192,7 @@ Create a `CLAUDE.local.md` file in the project root for personal project-specifi
 
 Items identified for potential enhancement:
 
-- [ ] Extract initializer subagent from /init command
+- [x] ~~Extract initializer subagent from /init command~~ (resolved: setup tasks in task-list.json)
 - [x] ~~Add CLAUDE.local.md template for personal overrides~~ (documented above)
 - [x] ~~Document context clearing strategy~~ (consolidated into /dev; removed /catchup)
 - [ ] Integrate Explore subagent for read-only context gathering

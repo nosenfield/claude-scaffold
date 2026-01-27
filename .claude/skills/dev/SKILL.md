@@ -52,12 +52,14 @@ This ensures continuity - the new session has the same reference material as the
 
 ### 4. Load Memory Files
 
-Read in order:
+Read in order (handle missing files gracefully):
 - `progress.md`: Last session summary, completed tasks, in-progress work
 - `decisions.md`: Architectural decisions, rejected approaches
 - `_docs/task-list.json`: Task statuses, current task
 
-### 4. Check Repository State
+**Fresh project detection**: If `progress.md` or `decisions.md` don't exist, this is a fresh project. Note this for the status report.
+
+### 5. Check Repository State
 
 ```bash
 git status
@@ -65,15 +67,6 @@ git log --oneline -5
 ```
 
 Note uncommitted changes. Git log is verification only; trust memory files as authoritative.
-
-### 5. Verify Environment
-
-```bash
-npm run build --silent
-npm run test --silent
-```
-
-If either fails, report the issue before proceeding.
 
 ### 6. Report Session Status
 
@@ -104,7 +97,23 @@ If either fails, report the issue before proceeding.
 [Based on in-progress work from summary]
 ```
 
-**If normal session start**, report:
+**If fresh project** (memory files don't exist), report:
+
+```
+## Fresh Project Detected
+
+**Task List**: [N] tasks found in _docs/task-list.json
+**First Task**: [TASK-001 title]
+
+### Repository State
+- [clean/dirty]
+- [uncommitted changes if any]
+
+### Recommended Action
+Run `/next` to begin with the first task (typically environment setup).
+```
+
+**If normal session start** (existing project), report:
 
 ```
 ## Session Status
@@ -127,3 +136,4 @@ If either fails, report the issue before proceeding.
 - When resuming, the summary supplements (not replaces) memory files
 - Key resources from prior sessions should be noted for continuity
 - If summary file doesn't exist, warn and proceed with normal session start
+- Fresh projects (no memory files) are handled gracefully; setup tasks in task-list.json will create them
