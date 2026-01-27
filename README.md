@@ -23,6 +23,7 @@ scaffold/
 │   ├── rules/           # File protection policies
 │   ├── skills/          # Extended capabilities
 │   │   ├── dev/         # Session start (with resume support)
+│   │   ├── init-repo/   # One-time scaffold initialization
 │   │   └── summarize/   # Context handoff
 │   └── settings.json    # Hook configuration
 ├── _docs/               # Core documentation (read-only for agents)
@@ -50,7 +51,7 @@ scaffold/
 6. `/review` - Code review
 7. `/commit` - Commit and update memory
 
-**Note**: Environment setup (documentation validation, dependency installation, memory bank initialization) is handled through the first tasks in `task-list.json`, not a separate initialization command.
+**Note**: Run `/init-repo` once after placing project documentation to initialize memory files (`progress.md`, `decisions.md`) and validate core docs. Environment setup (dependency installation, dev server configuration) is handled through the first tasks in `task-list.json`.
 
 ## Context Management
 
@@ -133,24 +134,45 @@ chmod +x .git/hooks/pre-commit
 
 ---
 
-#### 2026-01-26: Environment Setup via Task List
+#### 2026-01-26: /init-repo Skill for Scaffold Initialization
 
-**Context**: Evaluated whether to extract `/init` into a dedicated initializer subagent (R5 from scaffold evaluation).
+**Context**: Setup responsibilities (doc validation, memory file creation, backlog.json) were initially placed in `task-list.json` as TASK-001 through TASK-003. However, these are scaffold infrastructure tasks, not project features -- they don't belong in the user's task list.
 
-**Decision**: Remove `/init` command; handle environment setup through standard task list.
+**Decision**: Create `/init-repo` skill for one-time scaffold initialization. Remove setup tasks from `task-list.json`.
 
 **Implementation**:
-- `/dev` skill now handles fresh project state gracefully
-- `task-list.json` template includes setup tasks (TASK-001 through TASK-003)
-- Setup flows through standard development loop: /next → /plan → /implement → /review
+- `/init-repo` skill validates core docs, creates `progress.md`, `decisions.md`, `backlog.json`
+- `/dev` requires initialization (reports and stops if memory files missing)
+- `task-list.json` template contains only placeholder project tasks
+- Environment setup (dependencies, dev server) remains as first user task in task list
 
 **Rationale**:
-- Anthropic's "initializer agent" pattern (from long-running agents article) was designed for autonomous spec-to-feature decomposition
-- Our workflow has human-provided documentation; setup is validation, not generation
-- Single workflow for all tasks is simpler than special-casing initialization
-- Setup tasks get same tracking and review as feature tasks
+- Scaffold infrastructure tasks should not modify the user's task list
+- One-time setup is invoked explicitly, not discovered through `/next`
+- User controls when initialization runs
+- Clean separation: /init-repo = scaffold setup, task-list.json = project work
 
-**Alternative Rejected**: Extracting initializer to subagent. This would add complexity without capability gain since our setup is validation-based, not generative.
+**Alternative Rejected**: Keeping setup tasks in task-list.json. This modifies the user's file with scaffold concerns and conflates infrastructure with project work.
+
+---
+
+#### 2026-01-26: Task-Selector Subagent for Context Isolation
+
+**Context**: The `/next` command previously read `task-list.json` directly, pulling the full task list into the orchestrator's context window.
+
+**Decision**: Create `task-selector` subagent to isolate task-list.json reads from the orchestrator.
+
+**Implementation**:
+- `.claude/agents/task-selector.md` reads task-list.json and returns only the selected task
+- `/next` spawns task-selector instead of reading the file directly
+- `/dev` verifies task-list.json exists but does not read contents
+
+**Rationale**:
+- Task list can be large; loading it pollutes the orchestrator's context
+- Subagent explores extensively but returns only a condensed selection
+- Aligns with context isolation principle from best practices manual
+
+**Alternative Rejected**: Continue reading task-list.json directly in /next. This pulls unnecessary content into the orchestrator's limited context window.
 
 ---
 
@@ -192,11 +214,13 @@ Create a `CLAUDE.local.md` file in the project root for personal project-specifi
 
 Items identified for potential enhancement:
 
-- [x] ~~Extract initializer subagent from /init command~~ (resolved: setup tasks in task-list.json)
+- [x] ~~Extract initializer subagent from /init command~~ (resolved: /init-repo skill for scaffold setup; task-selector subagent for context isolation)
 - [x] ~~Add CLAUDE.local.md template for personal overrides~~ (documented above)
 - [x] ~~Document context clearing strategy~~ (consolidated into /dev; removed /catchup)
-- [ ] Integrate Explore subagent for read-only context gathering
-- [ ] Add end-to-end testing guidance with puppeteer MCP
+- [ ] Integrate Explore subagent for read-only context gathering (R6)
+- [ ] Strengthen agent descriptions with when-to-use framing (R7)
+- [ ] Add SubagentStop hook for progress tracking (R8)
+- [ ] Add end-to-end testing guidance with puppeteer MCP (R9)
 
 ## References
 

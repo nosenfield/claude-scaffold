@@ -157,14 +157,6 @@ Create `_context-summaries/[timestamp].md`:
 
 *[Include rows for all sessions in chain, newest first]*
 
----
-
-## Resume Instructions
-
-1. Spawn new agent
-2. Run `/dev`
-3. Resume: `resume session based on _context-summaries/[timestamp].md`
-4. [Specific next action based on in-progress work]
 ```
 
 ### 8. Update progress.md
@@ -192,8 +184,7 @@ Append session entry:
 ### Handoff Instructions
 
 1. Spawn new Claude Code agent
-2. Run `/dev` to initialize
-3. Resume: "resume session based on _context-summaries/[timestamp].md"
+2. Run `/dev _context-summaries/[timestamp].md`
 
 ### Quick Context for New Agent
 

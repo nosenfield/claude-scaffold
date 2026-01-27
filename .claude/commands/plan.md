@@ -9,9 +9,8 @@ A task must be in-progress. If not, run `/next` first.
 ## Steps
 
 1. **Identify Current Task**
-   Read `/_docs/task-list.json`.
-   Find the task with `status: "in-progress"`.
-   If none found, stop and instruct user to run `/next`.
+   Use the in-progress task from session context (set by `/next`).
+   If no task is in session context, stop and instruct user to run `/next`.
 
 2. **Prepare Handoff Payload**
    Extract from the task:
