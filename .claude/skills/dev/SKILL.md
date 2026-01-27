@@ -8,6 +8,10 @@ argument-hint: "[summary-file]"
 
 Resume development workflow and establish session context. Optionally load a session summary for continuity across context windows.
 
+## Prerequisites
+
+Repository must be initialized. If memory files don't exist, run `/init-repo` first.
+
 ## Usage
 
 ```bash
@@ -52,12 +56,25 @@ This ensures continuity - the new session has the same reference material as the
 
 ### 4. Load Memory Files
 
-Read in order (handle missing files gracefully):
+Check that memory files exist:
+- `progress.md`
+- `decisions.md`
+
+**If memory files don't exist**, report and stop:
+
+```
+## Repository Not Initialized
+
+Memory files (progress.md, decisions.md) not found.
+
+Run `/init-repo` to initialize this repository before starting development.
+```
+
+If memory files exist, read them:
 - `progress.md`: Last session summary, completed tasks, in-progress work
 - `decisions.md`: Architectural decisions, rejected approaches
-- `_docs/task-list.json`: Task statuses, current task
 
-**Fresh project detection**: If `progress.md` or `decisions.md` don't exist, this is a fresh project. Note this for the status report.
+Verify `_docs/task-list.json` exists (do not read contents; task list access is handled by `task-selector` subagent via `/next`).
 
 ### 5. Check Repository State
 
@@ -97,37 +114,21 @@ Note uncommitted changes. Git log is verification only; trust memory files as au
 [Based on in-progress work from summary]
 ```
 
-**If fresh project** (memory files don't exist), report:
-
-```
-## Fresh Project Detected
-
-**Task List**: [N] tasks found in _docs/task-list.json
-**First Task**: [TASK-001 title]
-
-### Repository State
-- [clean/dirty]
-- [uncommitted changes if any]
-
-### Recommended Action
-Run `/next` to begin with the first task (typically environment setup).
-```
-
-**If normal session start** (existing project), report:
+**If normal session start**, report:
 
 ```
 ## Session Status
 
 **Repository**: [clean/dirty]
-**Last Completed Task**: [task ID and title]
-**In-Progress Task**: [task ID and title, or "None"]
+
+### Recent Progress
+[Summary from progress.md: last completed work, current state]
 
 ### Recent Decisions
 - [relevant decisions from decisions.md]
 
 ### Recommended Action
-- If in-progress task exists: "Continue with `/plan` or `/implement`"
-- If clean state: "Select next task with `/next`"
+Run `/next` to check task status and continue development.
 ```
 
 ## Notes
@@ -136,4 +137,4 @@ Run `/next` to begin with the first task (typically environment setup).
 - When resuming, the summary supplements (not replaces) memory files
 - Key resources from prior sessions should be noted for continuity
 - If summary file doesn't exist, warn and proceed with normal session start
-- Fresh projects (no memory files) are handled gracefully; setup tasks in task-list.json will create them
+- Task list contents are accessed only through `/next` (via task-selector subagent) to keep orchestrator context lean

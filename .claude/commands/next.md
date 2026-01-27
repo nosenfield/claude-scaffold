@@ -1,26 +1,22 @@
 # Select Next Task
 
-Identify and display the highest-priority unblocked task.
+Identify and select the highest-priority unblocked task.
 
 ## Steps
 
-1. **Load Task List**
-   Read `/_docs/task-list.json`.
+1. **Spawn task-selector Subagent**
+   Invoke the `task-selector` agent with no payload.
 
-2. **Filter Candidates**
-   Select tasks where:
-   - `status` is "pending"
-   - `blockedBy` array is empty OR all blocking tasks have `status: "complete"`
+   The subagent will:
+   - Read and parse task-list.json
+   - Filter for pending, unblocked tasks
+   - Sort by priority
+   - Update selected task status to in-progress
+   - Return selected task or edge case status
 
-3. **Sort by Priority**
-   Order candidates by `priority` field (lower number = higher priority).
+2. **Handle Response**
 
-4. **Select Task**
-   Choose the first task after sorting.
-
-5. **Display Task Details**
-   Present the selected task:
-
+   **If TASK_SELECTED:**
    ```
    ## Next Task
 
@@ -38,17 +34,39 @@ Identify and display the highest-priority unblocked task.
 
    ### Dependencies
    [blockedBy list or "None"]
-   ```
 
-6. **Update Task Status**
-   In `/_docs/task-list.json`, set the selected task's status to "in-progress".
+   ---
 
-7. **Recommend Next Action**
-   ```
    Ready to plan implementation. Run `/plan` to continue.
    ```
 
-## Edge Cases
+   **If NO_PENDING_TASKS:**
+   ```
+   ## All Tasks Complete
 
-- **No pending tasks**: Report "All tasks complete" and summarize completion status.
-- **All pending tasks blocked**: List blocked tasks and their blockers.
+   **Completed**: [N] of [N] tasks
+
+   All tasks in the task list have been completed.
+   ```
+
+   **If ALL_TASKS_BLOCKED:**
+   ```
+   ## All Pending Tasks Blocked
+
+   The following tasks are waiting on dependencies:
+
+   | Task | Blocked By |
+   |------|------------|
+   | [taskId]: [title] | [blockers] |
+
+   Resolve blocking tasks or update task-list.json to unblock.
+   ```
+
+3. **Store Task Context**
+   On TASK_SELECTED, retain the task object for subsequent stages:
+   - `currentTask`: Full task object from subagent
+
+## State Management
+
+Session context after successful selection:
+- `currentTask`: Selected task object (id, title, description, acceptanceCriteria)

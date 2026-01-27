@@ -7,70 +7,29 @@
   "tasks": [
     {
       "id": "TASK-001",
-      "title": "Validate project documentation",
-      "description": "Verify that all required project documentation exists and is complete before beginning development.",
+      "title": "[First task - typically environment setup]",
+      "description": "[Detailed description of what this task accomplishes]",
       "priority": 1,
-      "status": "pending",
-      "acceptanceCriteria": [
-        "_docs/prd.md exists and contains project requirements",
-        "_docs/architecture.md exists and contains system design",
-        "_docs/best-practices.md exists and contains coding standards"
-      ],
-      "blockedBy": [],
-      "completedAt": null
-    },
-    {
-      "id": "TASK-002",
-      "title": "Set up development environment",
-      "description": "Install dependencies and verify the build and test systems are functional.",
-      "priority": 2,
-      "status": "pending",
-      "acceptanceCriteria": [
-        "npm install completes without errors",
-        "npm run build completes without errors",
-        "npm run test executes successfully (tests may be empty initially)"
-      ],
-      "blockedBy": ["TASK-001"],
-      "completedAt": null
-    },
-    {
-      "id": "TASK-003",
-      "title": "Initialize memory bank",
-      "description": "Create the progress and decision tracking files that persist context across sessions.",
-      "priority": 3,
-      "status": "pending",
-      "acceptanceCriteria": [
-        "progress.md exists with initial session entry",
-        "decisions.md exists with header structure"
-      ],
-      "blockedBy": ["TASK-002"],
-      "completedAt": null
-    },
-    {
-      "id": "TASK-004",
-      "title": "[Feature 1 name]",
-      "description": "[Detailed description of what this feature accomplishes]",
-      "priority": 4,
       "status": "pending",
       "acceptanceCriteria": [
         "[Criterion 1]",
         "[Criterion 2]",
         "[Criterion 3]"
       ],
-      "blockedBy": ["TASK-003"],
+      "blockedBy": [],
       "completedAt": null
     },
     {
-      "id": "TASK-005",
-      "title": "[Feature 2 name]",
-      "description": "[Detailed description of what this feature accomplishes]",
-      "priority": 5,
+      "id": "TASK-002",
+      "title": "[Feature or task name]",
+      "description": "[Detailed description of what this task accomplishes]",
+      "priority": 2,
       "status": "pending",
       "acceptanceCriteria": [
         "[Criterion 1]",
         "[Criterion 2]"
       ],
-      "blockedBy": ["TASK-003"],
+      "blockedBy": ["TASK-001"],
       "completedAt": null
     }
   ],
