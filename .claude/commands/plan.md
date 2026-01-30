@@ -12,48 +12,67 @@ A task must be in-progress. If not, run `/next` first.
    Use the in-progress task from session context (set by `/next`).
    If no task is in session context, stop and instruct user to run `/next`.
 
-2. **Prepare Handoff Payload**
-   Extract from the task:
+2. **Determine Exploration Target**
+   Based on the task, identify what to explore:
+   - Feature name or system area from task description
+   - Keywords that indicate affected code areas
+
+   Example targets:
+   - Task "Add user authentication" → target: "authentication"
+   - Task "Fix checkout validation" → target: "checkout validation"
+
+3. **Invoke /map for Exploration**
+   Run `/map <target> --depth medium` to create exploration artifact.
+
+   This produces `_docs/maps/{target-slug}.md` with:
+   - Entry points
+   - Architecture observations
+   - Related systems
+   - Relevant file paths
+
+4. **Prepare Handoff Payload**
+   Extract from the task and exploration:
    ```
    taskId: [task.id]
    taskTitle: [task.title]
    taskDescription: [task.description]
    acceptanceCriteria: [task.acceptanceCriteria]
+   explorationArtifact: [path to exploration artifact from /map]
    ```
 
-3. **Spawn task-planner Subagent**
+5. **Spawn task-planner Subagent**
    Invoke the `task-planner` agent with the payload.
-   
+
    The subagent will:
+   - Read the exploration artifact
    - Read architecture and best practices
-   - Explore the codebase
    - Return a structured implementation plan
 
-4. **Receive and Validate Plan**
+6. **Receive and Validate Plan**
    Confirm the plan includes:
    - Affected files list
    - Implementation steps
    - Test scenarios
    - Risk assessment
 
-5. **Present Plan for Approval**
+7. **Present Plan for Approval**
    Display the complete implementation plan.
-   
+
    ```
    ## Implementation Plan Ready
 
    [Display full plan from subagent]
 
    ---
-   
+
    **Approve this plan?**
    - Reply "approve" to proceed to test writing
    - Reply with feedback to request plan changes
    ```
 
-6. **Store Plan**
+8. **Store Plan**
    On approval, retain the implementation plan for subsequent stages.
-   
+
    Recommend next action:
    ```
    Plan approved. Run `/test` to write tests.
@@ -63,4 +82,5 @@ A task must be in-progress. If not, run `/next` first.
 
 Store in session context:
 - `currentTask`: Full task object
+- `explorationArtifact`: Path to exploration artifact
 - `implementationPlan`: Approved plan from subagent
