@@ -27,6 +27,7 @@ This file tracks session history and completed work. Entries are append-only.
 - Clarified constraints to allow artifact writes while enforcing read-only exploration
 
 **Outcome**: R6 closed; /map now executes in isolated context with artifact output
+**Context Summary**: `_context-summaries/20260130-011722.md`
 **Session Chain**: 8 sessions
 
 ---

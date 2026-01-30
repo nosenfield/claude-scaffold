@@ -1,0 +1,9 @@
+# Personal Claude overrides (not shared with team)
+CLAUDE.local.md
+
+# dim .git directory in the explorer
+.git/
+
+# local documentation
+_context-summaries
+_docs/maps
