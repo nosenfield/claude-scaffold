@@ -45,13 +45,31 @@ scaffold/
 
 ## Development Workflow
 
+### Task-List Workflow (Structured)
+
+Use when working through predefined tasks in `task-list.json`:
+
 1. `/dev [summary]` - Start development session (optionally resume from summary)
-2. `/next` - Select next task
+2. `/next` - Select next task from task list
 3. `/plan` - Plan implementation
 4. `/test` - Write failing tests
 5. `/implement` - Make tests pass
 6. `/review` - Code review
 7. `/commit` - Commit and update memory
+
+### Ad-hoc Workflow (Exploratory)
+
+Use for unplanned work or when task list doesn't apply:
+
+1. `/dev [summary]` - Start development session
+2. `/map <target>` - Explore relevant codebase area
+3. "Plan this" or describe what to build - Orchestrator invokes task-planner
+4. `/test` - Write failing tests
+5. `/implement` - Make tests pass
+6. `/review` - Code review
+7. `/commit` - Commit changes
+
+The ad-hoc workflow skips `/next` (no task selection) and uses `/map` exploration as input to planning. Both workflows share the same TDD cycle from `/test` onward.
 
 **Note**: Run `/init-repo` once after placing project documentation to initialize memory files (`progress.md`, `decisions.md`) and validate core docs. Environment setup (dependency installation, dev server configuration) is handled through the first tasks in `task-list.json`.
 
@@ -203,6 +221,29 @@ chmod +x .git/hooks/pre-commit
 
 ---
 
+#### 2026-02-01: Dual Workflow Support via Agent Descriptions (R7 Resolution)
+
+**Context**: Subagent descriptions previously used rigid skill-triggered phrasing ("Use when /skill is invoked"), tightly coupling agents to specific skills. This prevented ad-hoc usage where the orchestrator might invoke agents directly after `/map` exploration.
+
+**Decision**: Strengthen agent descriptions with when-to-use framing and make `taskId` optional across workflow agents.
+
+**Implementation**:
+- All 6 agent descriptions updated to lead with timing triggers ("Use after...", "Use when...")
+- Changed from "Use when /skill is invoked" to "Typically invoked via /skill" (soft coupling)
+- Made `taskId` optional in task-planner, test-writer, implementer, code-reviewer
+- Output formats handle missing taskId: `Task: [taskId if provided, otherwise taskTitle]`
+- Established payload convention: unmarked fields = required; `(optional)` annotation = optional
+
+**Rationale**:
+- Descriptions should contain when-to-use information, not what-it-does (per best practices manual Section 6.4)
+- Soft coupling enables orchestrator to recognize when to use agents outside skill invocation
+- Optional `taskId` allows same agents to serve both task-list and ad-hoc workflows
+- Return types in descriptions (APPROVE/REQUEST_CHANGES, TASK_SELECTED) aid orchestrator routing
+
+**Alternative Rejected**: Modify `/plan` skill to accept ad-hoc requests. This would add complexity; strengthened descriptions achieve the same goal by enabling orchestrator recognition of the `/map` → task-planner pattern.
+
+---
+
 ## Best Practices Alignment
 
 This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Key alignments:
@@ -212,6 +253,7 @@ This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Ke
 | CLAUDE.md under 60 lines | ~53 lines |
 | Path-scoped rules | 5 rules in `.claude/rules/` |
 | Structured subagent output | All agents define exact output format |
+| Agent descriptions = when-to-use | All 6 agents lead with timing triggers |
 | Test immutability | Triple enforcement: rule + hook + agent instruction |
 | Append-only memory | progress.md and decisions.md |
 | Hook-based quality gates | Advisory (PostToolUse) + Git pre-commit |
@@ -245,7 +287,7 @@ Items identified for potential enhancement:
 - [x] ~~Add CLAUDE.local.md template for personal overrides~~ (documented above)
 - [x] ~~Document context clearing strategy~~ (consolidated into /dev; removed /catchup)
 - [x] ~~Integrate Explore subagent for read-only context gathering~~ (R6 resolved: `/map` skill with `context: fork` and artifact output)
-- [ ] Strengthen agent descriptions with when-to-use framing (R7)
+- [x] ~~Strengthen agent descriptions with when-to-use framing~~ (R7 resolved: all 6 agents updated with trigger conditions, payload requirements, and output expectations)
 - [ ] Add SubagentStop hook for progress tracking (R8)
 - [ ] Add end-to-end testing guidance with puppeteer MCP (R9)
 

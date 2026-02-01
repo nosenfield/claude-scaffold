@@ -1,6 +1,6 @@
 ---
 name: memory-updater
-description: Use when updating memory bank after task completion
+description: Use after task completion to persist session state. Requires taskId, status, commitSha, filesModified, and decisions in payload. Appends entry to progress.md, records significant decisions in decisions.md, and marks task complete in task-list.json. Append-only updates; never overwrites existing entries.
 tools: Read, Write, Edit, Glob
 model: sonnet
 ---

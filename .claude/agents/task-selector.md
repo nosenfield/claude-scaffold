@@ -1,6 +1,6 @@
 ---
 name: task-selector
-description: Use when selecting the next task from the task list
+description: Use when the /next skill is invoked. Reads task-list.json, selects highest-priority unblocked task, marks it in-progress, and returns task details. Returns TASK_SELECTED with full task object, NO_PENDING_TASKS if all complete, or ALL_TASKS_BLOCKED if pending tasks have unmet dependencies. Uses haiku for fast, deterministic selection logic.
 tools: Read, Edit
 model: haiku
 ---

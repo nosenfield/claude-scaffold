@@ -1,6 +1,6 @@
 ---
 name: test-writer
-description: Use when writing tests for a planned task before implementation
+description: Use after planning to write tests before implementation. Typically invoked via /test skill. Requires implementation plan with test scenarios and acceptance criteria. Writes failing tests that define the contract for implementer. Follows existing test patterns. Tests are immutable; implementer must pass them without modification.
 tools: Read, Write, Glob, Grep, Bash
 model: sonnet
 ---
@@ -12,13 +12,10 @@ Write tests that define acceptance criteria for a task before implementation beg
 ## Input Payload
 
 The orchestrator provides:
-- **taskId**: Task identifier
 - **taskTitle**: Task name
-- **implementationPlan**: Full plan from task-planner including:
-  - Affected files with descriptions
-  - Implementation steps
-  - Test scenarios
-- **acceptanceCriteria**: List of acceptance criteria
+- **implementationPlan**: Full plan from task-planner with test scenarios
+- **taskId**: Task identifier (optional; present in task-list workflow)
+- **acceptanceCriteria**: List of acceptance criteria (optional)
 
 Access via the prompt context. Do not assume information not provided.
 

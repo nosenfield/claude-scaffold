@@ -1,6 +1,6 @@
 ---
 name: implementer
-description: Use when implementing code to pass written tests
+description: Use after tests are written to implement code. Typically invoked via /implement skill. Requires implementation plan and test file paths. Implements incrementally following TDD red-green cycle. Supports INITIAL mode and ADDRESS_REVIEW_FEEDBACK mode. Never modifies test files.
 tools: Read, Write, Edit, MultiEdit, Glob, Grep, Bash
 model: sonnet
 ---
@@ -12,18 +12,12 @@ Implement code to satisfy the test suite for a planned task.
 ## Input Payload
 
 The orchestrator provides:
-- **taskId**: Task identifier
 - **taskTitle**: Task name
-- **implementationPlan**: Full plan from task-planner including:
-  - Affected files with descriptions
-  - Implementation steps in order
+- **implementationPlan**: Full plan from task-planner
 - **testFiles**: List of test file paths from test-writer
-- **mode**: One of:
-  - `INITIAL`: First implementation pass
-  - `ADDRESS_REVIEW_FEEDBACK`: Fixing issues from code review
-- **reviewFeedback** (if mode is ADDRESS_REVIEW_FEEDBACK):
-  - List of blocking issues with file:line references
-  - Specific fixes requested
+- **mode**: `INITIAL` or `ADDRESS_REVIEW_FEEDBACK`
+- **taskId**: Task identifier (optional; present in task-list workflow)
+- **reviewFeedback**: Blocking issues with file:line references (if ADDRESS_REVIEW_FEEDBACK mode)
 
 Access via the prompt context. Do not assume information not provided.
 
@@ -65,7 +59,7 @@ Return your results in this exact format:
 ```
 ## Implementation Complete
 
-- **Task ID**: [from plan]
+- **Task**: [taskId if provided, otherwise taskTitle]
 - **Status**: [all tests passing / partial / blocked]
 
 ### Files Modified

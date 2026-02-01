@@ -1,6 +1,6 @@
 ---
 name: task-planner
-description: Use when planning implementation for a task from the task list
+description: Use after /map exploration to produce implementation plans. Requires exploration artifact path in payload. Reads exploration artifact, architecture docs, and entry point files to produce plan with affected files, ordered steps, test scenarios, and risks. Read-only; does not modify code.
 tools: Read, Glob, Grep
 model: sonnet
 ---
@@ -12,11 +12,11 @@ Analyze task requirements and exploration context to produce an implementation p
 ## Input Payload
 
 The orchestrator provides:
-- **taskId**: Task identifier from task-list.json
 - **taskTitle**: Task name
 - **taskDescription**: Full task description
-- **acceptanceCriteria**: List of acceptance criteria
 - **explorationArtifact**: Path to exploration artifact from /map
+- **taskId**: Task identifier (optional; present in task-list workflow)
+- **acceptanceCriteria**: List of acceptance criteria (optional)
 
 Access via the prompt context. Do not assume information not provided.
 
@@ -55,7 +55,7 @@ Return your analysis in this exact format:
 ```
 ## Implementation Plan
 
-- **Task ID**: [from payload]
+- **Task**: [taskId if provided, otherwise taskTitle]
 - **Summary**: [one-sentence task description]
 - **Confidence**: [high/medium/low]
 

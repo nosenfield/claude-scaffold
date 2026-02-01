@@ -6,6 +6,28 @@ This file tracks session history and completed work. Entries are append-only.
 
 <!-- New entries are added below this line -->
 
+## 2026-02-01 - Strengthen Agent Descriptions + Ad-hoc Workflow (R7 Resolution)
+
+**Summary**: Updated all 6 subagent descriptions with when-to-use framing. Enabled dual workflow: task-list (/next → /plan) and ad-hoc (/map → task-planner via orchestrator). Established Input Payload convention (unmarked=required, annotated=optional).
+
+**Key Changes**:
+- All agent descriptions updated with trigger conditions and capabilities
+- Decoupled agents from skill invocation (use "typically invoked via" instead of "use when skill invoked")
+- Made `taskId` optional across task-planner, test-writer, implementer, code-reviewer
+- Updated Output Format sections to handle missing taskId: `Task: [taskId if provided, otherwise taskTitle]`
+- Established convention: unmarked fields = required; `(optional)` annotation = optional
+
+**Analysis Performed**:
+- Traced task-list workflow vs ad-hoc workflow
+- Determined /plan modifications unnecessary; strengthened descriptions enable orchestrator recognition
+- Verified agents support both workflows with optional taskId
+
+**Outcome**: R7 closed; dual workflow enabled; agents support task-list and ad-hoc development
+**Context Summary**: `_docs/context-summaries/20260201-041201.md`
+**Session Chain**: 9 sessions
+
+---
+
 ## 2026-01-30 - /map Skill Conversion (R6 Resolution)
 
 **Summary**: Researched Claude Code skills vs commands distinction. Converted `/map` from command to skill with forked context execution, tool restrictions, and supporting files. Resolved R6 recommendation.
