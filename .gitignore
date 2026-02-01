@@ -1,9 +1,10 @@
 # Personal Claude overrides (not shared with team)
 CLAUDE.local.md
 
+
+# explicitly exposes folder presence but ignores local documentation
+!_docs/maps/.gitkeep
+!_docs/context-summaries/.gitkeep
+
 # dim .git directory in the explorer
 .git/
-
-# local documentation
-_context-summaries
-_docs/maps
