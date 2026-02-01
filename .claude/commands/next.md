@@ -5,7 +5,7 @@ Identify and select the highest-priority unblocked task.
 ## Steps
 
 1. **Spawn task-selector Subagent**
-   Invoke the `task-selector` agent with no payload.
+   Invoke the `task-selector` agent with prompt: `" "` (single space).
 
    The subagent will:
    - Read and parse task-list.json
