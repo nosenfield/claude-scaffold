@@ -288,7 +288,7 @@ Items identified for potential enhancement:
 - [x] ~~Document context clearing strategy~~ (consolidated into /dev; removed /catchup)
 - [x] ~~Integrate Explore subagent for read-only context gathering~~ (R6 resolved: `/map` skill with `context: fork` and artifact output)
 - [x] ~~Strengthen agent descriptions with when-to-use framing~~ (R7 resolved: all 6 agents updated with trigger conditions, payload requirements, and output expectations)
-- [ ] Add SubagentStop hook for progress tracking (R8)
+- [x] ~~Add SubagentStop hook for progress tracking~~ (R8 resolved: `.claude/hooks/log-subagent.sh` logs agent type, prompt excerpt, and output excerpt to `.claude/subagent.log`)
 - [ ] Add end-to-end testing guidance with puppeteer MCP (R9)
 
 ## References

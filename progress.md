@@ -6,6 +6,26 @@ This file tracks session history and completed work. Entries are append-only.
 
 <!-- New entries are added below this line -->
 
+## 2026-02-02 - SubagentStop Hook Implementation (R8 Resolution)
+
+**Summary**: Researched official Claude Code documentation to verify SubagentStop hook support. Discovered transcript JSONL schema and implemented progress tracking hook with prompt/output excerpt logging.
+
+**Key Changes**:
+- Created `.claude/hooks/log-subagent.sh` - logs agent type, ID, prompt excerpt (100 chars), output excerpt (100 chars)
+- Updated `.claude/settings.json` - added SubagentStop hook configuration
+- Updated `README.md` - marked R8 complete
+
+**Research Performed**:
+- Verified SubagentStop is officially supported via code.claude.com/docs/en/hooks
+- Discovered transcript location: `~/.claude/projects/<project-slug>/<session-uuid>/subagents/agent-<id>.jsonl`
+- Mapped transcript schema: JSONL with `type`, `message.role`, `message.content`
+
+**Outcome**: R8 closed; SubagentStop hook implemented with prompt/output logging
+**Context Summary**: `_docs/context-summaries/20260202-005307.md`
+**Session Chain**: 10 sessions
+
+---
+
 ## 2026-02-01 - Strengthen Agent Descriptions + Ad-hoc Workflow (R7 Resolution)
 
 **Summary**: Updated all 6 subagent descriptions with when-to-use framing. Enabled dual workflow: task-list (/next → /plan) and ad-hoc (/map → task-planner via orchestrator). Established Input Payload convention (unmarked=required, annotated=optional).
