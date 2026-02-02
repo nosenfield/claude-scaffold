@@ -6,5 +6,9 @@ CLAUDE.local.md
 !_docs/maps/.gitkeep
 !_docs/context-summaries/.gitkeep
 
+
+subagent.log
+
 # dim .git directory in the explorer
 .git/
+

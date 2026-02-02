@@ -48,8 +48,7 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ]; then
       (map(select(.type == "text")) | .[0].text // "")
     else
       (. // "")
-    end |
-    .[0:100]
+    end
   ' "$TRANSCRIPT" 2>/dev/null | tr '\n' ' ' | sed 's/  */ /g')
 
   # Last "assistant" entry contains the output
@@ -58,8 +57,7 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ]; then
       (map(select(.type == "text")) | .[0].text // "")
     else
       (. // "")
-    end |
-    .[0:100]
+    end
   ' "$TRANSCRIPT" 2>/dev/null | tr '\n' ' ' | sed 's/  */ /g')
 fi
 
