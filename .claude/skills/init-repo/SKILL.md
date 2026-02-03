@@ -49,7 +49,13 @@ Confirm the file contains valid JSON with a `tasks` array.
 
 ### 3. Create Memory Files
 
-**Create `progress.md`** if it doesn't exist:
+Create the memory directory if needed:
+
+```bash
+mkdir -p _docs/memory
+```
+
+**Create `_docs/memory/progress.md`** if it doesn't exist:
 
 ```markdown
 # Progress Log
@@ -91,7 +97,7 @@ Entries below are append-only. New entries are added at the top.
 ---
 ```
 
-**Create `decisions.md`** if it doesn't exist:
+**Create `_docs/memory/decisions.md`** if it doesn't exist:
 
 ```markdown
 # Decision Log
@@ -123,8 +129,8 @@ This file records architecture and implementation decisions. Entries are append-
 - best-practices.md: Present
 
 ### Memory Files Created
-- progress.md: Created
-- decisions.md: Created
+- _docs/memory/progress.md: Created
+- _docs/memory/decisions.md: Created
 - _docs/backlog.json: Created
 
 ---

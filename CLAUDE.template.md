@@ -39,7 +39,7 @@ npm run typecheck    # Run TypeScript type checking
 - Follow TDD: write tests before implementation
 - Never modify test assertions to make tests pass
 - Never modify task definitions in task-list.json
-- Append only to progress.md and decisions.md
+- Append only to _docs/memory/progress.md and _docs/memory/decisions.md
 - Core docs (_docs/*.md) are read-only for agents
 
 ## Key Files
@@ -48,5 +48,5 @@ npm run typecheck    # Run TypeScript type checking
 - `/_docs/architecture.md` - System design
 - `/_docs/task-list.json` - Development tasks
 - `/_docs/best-practices.md` - Coding standards
-- `/progress.md` - Session history
-- `/decisions.md` - Architecture decisions
+- `/_docs/memory/progress.md` - Session history
+- `/_docs/memory/decisions.md` - Architecture decisions

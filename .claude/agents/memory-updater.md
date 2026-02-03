@@ -29,15 +29,15 @@ Access via the prompt context. Do not assume information not provided.
 
 | File | Purpose | Update Pattern |
 |------|---------|----------------|
-| progress.md | Active context + session history | **Replace** Active Context section; **Append** to Session Log |
-| decisions.md | Significant implementation decisions | Append if decisions were made |
+| _docs/memory/progress.md | Active context + session history | **Replace** Active Context section; **Append** to Session Log |
+| _docs/memory/decisions.md | Significant implementation decisions | Append if decisions were made |
 | _docs/task-list.json | Task completion status | Update status field only (if taskId provided) |
 
 ## Process
 
 ### Step 1: Update Active Context Section
 
-Read progress.md and **replace** the Active Context section (between `## Active Context` and `## Session Log`) with current state:
+Read _docs/memory/progress.md and **replace** the Active Context section (between `## Active Context` and `## Session Log`) with current state:
 
 ```markdown
 ## Active Context
@@ -83,7 +83,7 @@ Add new entry **after** the `<!-- New entries are added below this line -->` mar
 ### Step 3: Record Decisions (if any)
 
 If significant decisions were made:
-- Read current decisions.md
+- Read current _docs/memory/decisions.md
 - Append decision record
 
 ### Step 4: Update task-list.json (if taskId provided)
@@ -175,8 +175,8 @@ Only modify these fields in task-list.json:
 - Next Steps: [N items]
 
 ### Files Modified
-- progress.md: Updated Active Context; added Session Log entry for [task]
-- decisions.md: [Added N entries / No updates needed]
+- _docs/memory/progress.md: Updated Active Context; added Session Log entry for [task]
+- _docs/memory/decisions.md: [Added N entries / No updates needed]
 - _docs/task-list.json: [Marked task [ID] complete / Not updated (ad-hoc work)]
 
 ### Summary

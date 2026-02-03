@@ -57,22 +57,22 @@ This ensures continuity - the new session has the same reference material as the
 ### 4. Load Memory Files
 
 Check that memory files exist:
-- `progress.md`
-- `decisions.md`
+- `_docs/memory/progress.md`
+- `_docs/memory/decisions.md`
 
 **If memory files don't exist**, report and stop:
 
 ```
 ## Repository Not Initialized
 
-Memory files (progress.md, decisions.md) not found.
+Memory files (_docs/memory/progress.md, _docs/memory/decisions.md) not found.
 
 Run `/init-repo` to initialize this repository before starting development.
 ```
 
 If memory files exist, read them:
-- `progress.md`: **Active Context section** (current focus, task, next steps) + recent Session Log entries
-- `decisions.md`: Architectural decisions, rejected approaches
+- `_docs/memory/progress.md`: **Active Context section** (current focus, task, next steps) + recent Session Log entries
+- `_docs/memory/decisions.md`: Architectural decisions, rejected approaches
 
 **Active Context** is the primary source for session state. It contains:
 - Current Focus (what we're working on)

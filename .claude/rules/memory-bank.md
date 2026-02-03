@@ -1,7 +1,7 @@
 ---
 paths:
-  - "progress.md"
-  - "decisions.md"
+  - "_docs/memory/progress.md"
+  - "_docs/memory/decisions.md"
   - "CLAUDE.md"
 ---
 
@@ -13,11 +13,11 @@ Memory bank files provide persistent context across sessions. They must be maint
 
 | File | Purpose | Update Frequency |
 |------|---------|------------------|
-| progress.md | Session history, completed work | After each task completion |
-| decisions.md | Architecture and implementation decisions | When significant decisions made |
+| _docs/memory/progress.md | Session history, completed work | After each task completion |
+| _docs/memory/decisions.md | Architecture and implementation decisions | When significant decisions made |
 | CLAUDE.md | Project context for Claude Code | Rarely, when project structure changes |
 
-## progress.md Rules
+## _docs/memory/progress.md Rules
 
 **Structure**: Append-only log with newest entries at bottom.
 
@@ -41,7 +41,7 @@ Memory bank files provide persistent context across sessions. They must be maint
 - Delete entries: No
 - Reorder entries: No
 
-## decisions.md Rules
+## _docs/memory/decisions.md Rules
 
 **Structure**: Append-only log of architectural decisions.
 
