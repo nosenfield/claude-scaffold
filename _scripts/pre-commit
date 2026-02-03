@@ -1,16 +1,24 @@
 #!/bin/bash
 # Git Pre-Commit Hook
-# Mirrors the quality checks from .claude/hooks/pre-commit-check.sh
-# Ensures quality gates run regardless of commit source (Claude or human)
+# Runs quality checks and creates marker for bypass detection
+#
+# Features:
+# - Runs test, lint, and typecheck if available
+# - Creates marker file for post-commit bypass detection
 #
 # Installation:
-#   cp _scripts/pre-commit .git/hooks/pre-commit
-#   chmod +x .git/hooks/pre-commit
-#
-# Or configure git to use _scripts as hooks directory:
 #   git config core.hooksPath _scripts
+#
+# Or copy hooks manually:
+#   cp _scripts/pre-commit .git/hooks/pre-commit
+#   cp _scripts/post-commit .git/hooks/post-commit
 
 set -o pipefail
+
+# Marker for bypass detection (validated by post-commit)
+MARKER_FILE="_logs/.pre-commit-ran"
+MARKER_SIGNATURE="pre-commit-hook-v1"
+mkdir -p _logs
 
 echo "=== Git Pre-Commit Quality Check ==="
 echo ""
@@ -68,4 +76,8 @@ fi
 
 echo ""
 echo "All pre-commit checks passed"
+
+# Create marker for post-commit bypass detection
+echo "$MARKER_SIGNATURE" > "$MARKER_FILE"
+
 exit 0

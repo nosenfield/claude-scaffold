@@ -9,21 +9,22 @@ This file tracks session history and completed work.
 **Last Updated**: 2026-02-03
 
 ### Current Focus
-- Documentation alignment complete
-- HumanLayer analysis complete; potential enhancements identified
+- Git hooks adoption complete (commit logging + bypass detection)
+- Merged into existing `_scripts/` directory
 
 ### Current Task
 None
 
 ### Recent Decisions
-- Documentation must reflect Active Context structure (3 gaps fixed)
-- Context7 API key uses env var pattern (matches GitHub token)
-- Identified /debug, /validate, MAX_THINKING_TOKENS as potential additions
+- Adopt commit logging and bypass detection from ai-project-template
+- Merge hooks into existing `_scripts/` (not separate directory)
+- Skip pre-commit Claude review (conflicts with skill-based workflow)
 
 ### Immediate Next Steps
-1. Consider implementing /debug command
-2. Consider implementing /validate command
-3. Address R9 (E2E testing guidance with puppeteer MCP)
+1. Commit git hooks changes
+2. Consider implementing /debug command
+3. Consider implementing /validate command
+4. Address R9 (E2E testing guidance with puppeteer MCP)
 
 ---
 
@@ -32,6 +33,15 @@ None
 Entries below are append-only. New entries are added at the top.
 
 <!-- New entries are added below this line -->
+
+## 2026-02-03 - Git Hooks Adoption from ai-project-template
+
+**Summary**: Evaluated ai-project-template pre-commit and post-commit hooks. Adopted commit logging and bypass detection. Merged into existing `_scripts/` directory.
+**Context Summary**: `_docs/context-summaries/20260203-021321.md`
+**Session Chain**: 13 sessions
+**Outcome**: Commit logging + bypass detection implemented; pre-commit Claude review rejected (conflicts with skill workflow)
+
+---
 
 ## 2026-02-03 - Documentation Alignment + HumanLayer Analysis
 

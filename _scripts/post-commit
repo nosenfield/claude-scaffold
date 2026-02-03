@@ -1,0 +1,96 @@
+#!/bin/bash
+# Git Post-Commit Hook
+# Logs all commits and detects --no-verify bypass
+#
+# Features:
+# - Logs commits to _logs/all-commits.log
+# - Detects when pre-commit was bypassed via --no-verify
+# - Logs bypasses to _logs/commit-bypasses.log
+#
+# Installation:
+#   git config core.hooksPath _scripts
+#
+# Or copy hooks manually:
+#   cp _scripts/pre-commit .git/hooks/pre-commit
+#   cp _scripts/post-commit .git/hooks/post-commit
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+LOG_FILE="_logs/all-commits.log"
+BYPASS_LOG="_logs/commit-bypasses.log"
+MARKER_FILE="_logs/.pre-commit-ran"
+MARKER_SIGNATURE="pre-commit-hook-v1"
+
+# Ensure logs directory exists
+mkdir -p _logs
+
+# ============================================================================
+# GATHER COMMIT INFORMATION
+# ============================================================================
+
+COMMIT_HASH=$(git rev-parse HEAD 2>/dev/null)
+if [ -z "$COMMIT_HASH" ]; then
+    echo "ERROR: Failed to get commit hash" >&2
+    exit 1
+fi
+
+COMMIT_SHORT=$(git rev-parse --short HEAD 2>/dev/null)
+COMMIT_MSG=$(git log -1 --pretty=%s 2>/dev/null || echo "<error retrieving message>")
+COMMIT_AUTHOR=$(git log -1 --pretty=%an 2>/dev/null || echo "<unknown>")
+TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+FILES_CHANGED=$(git diff-tree --no-commit-id --name-only -r HEAD 2>/dev/null | wc -l | tr -d ' ')
+
+# ============================================================================
+# CHECK IF PRE-COMMIT HOOK RAN
+# ============================================================================
+
+MARKER_VALID="false"
+if [ -f "$MARKER_FILE" ]; then
+    if grep -qF "$MARKER_SIGNATURE" "$MARKER_FILE" 2>/dev/null; then
+        MARKER_VALID="true"
+    fi
+fi
+
+if [ "$MARKER_VALID" = "true" ]; then
+    # Pre-commit hook ran normally
+    echo "[$TIMESTAMP] COMMIT: $COMMIT_SHORT | Files: $FILES_CHANGED | $COMMIT_MSG" >> "$LOG_FILE"
+
+    # Clean up marker
+    rm -f "$MARKER_FILE"
+
+else
+    # Pre-commit hook was bypassed (--no-verify used)
+    echo "[$TIMESTAMP] BYPASS: $COMMIT_SHORT | Files: $FILES_CHANGED | $COMMIT_MSG" >> "$LOG_FILE"
+
+    # Log detailed bypass information
+    {
+        echo "==============================================================="
+        echo "PRE-COMMIT HOOK BYPASSED"
+        echo "==============================================================="
+        echo "Timestamp:       $TIMESTAMP"
+        echo "Commit Hash:     $COMMIT_HASH"
+        echo "Author:          $COMMIT_AUTHOR"
+        echo "Files Changed:   $FILES_CHANGED"
+        echo "Commit Message:  $COMMIT_MSG"
+        echo ""
+        echo "Details:"
+        if [ -f "$MARKER_FILE" ]; then
+            echo "  Marker file exists but has invalid signature"
+        else
+            echo "  Commit created with --no-verify or -n flag"
+        fi
+        echo ""
+        echo "Files Modified:"
+        git diff-tree --no-commit-id --name-only -r HEAD 2>/dev/null | sed 's/^/  - /'
+        echo ""
+        echo "==============================================================="
+        echo ""
+    } >> "$BYPASS_LOG"
+
+    # Clean up invalid marker if exists
+    rm -f "$MARKER_FILE"
+fi
+
+exit 0

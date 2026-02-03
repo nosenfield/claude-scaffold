@@ -6,6 +6,46 @@ This file records architecture and implementation decisions. Entries are append-
 
 <!-- New entries are added below this line -->
 
+## 2026-02-03: Git Hooks for Commit Logging and Bypass Detection
+
+**Context**: Evaluated ai-project-template's pre-commit and post-commit git hooks to assess adoption benefit for scaffold.
+
+**Source Analysis**:
+
+| ai-project-template Feature | Lines | Purpose |
+|----------------------------|-------|---------|
+| Pre-commit Claude Review | ~600 | Runs `claude --print` for non-interactive code review |
+| Review Cache | ~200 | Hash-based caching with dependency tracking |
+| AUTO_ACCEPT Validation | ~100 | Validates retry commits; blocks if content changed |
+| Session State | ~50 | JSON session file tracks approval status |
+| Post-commit Logging | ~100 | Logs commits, detects `--no-verify` bypass |
+| Post-commit Cleanup | ~80 | Removes stale session files |
+
+**Decision**: Adopt simplified commit logging and bypass detection only. Do not adopt pre-commit Claude review or review cache.
+
+**Analysis**:
+- ai-project-template uses non-interactive `claude --print` workflow; our scaffold uses interactive skill-based workflow with subagents
+- Pre-commit Claude review would duplicate our `/commit` skill + `code-reviewer` subagent
+- Review cache is complex (~200 lines with dependency tracking); our subagent isolation already handles context
+- AUTO_ACCEPT validation solves a problem specific to non-interactive CI workflows
+- Commit logging and bypass detection provide value without workflow conflict
+
+**Implementation**:
+- Enhanced `_scripts/pre-commit` - added marker file creation for bypass detection
+- Created `_scripts/post-commit` - logs commits, detects `--no-verify` bypass
+- Installation: `git config core.hooksPath _scripts`
+- Logs written to `_logs/all-commits.log` and `_logs/commit-bypasses.log`
+
+**Merge Decision**: Discovered existing `_scripts/pre-commit` with quality gates (test, lint, typecheck). Merged bypass detection into existing hook rather than creating separate `scripts/git-hooks/` directory. Single hook location is cleaner.
+
+**Rejected Alternatives**:
+- Full pre-commit Claude review: Would conflict with `/commit` + `code-reviewer` workflow
+- Review cache: Over-engineered for our interactive workflow
+- AUTO_ACCEPT pattern: Specific to non-interactive CI; not applicable
+- Separate `scripts/git-hooks/` directory: Redundant; merged into existing `_scripts/`
+
+---
+
 ## 2026-02-03: Active Context Section in progress.md (Memory System Enhancement)
 
 **Context**: Evaluated whether scaffold would benefit from adopting a 6-file granular Memory Bank (projectBrief, productContext, systemPatterns, techContext, activeContext, progress) like the ai-project-template repository.
