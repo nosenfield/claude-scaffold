@@ -1,4 +1,7 @@
 {
+  "env": {
+    "MAX_THINKING_TOKENS": "32000"
+  },
   "hooks": {
     "PostToolUse": [
       {

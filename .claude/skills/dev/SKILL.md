@@ -19,7 +19,7 @@ Repository must be initialized. If memory files don't exist, run `/init-repo` fi
 /dev
 
 # Resume from session summary
-/dev _context-summaries/20260125-195500.md
+/dev _docs/context-summaries/20260125-195500.md
 ```
 
 ## Steps

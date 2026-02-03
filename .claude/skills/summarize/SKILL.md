@@ -17,7 +17,7 @@ User initiates when `/context` shows high usage (recommended: >70%).
 ### 1. Detect Session Chain
 
 Search conversation for references to previous summaries:
-- Look for `_context-summaries/*.md` file references
+- Look for `_docs/context-summaries/*.md` file references
 - Check if user said "resume session based on..." at start
 
 If found, read the previous summary file to:
@@ -85,7 +85,7 @@ git diff --name-only
 
 ### 7. Write Context Summary
 
-Create `_context-summaries/[timestamp].md`:
+Create `_docs/context-summaries/[timestamp].md`:
 
 ```markdown
 # Session Summary: [Topic]
@@ -167,7 +167,7 @@ Append session entry:
 ## [Date] - [Topic]
 
 **Summary**: [1-2 sentences]
-**Context Summary**: `_context-summaries/[timestamp].md`
+**Context Summary**: `_docs/context-summaries/[timestamp].md`
 **Session Chain**: [count] sessions
 **Outcome**: [Completed X, handed off Y]
 ```
@@ -177,14 +177,14 @@ Append session entry:
 ```
 ## Session Summarized
 
-**Summary File**: _context-summaries/[timestamp].md
+**Summary File**: _docs/context-summaries/[timestamp].md
 **Session Chain**: [count] sessions on this work stream
 **Progress Updated**: Yes
 
 ### Handoff Instructions
 
 1. Spawn new Claude Code agent
-2. Run `/dev _context-summaries/[timestamp].md`
+2. Run `/dev _docs/context-summaries/[timestamp].md`
 
 ### Quick Context for New Agent
 

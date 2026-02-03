@@ -9,21 +9,21 @@ This file tracks session history and completed work.
 **Last Updated**: 2026-02-03
 
 ### Current Focus
-- Active Context enhancement complete
-- Memory system architecture validated
+- Documentation alignment complete
+- HumanLayer analysis complete; potential enhancements identified
 
 ### Current Task
-None (enhancement complete)
+None
 
 ### Recent Decisions
-- Scaffold does NOT need 6-file granular memory bank (subagent isolation already solves context pollution)
-- Add Active Context section to progress.md (replaced on update) instead of separate file
-- Session Log section remains append-only
+- Documentation must reflect Active Context structure (3 gaps fixed)
+- Context7 API key uses env var pattern (matches GitHub token)
+- Identified /debug, /validate, MAX_THINKING_TOKENS as potential additions
 
 ### Immediate Next Steps
-1. Test Active Context flow with memory-updater
-2. Consider committing changes
-3. Optionally address R9 (E2E testing guidance)
+1. Consider implementing /debug command
+2. Consider implementing /validate command
+3. Address R9 (E2E testing guidance with puppeteer MCP)
 
 ---
 
@@ -32,6 +32,15 @@ None (enhancement complete)
 Entries below are append-only. New entries are added at the top.
 
 <!-- New entries are added below this line -->
+
+## 2026-02-03 - Documentation Alignment + HumanLayer Analysis
+
+**Summary**: Reviewed Active Context commit, fixed 3 documentation gaps (README.md, init-repo template). Analyzed HumanLayer's .claude directory structure and compared against our scaffold.
+**Context Summary**: `_docs/context-summaries/20260203-013650.md`
+**Session Chain**: 12 sessions
+**Outcome**: Documentation aligned; identified potential enhancements (/debug, /validate, MAX_THINKING_TOKENS)
+
+---
 
 ## 2026-02-03 - Active Context Enhancement (Memory System)
 
@@ -117,7 +126,7 @@ Entries below are append-only. New entries are added at the top.
 - Clarified constraints to allow artifact writes while enforcing read-only exploration
 
 **Outcome**: R6 closed; /map now executes in isolated context with artifact output
-**Context Summary**: `_context-summaries/20260130-011722.md`
+**Context Summary**: `_docs/context-summaries/20260130-011722.md`
 **Session Chain**: 8 sessions
 
 ---
@@ -125,7 +134,7 @@ Entries below are append-only. New entries are added at the top.
 ## 2026-01-27 - Audit Documentation Fixes
 
 **Summary**: Applied all documentation fixes identified in session 5's comprehensive audit. Updated README.md (structure, workflow, decisions, known gaps), fixed /summarize resume instructions, updated /plan to use session context. Assessed R6 and recommended deferral.
-**Context Summary**: `_context-summaries/20260127-141123.md`
+**Context Summary**: `_docs/context-summaries/20260127-141123.md`
 **Session Chain**: 6 sessions
 **Outcome**: All audit fixes applied; R6 assessed and deferred; R7-R9 remain open
 
@@ -149,7 +158,7 @@ Entries below are append-only. New entries are added at the top.
 - /plan should use session context, not re-read task-list.json
 
 **Outcome**: Architecture refined; documentation fixes pending
-**Context Summary**: `_context-summaries/20260126-201819.md`
+**Context Summary**: `_docs/context-summaries/20260126-201819.md`
 **Session Chain**: 5 sessions
 
 ---
@@ -171,7 +180,7 @@ Entries below are append-only. New entries are added at the top.
 - "Pure coordinator" principle is from practitioner literature, not Anthropic source
 
 **Outcome**: R5 closed as not applicable; workflow simplified
-**Context Summary**: `_context-summaries/20260126-192118.md`
+**Context Summary**: `_docs/context-summaries/20260126-192118.md`
 **Session Chain**: 4 sessions
 
 ---
@@ -179,6 +188,6 @@ Entries below are append-only. New entries are added at the top.
 ## 2026-01-26 - Context Management Implementation
 
 **Summary**: Implemented `/summarize` skill for session handoff and converted `/dev` to skill with optional resume argument. Established session chaining pattern for multi-session work streams.
-**Context Summary**: `_context-summaries/20260126-145828.md`
+**Context Summary**: `_docs/context-summaries/20260126-145828.md`
 **Session Chain**: 3 sessions
 **Outcome**: Completed context management implementation; R5-R9 remain pending
