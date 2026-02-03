@@ -59,8 +59,8 @@ If review isn't approved, run `/review` first.
    Invoke the `memory-updater` agent with the payload.
    
    The subagent will:
-   - Append entry to progress.md
-   - Append decisions to decisions.md
+   - Append entry to _docs/memory/progress.md
+   - Append decisions to _docs/memory/decisions.md
    - Update task status in task-list.json
 
 7. **Receive Update Confirmation**
@@ -85,8 +85,8 @@ If review isn't approved, run `/review` first.
    **Status**: Complete
 
    ### Memory Bank Updated
-   - progress.md: Entry added
-   - decisions.md: [N] decisions recorded
+   - _docs/memory/progress.md: Entry added
+   - _docs/memory/decisions.md: [N] decisions recorded
    - task-list.json: Task marked complete
 
    ---

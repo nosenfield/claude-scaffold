@@ -1,6 +1,6 @@
 ---
 name: memory-updater
-description: Use after task completion to persist session state. Requires taskId, status, commitSha, filesModified, and decisions in payload. Updates Active Context section, appends entry to Session Log in progress.md, records significant decisions in decisions.md, and marks task complete in task-list.json.
+description: Use after task completion to persist session state. Requires taskId, status, commitSha, filesModified, and decisions in payload. Updates Active Context section, appends entry to Session Log in _docs/memory/progress.md, records significant decisions in _docs/memory/decisions.md, and marks task complete in task-list.json.
 tools: Read, Write, Edit, Glob
 model: sonnet
 ---
@@ -196,7 +196,7 @@ Only modify these fields in task-list.json:
 - New entries go immediately after the marker comment
 - Keep entries concise and factual
 
-### decisions.md
+### _docs/memory/decisions.md
 - **APPEND** only; never overwrite existing entries
 
 ### task-list.json

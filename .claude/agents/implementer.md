@@ -97,7 +97,7 @@ Record any implementation decisions for the memory bank:
 - Deviations from standard patterns
 - Configuration values chosen
 
-These decisions will be recorded in decisions.md by the memory-updater.
+These decisions will be recorded in _docs/memory/decisions.md by the memory-updater.
 
 ## Rules
 

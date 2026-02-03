@@ -159,7 +159,7 @@ Create `_docs/context-summaries/[timestamp].md`:
 
 ```
 
-### 8. Update progress.md
+### 8. Update _docs/memory/progress.md
 
 Append session entry:
 
