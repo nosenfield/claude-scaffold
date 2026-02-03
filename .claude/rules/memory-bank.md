@@ -19,7 +19,25 @@ Memory bank files provide persistent context across sessions. They must be maint
 
 ## _docs/memory/progress.md Rules
 
-**Structure**: Append-only log with newest entries at bottom.
+**Structure**: Two sections with different update patterns.
+
+### Active Context Section
+
+Located at top of file, between `## Active Context` and `## Session Log`.
+
+**Content**:
+- Current Focus (what we're working on)
+- Current Task (if any)
+- Recent Decisions (last 2-3)
+- Immediate Next Steps
+
+**Operations**:
+- REPLACE entire section on each update: Yes
+- This is what `/dev` reads at session start
+
+### Session Log Section
+
+Located below Active Context, after `<!-- New entries are added below this line -->`.
 
 **Entry Format**:
 ```markdown
@@ -36,7 +54,7 @@ Memory bank files provide persistent context across sessions. They must be maint
 ```
 
 **Operations**:
-- APPEND new entries: Yes
+- APPEND new entries: Yes (immediately after marker comment)
 - Modify existing entries: No
 - Delete entries: No
 - Reorder entries: No

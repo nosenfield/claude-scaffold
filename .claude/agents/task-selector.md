@@ -16,7 +16,7 @@ The orchestrator provides no payload. Read directly from project files.
 ## Process
 
 1. **Load Task List**
-   Read `/_docs/task-list.json`.
+   Read `_docs/task-list.json`.
 
 2. **Filter Candidates**
    Select tasks where:
@@ -46,7 +46,7 @@ The orchestrator provides no payload. Read directly from project files.
    Select the first task.
 
 5. **Update Task Status**
-   Edit `/_docs/task-list.json` to set selected task's status to `"in-progress"`.
+   Edit `_docs/task-list.json` to set selected task's status to `"in-progress"`.
 
 6. **Return Selected Task**
    Return the complete task object:

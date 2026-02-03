@@ -25,7 +25,7 @@ npm run typecheck    # Run TypeScript type checking
 
 ## Development Workflow
 
-1. `/init` - Initialize environment (first time)
+1. `/init-repo` - Initialize scaffold (first time)
 2. `/dev` - Start session
 3. `/next` - Select task
 4. `/plan` - Plan implementation
