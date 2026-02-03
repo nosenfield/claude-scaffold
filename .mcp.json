@@ -3,7 +3,10 @@
     "context7": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      },
       "description": "Documentation search and retrieval for libraries and frameworks",
       "enabled": false
     },
@@ -12,7 +15,7 @@
       "command": "npx",
       "args": ["-y", "@anthropic/mcp-puppeteer"],
       "description": "Browser automation for end-to-end testing",
-      "enabled": false
+      "enabled": true
     },
     "github": {
       "type": "stdio",
