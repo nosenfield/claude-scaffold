@@ -71,8 +71,14 @@ Run `/init-repo` to initialize this repository before starting development.
 ```
 
 If memory files exist, read them:
-- `progress.md`: Last session summary, completed tasks, in-progress work
+- `progress.md`: **Active Context section** (current focus, task, next steps) + recent Session Log entries
 - `decisions.md`: Architectural decisions, rejected approaches
+
+**Active Context** is the primary source for session state. It contains:
+- Current Focus (what we're working on)
+- Current Task (if any)
+- Recent Decisions (last 2-3)
+- Immediate Next Steps
 
 Verify `_docs/task-list.json` exists (do not read contents; task list access is handled by `task-selector` subagent via `/next`).
 
@@ -120,15 +126,27 @@ Note uncommitted changes. Git log is verification only; trust memory files as au
 ## Session Status
 
 **Repository**: [clean/dirty]
+**Last Updated**: [date from Active Context]
 
-### Recent Progress
-[Summary from progress.md: last completed work, current state]
+### Active Context
 
-### Recent Decisions
-- [relevant decisions from decisions.md]
+**Current Focus**:
+- [from Active Context section]
+
+**Current Task**: [from Active Context, or "None"]
+
+**Recent Decisions**:
+- [from Active Context section]
+
+**Immediate Next Steps**:
+1. [from Active Context]
+2. [from Active Context]
+
+### Recent Session Log
+[Last 1-2 entries from Session Log section, summarized]
 
 ### Recommended Action
-Run `/next` to check task status and continue development.
+[Based on Current Task and Next Steps from Active Context, or "Run `/next` to select a task"]
 ```
 
 ## Notes
