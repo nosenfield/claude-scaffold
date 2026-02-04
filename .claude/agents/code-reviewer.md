@@ -25,7 +25,11 @@ Access via the prompt context. Do not assume information not provided.
 
 Retrieve from project files:
 - `/_docs/architecture.md`: Design constraints
-- `/_docs/best-practices.md`: Quality standards
+- `/_docs/best-practices.md`: Project-specific quality standards
+- `/_docs/principles/code-review.md`: Review process and communication guidelines
+- `/_docs/principles/security.md`: OWASP checklist and security principles
+- `/_docs/principles/code-quality.md`: SOLID principles and clean code practices
+- `/_docs/principles/system-design.md`: Black box principles, composability, contracts
 
 ## File Access
 
@@ -71,6 +75,8 @@ You receive a list of modified files. You MUST:
 - [ ] Follows established patterns
 - [ ] Dependencies flow in correct direction
 - [ ] No inappropriate coupling
+- [ ] Clear interfaces (could be reimplemented from interface alone)
+- [ ] Input/output contracts are explicit
 
 ### Code Quality
 - [ ] Follows project conventions

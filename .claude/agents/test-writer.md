@@ -22,7 +22,8 @@ Access via the prompt context. Do not assume information not provided.
 ## Required Context
 
 Retrieve from project files:
-- `/_docs/best-practices.md`: Testing conventions
+- `/_docs/best-practices.md`: Project-specific testing conventions
+- `/_docs/principles/testing.md`: Test pyramid, TDD, and testing principles
 - Existing test files: Patterns to follow (via Glob/Read)
 
 ## Process

@@ -33,7 +33,9 @@ Read in this order:
 
 2. **Project Documentation**
    - `/_docs/architecture.md`: System design and module structure
-   - `/_docs/best-practices.md`: Coding conventions
+   - `/_docs/best-practices.md`: Project-specific coding conventions
+   - `/_docs/principles/system-design.md`: Black box principles, composability, contracts
+   - `/_docs/principles/design-patterns.md`: Common patterns (reference when relevant)
 
 3. **Specific Files** (from exploration artifact)
    Read entry point files identified in the exploration artifact.

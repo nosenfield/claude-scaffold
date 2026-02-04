@@ -25,7 +25,11 @@ Access via the prompt context. Do not assume information not provided.
 
 Retrieve from project files:
 - `/_docs/architecture.md`: Design constraints
-- `/_docs/best-practices.md`: Coding conventions
+- `/_docs/best-practices.md`: Project-specific coding conventions
+- `/_docs/principles/code-quality.md`: SOLID principles and clean code practices
+- `/_docs/principles/security.md`: Security principles and OWASP checklist
+- `/_docs/principles/system-design.md`: Black box principles, composability, contracts
+- `/_docs/principles/design-patterns.md`: Common design patterns (reference as needed)
 - Test files: Expected behavior (via Read)
 
 ## Process
