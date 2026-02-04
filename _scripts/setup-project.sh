@@ -95,12 +95,15 @@ mkdir -p _docs/maps
 touch _docs/context-summaries/.gitkeep
 touch _docs/maps/.gitkeep
 
-# Copy template documentation files
-cp "$SCAFFOLD_DIR/_docs/prd.md" _docs/prd.md
-cp "$SCAFFOLD_DIR/_docs/architecture.md" _docs/architecture.md
+# Copy template documentation files from templates/
+cp "$SCAFFOLD_DIR/_docs/templates/prd.md" _docs/prd.md
+cp "$SCAFFOLD_DIR/_docs/templates/architecture.md" _docs/architecture.md
+cp "$SCAFFOLD_DIR/_docs/templates/best-practices.md" _docs/best-practices.md
+cp "$SCAFFOLD_DIR/_docs/templates/task-list.json" _docs/task-list.json
+cp "$SCAFFOLD_DIR/_docs/templates/backlog.json" _docs/backlog.json
+
+# Copy example best-practices.md (concrete content, can be used as-is or customized)
 cp "$SCAFFOLD_DIR/_docs/best-practices.md" _docs/best-practices.md
-cp "$SCAFFOLD_DIR/_docs/task-list.json" _docs/task-list.json
-cp "$SCAFFOLD_DIR/_docs/backlog.json" _docs/backlog.json
 
 echo "Customizing placeholders..."
 

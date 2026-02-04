@@ -15,6 +15,8 @@ The user must have placed these files in `_docs/`:
 - `task-list.json` - Project tasks
 - `best-practices.md` - Coding standards
 
+Templates are available in `_docs/templates/` for reference.
+
 ## Steps
 
 ### 1. Validate Core Documentation
@@ -35,6 +37,12 @@ The following required files are not present:
 
 Please create these files before running /init-repo.
 
+Templates are available in `_docs/templates/`:
+- prd.md
+- architecture.md
+- task-list.json
+- best-practices.md
+
 See README.md for documentation requirements.
 ```
 
@@ -45,7 +53,7 @@ See README.md for documentation requirements.
 cat _docs/task-list.json | head -20
 ```
 
-Confirm the file contains valid JSON with a `tasks` array.
+Confirm the file contains valid JSON with a `tasks` array. The expected schema is documented in `_docs/templates/task-list.json`.
 
 ### 3. Create Memory Files
 
@@ -55,66 +63,24 @@ Create the memory directory if needed:
 mkdir -p _docs/memory
 ```
 
-**Create `_docs/memory/progress.md`** if it doesn't exist:
+**Create `_docs/memory/progress.md`** if it doesn't exist. Copy from `_docs/templates/progress.md` and update the date:
 
-```markdown
-# Progress Log
-
-This file tracks session history and completed work.
-
----
-
-## Active Context
-
-**Last Updated**: [DATE]
-
-### Current Focus
-- Project initialized, ready for development
-
-### Current Task
-None
-
-### Recent Decisions
-- None yet
-
-### Immediate Next Steps
-1. Run `/dev` to start development session
-2. Run `/next` to select first task
-
----
-
-## Session Log
-
-Entries below are append-only. New entries are added at the top.
-
-<!-- New entries are added below this line -->
-
-## [DATE] - Project Initialized
-
-**Status**: Repository initialized, ready for development
-**Core Documentation**: Verified present
-
----
+```bash
+cp _docs/templates/progress.md _docs/memory/progress.md
+# Update [DATE] placeholders with current date
 ```
 
-**Create `_docs/memory/decisions.md`** if it doesn't exist:
+**Create `_docs/memory/decisions.md`** if it doesn't exist. Copy from `_docs/templates/decisions.md`:
 
-```markdown
-# Decision Log
-
-This file records architecture and implementation decisions. Entries are append-only.
-
----
-
-<!-- New entries are added below this line -->
+```bash
+cp _docs/templates/decisions.md _docs/memory/decisions.md
 ```
 
-**Create `_docs/backlog.json`** if it doesn't exist:
+**Create `_docs/backlog.json`** if it doesn't exist. Copy from `_docs/templates/backlog.json` and update metadata:
 
-```json
-{
-  "items": []
-}
+```bash
+cp _docs/templates/backlog.json _docs/backlog.json
+# Update [PROJECT_NAME] and [ISO_TIMESTAMP] in metadata
 ```
 
 ### 4. Report Initialized State
@@ -129,9 +95,9 @@ This file records architecture and implementation decisions. Entries are append-
 - best-practices.md: Present
 
 ### Memory Files Created
-- _docs/memory/progress.md: Created
-- _docs/memory/decisions.md: Created
-- _docs/backlog.json: Created
+- _docs/memory/progress.md: Created (from template)
+- _docs/memory/decisions.md: Created (from template)
+- _docs/backlog.json: Created (from template)
 
 ---
 
@@ -142,5 +108,6 @@ This file records architecture and implementation decisions. Entries are append-
 
 - Run this command once per project, after placing documentation
 - If memory files already exist, they are not overwritten
+- Templates in `_docs/templates/` provide structure and schema documentation
 - After initialization, use `/dev` to start each session
 - Environment setup (npm install, etc.) is handled as the first project task via `/next`
