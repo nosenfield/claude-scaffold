@@ -7,12 +7,10 @@
 # - Detects when pre-commit was bypassed via --no-verify
 # - Logs bypasses to _logs/commit-bypasses.log
 #
-# Installation:
-#   git config core.hooksPath _scripts
+# Configuration (set automatically by setup-project.sh):
+#   git config core.hooksPath .githooks
 #
-# Or copy hooks manually:
-#   cp _scripts/pre-commit .git/hooks/pre-commit
-#   cp _scripts/post-commit .git/hooks/post-commit
+# Edit this file directly to customize post-commit behavior.
 
 # ============================================================================
 # CONFIGURATION

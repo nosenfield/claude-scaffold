@@ -6,12 +6,10 @@
 # - Runs test, lint, and typecheck if available
 # - Creates marker file for post-commit bypass detection
 #
-# Installation:
-#   git config core.hooksPath _scripts
+# Configuration (set automatically by setup-project.sh):
+#   git config core.hooksPath .githooks
 #
-# Or copy hooks manually:
-#   cp _scripts/pre-commit .git/hooks/pre-commit
-#   cp _scripts/post-commit .git/hooks/post-commit
+# Edit this file directly to customize pre-commit behavior.
 
 set -o pipefail
 

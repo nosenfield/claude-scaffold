@@ -19,7 +19,7 @@ scaffold/
 ├── .claude/
 │   ├── agents/          # Specialized subagents
 │   ├── commands/        # Workflow commands (/next, /plan, etc.)
-│   ├── hooks/           # Quality gate scripts
+│   ├── hooks/           # Claude Code quality gate scripts
 │   ├── rules/           # File protection policies
 │   ├── skills/          # Extended capabilities
 │   │   ├── dev/         # Session start (with resume support)
@@ -27,6 +27,9 @@ scaffold/
 │   │   ├── map/         # Codebase exploration with artifacts
 │   │   └── summarize/   # Context handoff
 │   └── settings.json    # Hook configuration
+├── .githooks/           # Git hooks (version-controlled)
+│   ├── pre-commit       # Quality gates (test, lint, typecheck)
+│   └── post-commit      # Commit logging, bypass detection
 ├── _docs/               # Core documentation (read-only for agents)
 │   ├── prd.md           # Product requirements template
 │   ├── architecture.md  # System design template
@@ -38,8 +41,8 @@ scaffold/
 │   └── memory/          # Persistent memory files
 │       ├── progress.md  # Session state + session history
 │       └── decisions.md # Append-only decision log
-├── _scripts/            # Git hooks and setup scripts
-│   └── pre-commit       # Git pre-commit hook (requires installation)
+├── _scripts/            # Setup scripts (scaffold-only)
+│   └── setup-project.sh # Create new project from scaffold
 ├── CLAUDE.md            # Project context for Claude Code
 └── .mcp.json            # MCP server configuration
 ```
@@ -137,19 +140,22 @@ Decisions made during scaffold development are recorded below.
 **Implementation**:
 | Hook | Location | Trigger | Purpose |
 |------|----------|---------|---------|
-| pre-commit | `_scripts/pre-commit` | `git commit` | Runs test, lint, typecheck before commit |
+| pre-commit | `.githooks/pre-commit` | `git commit` | Runs test, lint, typecheck before commit |
+| post-commit | `.githooks/post-commit` | After commit | Logs commits, detects `--no-verify` bypass |
 
-**Installation** (required after cloning):
+**Configuration**: Hooks use `core.hooksPath` (Git 2.9+) for version-controlled hooks:
 ```bash
-cp _scripts/pre-commit .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
+git config core.hooksPath .githooks
 ```
+
+This is configured automatically by `setup-project.sh` when creating a new project.
 
 **Rationale**:
 - Git commit is the correct enforcement boundary—nothing commits without passing
 - Avoids unnecessary checks on non-commit operations (`/dev`, `/next`, Q&A)
 - Single source of truth for quality gate logic
 - Works regardless of commit source (Claude or human)
+- `core.hooksPath` keeps hooks version-controlled and visible (modern Husky-style pattern)
 
 **Alternative Rejected**: Claude Stop hook running on every response. This caused 10-30s delays after every interaction, even simple questions.
 
