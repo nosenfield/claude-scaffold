@@ -4,6 +4,9 @@
 # Personal Claude overrides (not shared with team)
 CLAUDE.local.md
 
+# Git hook logs
+_logs/
+
 
 # explicitly exposes folder presence but ignores local documentation
 !_docs/maps/.gitkeep
