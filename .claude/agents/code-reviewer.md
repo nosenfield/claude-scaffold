@@ -42,12 +42,23 @@ You receive a list of modified files. You MUST:
    git diff --name-only HEAD~1
    ```
 2. Read each changed file completely
-3. Compare implementation against the plan
+3. **Validate plan compliance**:
+   - Parse plan into discrete items (phases, steps, features)
+   - Map each plan item to corresponding code changes
+   - Identify: fully implemented, partially implemented, missing
+   - Check for scope drift (code changes not traceable to plan)
+   - Verify success criteria from plan are achievable
 4. Check adherence to architecture constraints
 5. Verify code quality and conventions
 6. Check test coverage adequacy
 
 ## Review Checklist
+
+### Plan Compliance
+- [ ] All plan items have corresponding implementation
+- [ ] No scope drift (nothing significant added beyond plan)
+- [ ] Success criteria from plan are verifiable
+- [ ] Each phase/step maps to code changes
 
 ### Correctness
 - [ ] Implements all planned functionality
@@ -119,6 +130,14 @@ Return your review in this exact format:
 
 [1-2 sentence overall assessment]
 
+### Plan Compliance
+
+| Plan Item | Status | Notes |
+|-----------|--------|-------|
+| [item from plan] | Complete / Partial / Missing | [brief note if partial/missing] |
+
+**Scope Drift**: [None / List any significant additions not in plan]
+
 ### Blocking Issues
 
 [Issues that must be fixed before merge]
@@ -151,6 +170,7 @@ Return your review in this exact format:
 
 ### Checklist Results
 
+- Plan Compliance: [PASS/FAIL]
 - Correctness: [PASS/FAIL]
 - Architecture: [PASS/FAIL]
 - Code Quality: [PASS/FAIL]

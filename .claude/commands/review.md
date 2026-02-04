@@ -51,12 +51,13 @@ If tests aren't passing, run `/implement` first.
 
 4. **Spawn code-reviewer Subagent**
    Invoke the `code-reviewer` agent with the payload.
-   
+
    The subagent will:
    - Read all modified files
-   - Compare against plan and standards
+   - Validate plan compliance (map plan items to code, check for scope drift)
+   - Compare against architecture and quality standards
    - Apply review checklist
-   - Return structured review
+   - Return structured review with plan compliance table
 
 5. **Receive Review Results**
    Confirm the response includes:
