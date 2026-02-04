@@ -6,25 +6,25 @@ This file tracks session history and completed work.
 
 ## Active Context
 
-**Last Updated**: 2026-02-03
+**Last Updated**: 2026-02-04
 
 ### Current Focus
-- Git hooks adoption complete (commit logging + bypass detection)
-- Merged into existing `_scripts/` directory
+- Engineering principles distributed to agents
+- Created `_docs/principles/` with 6 reusable principle files
+- Agents now reference project-agnostic principles separately from project-specific best-practices.md
 
 ### Current Task
 None
 
 ### Recent Decisions
-- Adopt commit logging and bypass detection from ai-project-template
-- Merge hooks into existing `_scripts/` (not separate directory)
-- Skip pre-commit Claude review (conflicts with skill-based workflow)
+- Decompose principles into files (not embed in agents): single source of truth, lean agents
+- Create system-design.md for blackbox/composability: gap identified, principles incomplete without it
+- Separate project-agnostic principles from project-specific conventions
 
 ### Immediate Next Steps
-1. Commit git hooks changes
-2. Consider implementing /debug command
-3. Consider implementing /validate command
-4. Address R9 (E2E testing guidance with puppeteer MCP)
+1. Consider implementing /debug command
+2. Consider implementing /validate command
+3. Address R9 (E2E testing guidance with puppeteer MCP)
 
 ---
 
@@ -33,6 +33,15 @@ None
 Entries below are append-only. New entries are added at the top.
 
 <!-- New entries are added below this line -->
+
+## 2026-02-04 - Engineering Principles for Agents
+
+**Summary**: Created `_docs/principles/` directory with 6 decomposed principle files extracted from software-engineering-best-practices.md. Updated 4 agents to reference relevant principles. Added system-design.md for blackbox/composability principles.
+**Context Summary**: `_docs/context-summaries/20260204-012948.md`
+**Session Chain**: 14 sessions
+**Outcome**: Project-agnostic principles separated from project-specific conventions; agents enhanced with principle references
+
+---
 
 ## 2026-02-03 - Git Hooks Adoption from ai-project-template
 
