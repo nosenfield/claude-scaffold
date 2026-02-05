@@ -32,6 +32,9 @@ Identify and select the highest-priority unblocked task.
    - [criterion 2]
    - [criterion 3]
 
+   ### References
+   [references list or "None"]
+
    ### Dependencies
    [blockedBy list or "None"]
 
@@ -69,4 +72,4 @@ Identify and select the highest-priority unblocked task.
 ## State Management
 
 Session context after successful selection:
-- `currentTask`: Selected task object (id, title, description, acceptanceCriteria)
+- `currentTask`: Selected task object (id, title, description, acceptanceCriteria, references)

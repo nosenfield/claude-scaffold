@@ -16,6 +16,7 @@ NEVER modify these fields on any task:
 - `description`: Task details
 - `priority`: Task ordering
 - `acceptanceCriteria`: Definition of done
+- `references`: Documentation pointers for agent context
 - `blockedBy`: Dependency list
 
 ## Mutable Fields

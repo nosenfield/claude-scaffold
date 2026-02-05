@@ -202,4 +202,4 @@ Only modify these fields in task-list.json:
 ### task-list.json
 - ONLY modify status and completedAt fields
 - Skip if no taskId provided (ad-hoc work)
-- Never modify task descriptions, priorities, or acceptance criteria
+- Never modify task descriptions, priorities, references, or acceptance criteria

@@ -17,6 +17,7 @@ The orchestrator provides:
 - **explorationArtifact**: Path to exploration artifact from /map
 - **taskId**: Task identifier (optional; present in task-list workflow)
 - **acceptanceCriteria**: List of acceptance criteria (optional)
+- **references**: Paths to relevant documentation sections (optional)
 
 Access via the prompt context. Do not assume information not provided.
 
@@ -31,13 +32,16 @@ Read in this order:
    - Related systems
    - Relevant file paths
 
-2. **Project Documentation**
+2. **Task References** (from payload, if provided)
+   Read each path in `references` array. These are task-specific documentation sections that define constraints and requirements for this task.
+
+3. **Project Documentation**
    - `/_docs/architecture.md`: System design and module structure
    - `/_docs/best-practices.md`: Project-specific coding conventions
    - `/_docs/principles/system-design.md`: Black box principles, composability, contracts
    - `/_docs/principles/design-patterns.md`: Common patterns (reference when relevant)
 
-3. **Specific Files** (from exploration artifact)
+4. **Specific Files** (from exploration artifact)
    Read entry point files identified in the exploration artifact.
 
 ## Process

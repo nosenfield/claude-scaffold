@@ -92,6 +92,7 @@ The `task-selector` agent expects tasks in this exact format:
       "priority": 1,
       "status": "pending",
       "acceptanceCriteria": ["Criterion 1", "Criterion 2"],
+      "references": ["architecture.md#relevant-section"],
       "blockedBy": [],
       "completedAt": null
     }
@@ -99,7 +100,7 @@ The `task-selector` agent expects tasks in this exact format:
 }
 ```
 
-Required fields: `id`, `title`, `description`, `priority`, `status`, `acceptanceCriteria`, `blockedBy`, `completedAt`
+Required fields: `id`, `title`, `description`, `priority`, `status`, `acceptanceCriteria`, `references`, `blockedBy`, `completedAt`
 
 See `_docs/templates/task-list.json` for full schema documentation.
 

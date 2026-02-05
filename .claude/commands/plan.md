@@ -37,6 +37,7 @@ A task must be in-progress. If not, run `/next` first.
    taskTitle: [task.title]
    taskDescription: [task.description]
    acceptanceCriteria: [task.acceptanceCriteria]
+   references: [task.references]
    explorationArtifact: [path to exploration artifact from /map]
    ```
 

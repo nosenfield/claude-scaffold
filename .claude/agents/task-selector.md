@@ -59,6 +59,9 @@ The orchestrator provides no payload. Read directly from project files.
    acceptanceCriteria:
      - [criterion 1]
      - [criterion 2]
+   references:
+     - [doc path 1]
+     - [doc path 2]
    blockedBy: [list or empty]
    ```
 

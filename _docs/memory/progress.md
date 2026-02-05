@@ -6,20 +6,20 @@ This file tracks session history and completed work.
 
 ## Active Context
 
-**Last Updated**: 2026-02-04
+**Last Updated**: 2026-02-05
 
 ### Current Focus
-- Engineering principles distributed to agents
-- Created `_docs/principles/` with 6 reusable principle files
-- Agents now reference project-agnostic principles separately from project-specific best-practices.md
+- Enhanced task-list.json schema with `references` field
+- Compared scaffold against alternative task list structures (single MD, chunked MD)
+- Documented schema design decisions including origin (Manual Section 3.3)
 
 ### Current Task
 None
 
 ### Recent Decisions
-- Decompose principles into files (not embed in agents): single source of truth, lean agents
-- Create system-design.md for blackbox/composability: gap identified, principles incomplete without it
-- Separate project-agnostic principles from project-specific conventions
+- Added `references` field to task schema for autonomous documentation lookup
+- Rejected `phase`, `effort`, `filesAffected` fields (do not improve autonomous development)
+- Documented full schema design history in decisions.md
 
 ### Immediate Next Steps
 1. Consider implementing /debug command
@@ -33,6 +33,32 @@ None
 Entries below are append-only. New entries are added at the top.
 
 <!-- New entries are added below this line -->
+
+## 2026-02-05 - task-list.json Schema Enhancement
+
+**Summary**: Compared scaffold task-list.json against alternative structures (single MD from MVP/DreamUp, chunked MD from SnakeBreaker). Evaluated potential fields for autonomous development value. Added `references` field to task schema; rejected `phase`, `effort`, `filesAffected`.
+
+**Key Changes**:
+- Updated `_docs/templates/task-list.json` with `references` field and schema documentation
+- Updated `task-selector` agent to include references in output
+- Updated `task-planner` agent to read references as priority context
+- Updated `task-list-protection` rule to mark references as immutable
+- Added comprehensive decision entry documenting schema design origin and field evaluation
+
+**Context Summary**: [pending]
+**Session Chain**: 16 sessions
+**Outcome**: Schema enhanced with `references` field; design decisions fully documented
+
+---
+
+## 2026-02-04 - task-list.json Design Origins Research
+
+**Summary**: Investigated the guiding principles and resources used to create the task-list.json template structure. Traced design to Best Practices Manual Section 3.3 "Feature List Management". Identified undocumented adaptations from manual's feature list pattern.
+**Context Summary**: `_docs/context-summaries/20260204-200237.md`
+**Session Chain**: 15 sessions
+**Outcome**: Design origins identified; gap noted (no decision entry for schema adaptation)
+
+---
 
 ## 2026-02-04 - Engineering Principles for Agents
 
