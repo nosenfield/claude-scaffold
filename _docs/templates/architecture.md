@@ -1,137 +1,170 @@
 # Architecture Document
 
-## System Overview
+## Document Metadata
 
-[High-level description of the system architecture]
+| Field | Value |
+|-------|-------|
+| Scope | [MVP / Full / Module name] |
+| Status | [Draft / Active / Deprecated] |
+
+## System Purpose
+
+[1-3 sentences: What the system does and what problem it solves.]
 
 ## Tech Stack
 
 | Layer | Technology | Rationale |
 |-------|------------|-----------|
-| Runtime | Node.js 20 | [Why chosen] |
-| Language | TypeScript 5.x | [Why chosen] |
-| Framework | [Framework] | [Why chosen] |
-| Database | [Database] | [Why chosen] |
-| Testing | Jest | [Why chosen] |
+| Runtime | [e.g., Node.js 20] | [Why chosen] |
+| Language | [e.g., TypeScript 5.x] | [Why chosen] |
+| Framework | [e.g., Express 4.x] | [Why chosen] |
+| Database | [e.g., PostgreSQL 16] | [Why chosen] |
+| Testing | [e.g., Vitest] | [Why chosen] |
+
+## Architecture Principles
+
+1. **[Principle]**: [Description]
+2. **[Principle]**: [Description]
+3. **[Principle]**: [Description]
 
 ## Project Structure
 
 ```
 project-root/
 ├── src/
-│   ├── routes/          # API route handlers
-│   ├── services/        # Business logic
-│   ├── repositories/    # Data access layer
-│   ├── models/          # Data models/types
-│   ├── middleware/      # Express middleware
-│   ├── utils/           # Shared utilities
-│   └── index.ts         # Application entry point
+│   ├── index.ts              # Entry point
+│   ├── config/               # Constants, env validation
+│   ├── routes/               # HTTP handlers
+│   ├── services/             # Business logic
+│   ├── repositories/         # Data access
+│   └── types/                # Type definitions
 ├── tests/
-│   ├── unit/            # Unit tests
-│   ├── integration/     # Integration tests
-│   └── e2e/             # End-to-end tests
-├── _docs/               # Project documentation
-├── .claude/             # Claude Code configuration
-└── package.json
+│   ├── unit/
+│   └── integration/
+└── _docs/
 ```
 
-## Architecture Principles
+## Core Components
 
-1. **[Principle 1]**: [Description and rationale]
-2. **[Principle 2]**: [Description and rationale]
-3. **[Principle 3]**: [Description and rationale]
+### [Component Name]
 
-## Component Design
+| Aspect | Value |
+|--------|-------|
+| Purpose | [One sentence] |
+| Location | `src/[path]/[file].ts` |
+| Dependencies | [What it requires] |
 
-### [Component 1 Name]
-**Responsibility**: [What this component does]
-**Dependencies**: [What it depends on]
+**Responsibilities**:
+- [Responsibility 1]
+- [Responsibility 2]
+
 **Interface**:
 ```typescript
-interface [ComponentInterface] {
-  [method signature]
+interface [Name] {
+  [method](input: Type): Promise<Type>;
 }
 ```
-
-### [Component 2 Name]
-**Responsibility**: [What this component does]
-**Dependencies**: [What it depends on]
 
 ## Data Flow
 
 ```
-[Request] → [Route] → [Service] → [Repository] → [Database]
-                ↓
-           [Response]
+[Input] → [Route] → [Service] → [Repository] → [Database]
+              ↓
+         [Response]
 ```
 
-## API Design
+1. Request arrives at route handler
+2. Middleware validates/transforms
+3. Service executes business logic
+4. Repository persists/retrieves
+5. Response returned
 
-### Endpoints
+## Configuration
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | /api/[resource] | [Description] |
-| POST | /api/[resource] | [Description] |
-| PUT | /api/[resource]/:id | [Description] |
-| DELETE | /api/[resource]/:id | [Description] |
+### Environment Variables
 
-### Authentication
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DATABASE_URL` | Yes | — | Connection string |
+| `PORT` | No | `3000` | Server port |
 
-[Describe authentication approach]
+### Constants
 
-### Error Handling
+Location: `src/config/constants.ts`
 
-[Describe error handling patterns]
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `MAX_PAGE_SIZE` | 100 | Pagination limit |
+| `REQUEST_TIMEOUT` | 30000 | Request timeout (ms) |
 
-## Database Schema
+## Error Handling
 
-### [Table/Collection 1]
-| Field | Type | Constraints |
-|-------|------|-------------|
-| id | UUID | Primary key |
-| [field] | [type] | [constraints] |
+| Category | Status | Pattern |
+|----------|--------|---------|
+| Validation | 400 | Return field-level errors |
+| Auth | 401/403 | Log attempt, generic response |
+| Not Found | 404 | Return resource identifier |
+| Internal | 500 | Log full error, generic response |
 
-## Environment Setup
+**Principles**: Fail fast at boundaries. Log with context. No silent failures.
 
-### Prerequisites
-- Node.js 20+
-- npm 10+
-- [Other prerequisites]
+## Constraints
 
-### Installation
-```bash
-git clone [repository]
-cd [project]
-npm install
-```
+### Technical Limits
 
-### Configuration
-```bash
-cp .env.example .env
-# Edit .env with your values
-```
+| Constraint | Limit | Rationale |
+|------------|-------|-----------|
+| Request body | 1 MB | Memory safety |
+| Query results | 1000 | DB performance |
 
-### Running Locally
-```bash
-npm run dev
-```
+### Scope Boundaries
 
-### Running Tests
-```bash
-npm run test
-```
+**In Scope**: [List features included]
 
-## Deployment
+**Out of Scope**: [List features explicitly excluded]
 
-[Describe deployment process and environments]
+## Testing
 
-## Security Considerations
+| Layer | Target | Focus |
+|-------|--------|-------|
+| Unit | 80% | Services, utilities |
+| Integration | 70% | Route → Service → Repository |
+| E2E | Critical paths | Core user flows |
 
-- [Security consideration 1]
-- [Security consideration 2]
+**Commands**: `npm run test`, `npm run test:cov`
 
-## Performance Considerations
+## Related Documents
 
-- [Performance consideration 1]
-- [Performance consideration 2]
+| Document | Purpose |
+|----------|---------|
+| `_docs/prd.md` | Requirements, acceptance criteria |
+| `_docs/best-practices.md` | Coding conventions |
+| `_docs/task-list.json` | Implementation tasks |
+
+Add project-specific docs as needed (e.g., `api-schema.md`, `database-schema.md`).
+
+## Agent Implementation Guide
+
+### Priority Order
+
+1. `src/types/` - Define interfaces first
+2. `src/config/` - Constants, environment
+3. `src/repositories/` - Data access
+4. `src/services/` - Business logic
+5. `src/routes/` - HTTP handlers
+6. Tests with each layer
+
+### Context Loading
+
+When implementing, read in order:
+1. This document (architecture overview)
+2. `src/types/` (relevant interfaces)
+3. Existing similar components (patterns)
+4. Related documents as needed
+
+### Verification
+
+Before completing:
+- [ ] Types match documented interfaces
+- [ ] Error handling follows patterns
+- [ ] Tests cover happy path + errors

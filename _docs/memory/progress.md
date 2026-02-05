@@ -45,7 +45,7 @@ Entries below are append-only. New entries are added at the top.
 - Updated `task-list-protection` rule to mark references as immutable
 - Added comprehensive decision entry documenting schema design origin and field evaluation
 
-**Context Summary**: [pending]
+**Commit**: `852bd3d`
 **Session Chain**: 16 sessions
 **Outcome**: Schema enhanced with `references` field; design decisions fully documented
 

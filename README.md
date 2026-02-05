@@ -73,7 +73,7 @@ Templates provide:
 | `prd.md` | Product requirements structure | None (guidance only) |
 | `architecture.md` | System design structure | task-planner, implementer, code-reviewer |
 | `task-list.json` | Task schema with `_schema` documentation | **task-selector** (strict format) |
-| `best-practices.md` | Coding standards skeleton | 5 agents reference |
+| `best-practices.md` | Coding standards skeleton | test-writer, implementer, code-reviewer, task-planner |
 | `backlog.json` | Deferred issues schema | code-reviewer |
 | `progress.md` | Memory file structure | memory-updater |
 | `decisions.md` | Decision log structure | memory-updater |
