@@ -116,8 +116,7 @@ If tests aren't passing, run `/implement` first.
          "category": "[issue.category]",
          "description": "[issue.description]",
          "file": "[issue.file]",
-         "line": "[issue.line]",
-         "effort": "[issue.effort]",
+         "lineHint": "[issue.line]",
          "createdAt": "[ISO timestamp]"
        }
        ```

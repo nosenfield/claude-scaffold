@@ -41,15 +41,10 @@ Located below Active Context, after `<!-- New entries are added below this line 
 
 **Entry Format**:
 ```markdown
-## [YYYY-MM-DD HH:MM] - Task [ID]: [Title]
-
-**Status**: [Complete/Partial/Blocked]
-
-**Changes**:
-- [file path]: [what changed]
-
-**Outcome**: [one-sentence summary]
-
+## YYYY-MM-DD - [Title]
+**Summary**: [1-2 sentences describing what was done]
+**Changes**: [file1], [file2], [file3]
+**Commit**: [hash] | **Chain**: [N]
 ---
 ```
 
@@ -65,17 +60,10 @@ Located below Active Context, after `<!-- New entries are added below this line 
 
 **Entry Format**:
 ```markdown
-## [YYYY-MM-DD] - [Decision Title]
-
-**Context**: [why decision was needed]
-
+## YYYY-MM-DD: [Title]
+**Context**: [1-2 sentences on why decision was needed]
 **Decision**: [what was decided]
-
-**Alternatives Considered**:
-- [option]: [why rejected]
-
-**Consequences**: [implications]
-
+**Rationale**: [why this choice; key rejected alternatives inline]
 ---
 ```
 
