@@ -19,25 +19,31 @@ The backlog tracks deferred non-blocking issues from code reviews. It serves as 
       "category": "security|performance|maintainability|convention",
       "description": "Issue description",
       "file": "path/to/file.ts",
-      "line": 42,
-      "effort": "low|medium|high",
-      "createdAt": "ISO timestamp",
-      "resolvedAt": null,
-      "resolvedBy": null
+      "lineHint": 42,
+      "createdAt": "ISO timestamp"
     }
   ]
 }
 ```
+
+## Workflow
+
+When code-reviewer identifies non-blocking issues:
+1. Orchestrator presents each suggestion to the user
+2. User chooses one of:
+   - **Address**: Fix the issue now (blocks task completion)
+   - **Defer**: Add to backlog for later resolution
+   - **Skip**: Ignore the suggestion (not recorded)
+3. Deferred items are appended to backlog.json
 
 ## Permitted Operations
 
 | Operation | Permitted | Actor |
 |-----------|-----------|-------|
 | Read backlog | Yes | Any agent |
-| Append new item | Yes | Orchestrator (via /review defer) |
-| Mark item resolved | Yes | User or orchestrator when addressed |
+| Append new item | Yes | Orchestrator (when user chooses "defer") |
+| Delete resolved item | Yes | User or orchestrator when addressed |
 | Modify item details | No | User only (manual edit) |
-| Delete item | No | User only (manual edit) |
 
 ## ID Generation
 
@@ -48,7 +54,7 @@ New items receive sequential IDs:
 
 ## Adding Items
 
-When deferring non-blocking issues from code review:
+When user chooses "defer" for a non-blocking issue:
 
 ```json
 {
@@ -57,30 +63,18 @@ When deferring non-blocking issues from code review:
   "category": "[from code-reviewer]",
   "description": "[from code-reviewer]",
   "file": "[from code-reviewer]",
-  "line": "[from code-reviewer]",
-  "effort": "[from code-reviewer]",
-  "createdAt": "[current ISO timestamp]",
-  "resolvedAt": null,
-  "resolvedBy": null
+  "lineHint": "[from code-reviewer]",
+  "createdAt": "[current ISO timestamp]"
 }
 ```
 
 ## Resolving Items
 
-When a backlog item is addressed (manually or via dedicated task):
-
-```json
-{
-  "resolvedAt": "[current ISO timestamp]",
-  "resolvedBy": "[task ID or 'manual']"
-}
-```
-
-Do NOT remove resolved items. They serve as historical record.
+When a backlog item is addressed, delete it from the items array.
 
 ## Backlog Review
 
 Periodically review backlog for:
 - Accumulating security issues (should be rare)
-- High-effort items that could be batched
+- Items that could be batched together
 - Items in files scheduled for modification

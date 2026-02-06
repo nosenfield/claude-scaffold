@@ -25,13 +25,12 @@ None
 
 ## Session Log
 
-Entries below are append-only. New entries are added at the top.
+Entries are append-only. New entries added after marker.
 
 <!-- New entries are added below this line -->
 
 ## [DATE] - Project Initialized
-
-**Status**: Repository initialized, ready for development
-**Core Documentation**: Verified present
-
+**Summary**: Repository initialized with scaffold, ready for development.
+**Changes**: _docs/memory/progress.md, _docs/memory/decisions.md
+**Commit**: [init] | **Chain**: 1
 ---

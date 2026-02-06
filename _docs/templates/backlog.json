@@ -12,11 +12,8 @@
       "category": "string - One of: security, performance, maintainability, convention",
       "description": "string - Issue description",
       "file": "string - File path where issue exists",
-      "line": "number - Line number in file",
-      "effort": "string - One of: low, medium, high",
-      "createdAt": "string - ISO timestamp when deferred",
-      "resolvedAt": "string|null - ISO timestamp when resolved",
-      "resolvedBy": "string|null - Task ID or 'manual' that resolved this"
+      "lineHint": "number - Approximate line number (may shift as code evolves)",
+      "createdAt": "string - ISO timestamp when deferred"
     }
   }
 }

@@ -67,16 +67,10 @@ Read _docs/memory/progress.md and **replace** the Active Context section (betwee
 Add new entry **after** the `<!-- New entries are added below this line -->` marker:
 
 ```markdown
-## [YYYY-MM-DD HH:MM] - Task [ID]: [Title]
-
-**Status**: Complete
-
-**Changes**:
-- [file path]: [what changed]
-- [file path]: [what changed]
-
-**Outcome**: [one-sentence summary]
-
+## YYYY-MM-DD - [Title]
+**Summary**: [1-2 sentences describing what was done]
+**Changes**: [file1], [file2], [file3]
+**Commit**: [hash] | **Chain**: [N]
 ---
 ```
 
@@ -125,35 +119,26 @@ Only modify these fields:
 ## Session Log Entry Format
 
 ```markdown
-## [YYYY-MM-DD HH:MM] - Task [ID]: [Title]
-
-**Status**: Complete
-
-**Changes**:
-- [file path]: [what changed]
-- [file path]: [what changed]
-
-**Outcome**: [one-sentence summary]
-
+## YYYY-MM-DD - [Title]
+**Summary**: [1-2 sentences describing what was done]
+**Changes**: [file1], [file2], [file3]
+**Commit**: [hash] | **Chain**: [N]
 ---
 ```
+
+Keep entries minimal. File list is comma-separated, not bulleted.
 
 ## Decision Entry Format
 
 ```markdown
-## [YYYY-MM-DD] - [Decision Title]
-
-**Context**: [why decision was needed]
-
+## YYYY-MM-DD: [Title]
+**Context**: [1-2 sentences on why decision was needed]
 **Decision**: [what was decided]
-
-**Alternatives Considered**:
-- [option]: [why rejected]
-
-**Consequences**: [implications of this decision]
-
+**Rationale**: [why this choice; key rejected alternatives inline]
 ---
 ```
+
+Keep entries concise. Only record decisions with lasting impact on project architecture or workflow.
 
 ## Task Status Update
 
