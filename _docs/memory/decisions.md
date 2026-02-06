@@ -6,6 +6,52 @@ This file records architecture and implementation decisions. Entries are append-
 
 <!-- New entries are added below this line -->
 
+## 2026-02-06: prd.md Template Redesign for Flexible Work Units
+
+**Context**: Assessed prd.md template for optimization. PRD is the first document users create (often conversationally with Claude), so rigid structure conflicts with discovery phase. However, downstream documents (architecture.md, task-list.json) require structured input.
+
+**Decision**: Redesign prd.md to support flexible work unit structures while requiring translation-critical elements.
+
+**Validation**: Compared against two real-world PRDs:
+
+| PRD | Style | Work Units | Key Insight |
+|-----|-------|------------|-------------|
+| SnakeBreaker | Technical/GDD | Systems with parameters | Game products need system-based organization |
+| Roblox Level Builder | Enterprise | User Stories (Epic/US) | Stakeholder products need story format |
+
+**Structure Changes**:
+
+| Removed | Rationale |
+|---------|-----------|
+| User Personas section | Moved to optional appendix; rarely informs implementation |
+| Success Metrics section | Moved to optional appendix; runtime concern |
+| Problem Statement section | Merged into Overview for flexibility |
+
+| Added | Rationale |
+|-------|-----------|
+| Explicit Scope section | Both example PRDs had this; critical for task boundaries |
+| Three work unit options | Features, User Stories, or Systems patterns |
+| Technical Context section | Bridges to architecture.md |
+| Technical Considerations per feature | Seeds architecture decisions |
+| Optional Appendix section | Home for context that doesn't drive implementation |
+
+**Translation Mapping**:
+
+| PRD Element | → architecture.md | → task-list.json |
+|-------------|-------------------|------------------|
+| Overview | System Purpose | — |
+| Scope In/Out | Scope Boundaries | — |
+| Work Unit | Core Component hint | Task (1-3 per unit) |
+| Acceptance Criteria | — | acceptanceCriteria |
+| Technical Context | Tech Stack, Constraints | references |
+
+**Rejected Alternatives**:
+- Rigid "Features only" template: Doesn't accommodate game/technical specs or enterprise formats
+- Minimal placeholder template: Loses translation guidance; downstream docs suffer
+- Separate translation guide document: Adds maintenance overhead; better to embed guidance in template
+
+---
+
 ## 2026-02-05: task-list.json Schema Design and References Field
 
 **Context**: Reviewed task-list.json template design origins and compared against alternative task list structures (single Markdown, chunked Markdown). Evaluated potential schema enhancements for autonomous development support.
