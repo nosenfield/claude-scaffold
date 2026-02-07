@@ -133,6 +133,9 @@ echo "Initializing git repository..."
 
 git init --quiet
 
+# Copy git exclude template (allows Claude to suggest files excluded from git)
+cp "$SCAFFOLD_DIR/_docs/templates/git-exclude" .git/info/exclude
+
 echo "Installing git hooks..."
 
 # Copy .githooks directory (version-controlled hooks)

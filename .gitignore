@@ -7,10 +7,10 @@ CLAUDE.local.md
 # Git hook logs
 _logs/
 
-
 # explicitly exposes folder presence but ignores local documentation
 !_docs/maps/.gitkeep
 !_docs/context-summaries/.gitkeep
+!_docs/memory/.gitkeep
 
 
 subagent.log

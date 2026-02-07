@@ -1,0 +1,13 @@
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+#
+# This file excludes ephemeral content from git while keeping files
+# visible to Claude Code's @file suggestions. Use .gitignore for files
+# that should be hidden from both git AND Claude suggestions.
+#
+# Copied from _docs/templates/git-exclude during project setup.
+
+# Session-specific documentation (regenerated each session)
+_docs/context-summaries/*
+_docs/maps/*
+_docs/memory/*
