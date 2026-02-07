@@ -87,23 +87,18 @@ cp "$SCAFFOLD_DIR/.mcp.json" .
 # Copy CLAUDE.template.md as CLAUDE.md
 cp "$SCAFFOLD_DIR/CLAUDE.template.md" CLAUDE.md
 
-# Create _docs structure
-mkdir -p _docs/context-summaries
-mkdir -p _docs/maps
+# Copy _docs structure (excluding templates directory)
+rsync -a --exclude='templates' "$SCAFFOLD_DIR/_docs/" _docs/
 
-# Create .gitkeep files for empty directories
-touch _docs/context-summaries/.gitkeep
-touch _docs/maps/.gitkeep
-
-# Copy template documentation files from templates/
-cp "$SCAFFOLD_DIR/_docs/templates/prd.md" _docs/prd.md
-cp "$SCAFFOLD_DIR/_docs/templates/architecture.md" _docs/architecture.md
-cp "$SCAFFOLD_DIR/_docs/templates/best-practices.md" _docs/best-practices.md
-cp "$SCAFFOLD_DIR/_docs/templates/task-list.json" _docs/task-list.json
-cp "$SCAFFOLD_DIR/_docs/templates/backlog.json" _docs/backlog.json
-
-# Copy example best-practices.md (concrete content, can be used as-is or customized)
-cp "$SCAFFOLD_DIR/_docs/best-practices.md" _docs/best-practices.md
+# Copy templates to target locations
+cp "$SCAFFOLD_DIR/_docs/templates/prd.md" _docs/
+cp "$SCAFFOLD_DIR/_docs/templates/architecture.md" _docs/
+cp "$SCAFFOLD_DIR/_docs/templates/best-practices.md" _docs/
+cp "$SCAFFOLD_DIR/_docs/templates/task-list.json" _docs/
+cp "$SCAFFOLD_DIR/_docs/templates/backlog.json" _docs/
+cp "$SCAFFOLD_DIR/_docs/templates/progress.md" _docs/memory/
+cp "$SCAFFOLD_DIR/_docs/templates/decisions.md" _docs/memory/
+# git-exclude copied after git init (see below)
 
 echo "Customizing placeholders..."
 
