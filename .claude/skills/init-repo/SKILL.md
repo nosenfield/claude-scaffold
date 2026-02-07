@@ -55,32 +55,27 @@ cat _docs/task-list.json | head -20
 
 Confirm the file contains valid JSON with a `tasks` array. The expected schema is documented in `_docs/templates/task-list.json`.
 
-### 3. Create Memory Files
+### 3. Validate Memory Files
 
-Create the memory directory if needed:
+Memory files are created by `setup-project.sh`. Verify they exist:
 
 ```bash
-mkdir -p _docs/memory
+ls -la _docs/memory/progress.md _docs/memory/decisions.md _docs/backlog.json
 ```
 
-**Create `_docs/memory/progress.md`** if it doesn't exist. Copy from `_docs/templates/progress.md` and update the date:
+**If any file is missing**, report and stop:
 
-```bash
-cp _docs/templates/progress.md _docs/memory/progress.md
-# Update [DATE] placeholders with current date
 ```
+## Missing Memory Files
 
-**Create `_docs/memory/decisions.md`** if it doesn't exist. Copy from `_docs/templates/decisions.md`:
+The following memory files are not present:
+- [list missing files]
 
-```bash
-cp _docs/templates/decisions.md _docs/memory/decisions.md
-```
-
-**Create `_docs/backlog.json`** if it doesn't exist. Copy from `_docs/templates/backlog.json` and update metadata:
-
-```bash
-cp _docs/templates/backlog.json _docs/backlog.json
-# Update [PROJECT_NAME] and [ISO_TIMESTAMP] in metadata
+These files should have been created by setup-project.sh.
+Run setup-project.sh again or copy from _docs/templates/:
+- progress.md → _docs/memory/
+- decisions.md → _docs/memory/
+- backlog.json → _docs/
 ```
 
 ### 4. Report Initialized State
@@ -94,10 +89,10 @@ cp _docs/templates/backlog.json _docs/backlog.json
 - task-list.json: Present
 - best-practices.md: Present
 
-### Memory Files Created
-- _docs/memory/progress.md: Created (from template)
-- _docs/memory/decisions.md: Created (from template)
-- _docs/backlog.json: Created (from template)
+### Memory Files Verified
+- _docs/memory/progress.md: Present
+- _docs/memory/decisions.md: Present
+- _docs/backlog.json: Present
 
 ---
 
@@ -106,8 +101,8 @@ cp _docs/templates/backlog.json _docs/backlog.json
 
 ## Notes
 
-- Run this command once per project, after placing documentation
-- If memory files already exist, they are not overwritten
+- Run this command once per project, after customizing documentation
+- Memory files are created by `setup-project.sh`; this skill validates them
 - Templates in `_docs/templates/` provide structure and schema documentation
 - After initialization, use `/dev` to start each session
 - Environment setup (npm install, etc.) is handled as the first project task via `/next`
