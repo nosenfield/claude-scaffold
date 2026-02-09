@@ -40,7 +40,7 @@ Identify and select the highest-priority unblocked task.
 
    ---
 
-   Ready to plan implementation. Run `/plan` to continue.
+   Ready to plan implementation. Run `/plan-task` to continue.
    ```
 
    **If NO_PENDING_TASKS:**

@@ -7,7 +7,7 @@ Perform code review on the current task implementation.
 - Implementation must be complete
 - All tests must be passing
 
-If tests aren't passing, run `/implement` first.
+If tests aren't passing, run `/implement-task` first.
 
 ## Steps
 
@@ -21,7 +21,7 @@ If tests aren't passing, run `/implement` first.
    ```bash
    npm run test
    ```
-   If tests fail, stop and instruct user to run `/implement`.
+   If tests fail, stop and instruct user to run `/implement-task`.
 
 2. **Determine Review Type**
    Check session context for `previousReviewIssues`:
@@ -76,7 +76,7 @@ If tests aren't passing, run `/implement` first.
 
    ---
 
-   Implementation approved. Run `/commit` to finalize.
+   Implementation approved. Run `/commit-task` to finalize.
    ```
 
    **If APPROVE with non-blocking issues:**
@@ -95,9 +95,9 @@ If tests aren't passing, run `/implement` first.
    ---
 
    **Choose how to handle these recommendations:**
-   - Enter issue numbers to address now (e.g., "1, 3"): loops back to `/implement`
-   - Enter "defer all": logs all to backlog, proceeds to `/commit`
-   - Enter "skip": proceeds to `/commit` without logging
+   - Enter issue numbers to address now (e.g., "1, 3"): loops back to `/implement-task`
+   - Enter "defer all": logs all to backlog, proceeds to `/commit-task`
+   - Enter "skip": proceeds to `/commit-task` without logging
    - Enter specific numbers to defer (e.g., "defer 2, 3"): logs selected, addresses rest
    ```
 
@@ -105,7 +105,7 @@ If tests aren't passing, run `/implement` first.
    
    - **Address now**: 
      - Set `reviewFeedback` to selected issues
-     - Instruct user to run `/implement`
+     - Instruct user to run `/implement-task`
    
    - **Defer**:
      - Append selected issues to `/_docs/backlog.json`:
@@ -121,11 +121,11 @@ If tests aren't passing, run `/implement` first.
        }
        ```
      - Report items logged
-     - If remaining items to address: set `reviewFeedback`, run `/implement`
-     - If no remaining items: proceed to `/commit`
+     - If remaining items to address: set `reviewFeedback`, run `/implement-task`
+     - If no remaining items: proceed to `/commit-task`
    
    - **Skip**:
-     - Proceed directly to `/commit`
+     - Proceed directly to `/commit-task`
 
    **If REQUEST_CHANGES:**
    ```
@@ -139,7 +139,7 @@ If tests aren't passing, run `/implement` first.
 
    ---
 
-   Address the blocking issues. Run `/implement` to apply fixes, then `/review` again.
+   Address the blocking issues. Run `/implement-task` to apply fixes, then `/review-task` again.
    ```
    Store blocking issues:
    - `reviewFeedback`: List of blocking issues
@@ -148,12 +148,12 @@ If tests aren't passing, run `/implement` first.
 ## State Management
 
 Session context after APPROVE (no non-blocking or skipped):
-- Ready for `/commit`
+- Ready for `/commit-task`
 - `reviewFeedback` cleared
 
 Session context after APPROVE (addressing non-blocking):
 - `reviewFeedback`: Selected non-blocking issues to address
-- Returns to `/implement` flow
+- Returns to `/implement-task` flow
 
 Session context after REQUEST_CHANGES:
 - `reviewFeedback`: Blocking issues for implementer

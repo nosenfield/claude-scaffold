@@ -18,7 +18,7 @@ This scaffold provides a structured workflow for greenfield project development 
 scaffold/
 ├── .claude/
 │   ├── agents/          # Specialized subagents
-│   ├── commands/        # Workflow commands (/next, /plan, etc.)
+│   ├── commands/        # Workflow commands (/next-from-task-list, /plan-task, etc.)
 │   ├── hooks/           # Claude Code quality gate scripts
 │   ├── rules/           # File protection policies
 │   ├── skills/          # Extended capabilities
@@ -111,12 +111,14 @@ See `_docs/templates/task-list.json` for full schema documentation.
 Use when working through predefined tasks in `task-list.json`:
 
 1. `/dev [summary]` - Start development session (optionally resume from summary)
-2. `/next` - Select next task from task list
-3. `/plan` - Plan implementation
-4. `/test` - Write failing tests
-5. `/implement` - Make tests pass
-6. `/review` - Code review
-7. `/commit` - Commit and update memory
+2. `/next-from-task-list` - Select next task from task list
+3. `/plan-task` - Plan implementation
+4. `/write-task-tests` - Write failing tests
+5. `/implement-task` - Make tests pass
+6. `/review-task` - Code review
+7. `/commit-task` - Commit and update memory
+
+Or use `/execute-task` to run the full workflow (steps 2-7) autonomously for a single task.
 
 ### Ad-hoc Workflow (Exploratory)
 
@@ -125,12 +127,12 @@ Use for unplanned work or when task list doesn't apply:
 1. `/dev [summary]` - Start development session
 2. `/map <target>` - Explore relevant codebase area
 3. "Plan this" or describe what to build - Orchestrator invokes task-planner
-4. `/test` - Write failing tests
-5. `/implement` - Make tests pass
-6. `/review` - Code review
-7. `/commit` - Commit changes
+4. `/write-task-tests` - Write failing tests
+5. `/implement-task` - Make tests pass
+6. `/review-task` - Code review
+7. `/commit-task` - Commit changes
 
-The ad-hoc workflow skips `/next` (no task selection) and uses `/map` exploration as input to planning. Both workflows share the same TDD cycle from `/test` onward.
+The ad-hoc workflow skips `/next-from-task-list` (no task selection) and uses `/map` exploration as input to planning. Both workflows share the same TDD cycle from `/write-task-tests` onward.
 
 **Note**: Run `/init-repo` once after placing project documentation to initialize memory files (`_docs/memory/progress.md`, `_docs/memory/decisions.md`) and validate core docs. Environment setup (dependency installation, dev server configuration) is handled through the first tasks in `task-list.json`.
 
@@ -242,13 +244,13 @@ This is configured automatically by `setup-project.sh` when creating a new proje
 
 #### 2026-01-26: Task-Selector Subagent for Context Isolation
 
-**Context**: The `/next` command previously read `task-list.json` directly, pulling the full task list into the orchestrator's context window.
+**Context**: The `/next-from-task-list` command previously read `task-list.json` directly, pulling the full task list into the orchestrator's context window.
 
 **Decision**: Create `task-selector` subagent to isolate task-list.json reads from the orchestrator.
 
 **Implementation**:
 - `.claude/agents/task-selector.md` reads task-list.json and returns only the selected task
-- `/next` spawns task-selector instead of reading the file directly
+- `/next-from-task-list` spawns task-selector instead of reading the file directly
 - `/dev` verifies task-list.json exists but does not read contents
 
 **Rationale**:
@@ -256,7 +258,7 @@ This is configured automatically by `setup-project.sh` when creating a new proje
 - Subagent explores extensively but returns only a condensed selection
 - Aligns with context isolation principle from best practices manual
 
-**Alternative Rejected**: Continue reading task-list.json directly in /next. This pulls unnecessary content into the orchestrator's limited context window.
+**Alternative Rejected**: Continue reading task-list.json directly in /next-from-task-list. This pulls unnecessary content into the orchestrator's limited context window.
 
 ---
 
@@ -304,7 +306,7 @@ This is configured automatically by `setup-project.sh` when creating a new proje
 - Optional `taskId` allows same agents to serve both task-list and ad-hoc workflows
 - Return types in descriptions (APPROVE/REQUEST_CHANGES, TASK_SELECTED) aid orchestrator routing
 
-**Alternative Rejected**: Modify `/plan` skill to accept ad-hoc requests. This would add complexity; strengthened descriptions achieve the same goal by enabling orchestrator recognition of the `/map` → task-planner pattern.
+**Alternative Rejected**: Modify `/plan-task` skill to accept ad-hoc requests. This would add complexity; strengthened descriptions achieve the same goal by enabling orchestrator recognition of the `/map` → task-planner pattern.
 
 ---
 

@@ -19,7 +19,7 @@ None
 
 ### Immediate Next Steps
 1. Run `/dev` to start development session
-2. Run `/next` to select first task
+2. Run `/next-from-task-list` to select first task
 
 ---
 

@@ -7,7 +7,7 @@ Generate tests for the current task before implementation.
 - A task must be in-progress
 - An implementation plan must be approved
 
-If no plan exists, run `/plan` first.
+If no plan exists, run `/plan-task` first.
 
 ## Steps
 
@@ -15,8 +15,8 @@ If no plan exists, run `/plan` first.
    Confirm session context contains:
    - `currentTask`: The in-progress task
    - `implementationPlan`: The approved plan
-   
-   If missing, instruct user to run `/plan` first.
+
+   If missing, instruct user to run `/plan-task` first.
 
 2. **Enable Test-Writing Mode**
    Create marker file to allow test file modifications:
@@ -73,7 +73,7 @@ If no plan exists, run `/plan` first.
 
    ---
 
-   Tests define the acceptance criteria. Run `/implement` to make them pass.
+   Tests define the acceptance criteria. Run `/implement-task` to make them pass.
    ```
 
 9. **Store Test Information**

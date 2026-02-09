@@ -8,7 +8,7 @@ Commit completed work and update the memory bank.
 - Code review must be approved
 - All tests must be passing
 
-If review isn't approved, run `/review` first.
+If review isn't approved, run `/review-task` first.
 
 ## Steps
 
@@ -91,7 +91,7 @@ If review isn't approved, run `/review` first.
 
    ---
 
-   Run `/next` to select the next task, or `/dev` to see project status.
+   Run `/next-from-task-list` to select the next task, or `/dev` to see project status.
    ```
 
 ## Post-Commit Verification

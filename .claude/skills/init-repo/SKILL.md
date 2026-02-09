@@ -105,4 +105,4 @@ Run setup-project.sh again or copy from _docs/templates/:
 - Memory files are created by `setup-project.sh`; this skill validates them
 - Templates in `_docs/templates/` provide structure and schema documentation
 - After initialization, use `/dev` to start each session
-- Environment setup (npm install, etc.) is handled as the first project task via `/next`
+- Environment setup (npm install, etc.) is handled as the first project task via `/next-from-task-list`

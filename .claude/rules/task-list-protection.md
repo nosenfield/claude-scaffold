@@ -39,8 +39,8 @@ ONLY these fields may be modified:
 ## Status Transitions
 
 ```
-pending → in-progress    (via /next command)
-in-progress → complete   (via /commit command)
+pending → in-progress    (via /next-from-task-list command)
+in-progress → complete   (via /commit-task command)
 in-progress → pending    (only if task is abandoned, requires user approval)
 ```
 

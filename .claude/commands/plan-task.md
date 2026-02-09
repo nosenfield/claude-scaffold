@@ -4,13 +4,13 @@ Generate an implementation plan for the current in-progress task.
 
 ## Prerequisites
 
-A task must be in-progress. If not, run `/next` first.
+A task must be in-progress. If not, run `/next-from-task-list` first.
 
 ## Steps
 
 1. **Identify Current Task**
-   Use the in-progress task from session context (set by `/next`).
-   If no task is in session context, stop and instruct user to run `/next`.
+   Use the in-progress task from session context (set by `/next-from-task-list`).
+   If no task is in session context, stop and instruct user to run `/next-from-task-list`.
 
 2. **Determine Exploration Target**
    Based on the task, identify what to explore:
@@ -76,7 +76,7 @@ A task must be in-progress. If not, run `/next` first.
 
    Recommend next action:
    ```
-   Plan approved. Run `/test` to write tests.
+   Plan approved. Run `/write-task-tests` to write tests.
    ```
 
 ## State Management

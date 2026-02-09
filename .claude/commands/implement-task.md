@@ -8,7 +8,7 @@ Write code to pass the tests for the current task.
 - An implementation plan must be approved
 - Tests must be written
 
-If tests don't exist, run `/test` first.
+If tests don't exist, run `/write-task-tests` first.
 
 ## Steps
 
@@ -83,7 +83,7 @@ If tests don't exist, run `/test` first.
 
    ---
 
-   Ready for code review. Run `/review` to continue.
+   Ready for code review. Run `/review-task` to continue.
    ```
 
 8. **Store Implementation Information**

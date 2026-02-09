@@ -1,6 +1,6 @@
 ---
 name: implementer
-description: Use after tests are written to implement code. Typically invoked via /implement skill. Requires implementation plan and test file paths. Implements incrementally following TDD red-green cycle. Supports INITIAL mode and ADDRESS_REVIEW_FEEDBACK mode. Never modifies test files.
+description: Use after tests are written to implement code. Typically invoked via /implement-task skill. Requires implementation plan and test file paths. Implements incrementally following TDD red-green cycle. Supports INITIAL mode and ADDRESS_REVIEW_FEEDBACK mode. Never modifies test files.
 tools: Read, Write, Edit, MultiEdit, Glob, Grep, Bash
 model: sonnet
 ---

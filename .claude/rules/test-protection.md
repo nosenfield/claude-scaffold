@@ -22,7 +22,7 @@ Tests define the contract. Implementation satisfies the contract. Never modify t
 
 ## Immutable Elements
 
-During implementation (`/implement` command), NEVER modify:
+During implementation (`/implement-task` command), NEVER modify:
 - Test assertions (`expect()`, `assert()`, etc.)
 - Test descriptions (`it()`, `test()`, `describe()` strings)
 - Expected values in assertions
@@ -32,9 +32,9 @@ During implementation (`/implement` command), NEVER modify:
 
 | Stage | Create Tests | Modify Tests | Delete Tests |
 |-------|--------------|--------------|--------------|
-| /test (test-writer) | Yes | N/A (new files) | No |
-| /implement (implementer) | No | No | No |
-| /review (code-reviewer) | No | No | No |
+| /write-task-tests (test-writer) | Yes | N/A (new files) | No |
+| /implement-task (implementer) | No | No | No |
+| /review-task (code-reviewer) | No | No | No |
 | Manual (user) | Yes | Yes | Yes |
 
 ## When Tests Seem Wrong

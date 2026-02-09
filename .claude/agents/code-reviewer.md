@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Use after implementation to review code quality. Typically invoked via /review skill. Requires implementation plan and modified files list. Reads full file contents, checks against plan and architecture, produces APPROVE or REQUEST_CHANGES verdict. Distinguishes blocking from non-blocking issues. Read-only.
+description: Use after implementation to review code quality. Typically invoked via /review-task skill. Requires implementation plan and modified files list. Reads full file contents, checks against plan and architecture, produces APPROVE or REQUEST_CHANGES verdict. Distinguishes blocking from non-blocking issues. Read-only.
 tools: Read, Glob, Grep, Bash
 model: sonnet
 ---

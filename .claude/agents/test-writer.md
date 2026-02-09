@@ -1,6 +1,6 @@
 ---
 name: test-writer
-description: Use after planning to write tests before implementation. Typically invoked via /test skill. Requires implementation plan with test scenarios and acceptance criteria. Writes failing tests that define the contract for implementer. Follows existing test patterns. Tests are immutable; implementer must pass them without modification.
+description: Use after planning to write tests before implementation. Typically invoked via /write-task-tests skill. Requires implementation plan with test scenarios and acceptance criteria. Writes failing tests that define the contract for implementer. Follows existing test patterns. Tests are immutable; implementer must pass them without modification.
 tools: Read, Write, Glob, Grep, Bash
 model: sonnet
 ---

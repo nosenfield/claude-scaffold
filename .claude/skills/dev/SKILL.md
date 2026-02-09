@@ -80,7 +80,7 @@ If memory files exist, read them:
 - Recent Decisions (last 2-3)
 - Immediate Next Steps
 
-Verify `_docs/task-list.json` exists (do not read contents; task list access is handled by `task-selector` subagent via `/next`).
+Verify `_docs/task-list.json` exists (do not read contents; task list access is handled by `task-selector` subagent via `/next-from-task-list`).
 
 ### 5. Check Repository State
 
@@ -146,7 +146,7 @@ Note uncommitted changes. Git log is verification only; trust memory files as au
 [Last 1-2 entries from Session Log section, summarized]
 
 ### Recommended Action
-[Based on Current Task and Next Steps from Active Context, or "Run `/next` to select a task"]
+[Based on Current Task and Next Steps from Active Context, or "Run `/next-from-task-list` to select a task"]
 ```
 
 ## Notes
@@ -155,4 +155,4 @@ Note uncommitted changes. Git log is verification only; trust memory files as au
 - When resuming, the summary supplements (not replaces) memory files
 - Key resources from prior sessions should be noted for continuity
 - If summary file doesn't exist, warn and proceed with normal session start
-- Task list contents are accessed only through `/next` (via task-selector subagent) to keep orchestrator context lean
+- Task list contents are accessed only through `/next-from-task-list` (via task-selector subagent) to keep orchestrator context lean
