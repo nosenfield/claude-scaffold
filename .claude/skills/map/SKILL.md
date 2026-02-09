@@ -5,7 +5,7 @@ argument-hint: <target> [--depth quick|medium|thorough]
 context: fork
 agent: general-purpose
 allowed-tools: Read, Write, Grep, Glob, Bash(git *)
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # Map Command
