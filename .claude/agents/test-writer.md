@@ -36,7 +36,11 @@ Retrieve from project files:
    ```
 3. Identify test utilities and fixtures in use
 4. Write test files with failing tests
-5. Run tests to verify they fail for the right reasons:
+5. Review tests for redundancy:
+   - Ensure each test validates a distinct behavior (not just different input values)
+   - Consolidate only when tests share identical setup AND assertion logic
+   - Prefer clarity over DRY; individual tests are acceptable when they improve readability
+6. Run tests to verify they fail for the right reasons:
    ```bash
    npm run test -- --testPathPattern="[new-test-file]"
    ```
@@ -99,4 +103,5 @@ Failure reasons: [expected failures due to missing implementation]
 - Do not write stubs or mock implementations
 - Follow existing test patterns in the codebase
 - Cover happy path, edge cases, and error conditions
+- Each test should validate a distinct behavior; prefer clarity over consolidation
 - Tests define the contract; they are immutable once written
