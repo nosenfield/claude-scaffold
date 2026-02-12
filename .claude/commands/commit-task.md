@@ -17,8 +17,14 @@ If review isn't approved, run `/review-task` first.
    - Tests pass: `npm run test`
    - Lint passes: `npm run lint`
    - Types check: `npm run typecheck`
-   
-   If any fail, stop and report the issue.
+
+   **If lint/typecheck fails**:
+   - Spawn `implementer` subagent with mode: ADDRESS_LINT_ERRORS
+   - Provide lintErrors: [error output]
+   - Re-verify: `npm run lint && npm run typecheck`
+   - If still failing, stop and report
+
+   **If tests fail**: Stop and report the issue.
 
 2. **Stage Changes**
    ```bash

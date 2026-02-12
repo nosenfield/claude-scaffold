@@ -114,14 +114,27 @@ All other phases execute autonomously (same as `/execute-task`).
 
 ## Error Handling
 
-If any phase fails:
+### Lint/Typecheck Failures (Pre-Commit)
+
+Delegate to implementer subagent:
+- Spawn `implementer` with mode: ADDRESS_LINT_ERRORS
+- Provide lintErrors: [error output from lint/typecheck]
+- Re-verify: `npm run lint && npm run typecheck`
+- If successful, continue to commit
+- If still failing after fix attempt, stop and report
+
+### Other Failures
+
+If tests fail or implementation encounters runtime errors:
 1. Report the failure with details
 2. Stop execution
 3. Preserve session context for manual intervention
-4. User can fix the issue and resume with the appropriate command:
-   - `/plan-task` to revise planning
-   - `/implement-task` to retry implementation
-   - `/review-task` to retry review
+
+User can resume with:
+- `/plan-task` to revise planning
+- `/implement-task` to retry implementation
+- `/review-task` to retry review
+- `/commit-task` to retry commit
 
 ## Notes
 
