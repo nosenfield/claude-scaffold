@@ -57,11 +57,14 @@ If review isn't approved, run `/review-task` first.
 
 6. **Spawn memory-updater Subagent**
    Invoke the `memory-updater` agent with the payload.
-   
+
    The subagent will:
    - Append entry to _docs/memory/progress.md
    - Append decisions to _docs/memory/decisions.md
    - Update task status in task-list.json
+   - Amend the commit to include task-list.json update (task-list workflow only)
+
+   **Note:** For task-list workflow, the commit will be amended with `--no-verify` to include the task-list.json update. This ensures task completion tracking travels with the work itself. The final SHA (post-amend) will be reported.
 
 7. **Receive Update Confirmation**
    Confirm memory bank files were updated.
@@ -81,18 +84,20 @@ If review isn't approved, run `/review-task` first.
    ## Task Complete
 
    **Task**: [taskId] - [taskTitle]
-   **Commit**: [SHA]
+   **Commit**: [SHA] (amended with task-list.json update)
    **Status**: Complete
 
    ### Memory Bank Updated
    - _docs/memory/progress.md: Entry added
    - _docs/memory/decisions.md: [N] decisions recorded
-   - task-list.json: Task marked complete
+   - task-list.json: Task marked complete (included in commit)
 
    ---
 
    Run `/next-from-task-list` to select the next task, or `/dev` to see project status.
    ```
+
+   For ad-hoc workflow (no taskId), report original SHA without amend note.
 
 ## Post-Commit Verification
 

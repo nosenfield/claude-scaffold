@@ -90,6 +90,23 @@ Only modify these fields:
 }
 ```
 
+### Step 5: Amend Commit with task-list.json (if taskId and commitSha provided)
+
+If both taskId and commitSha were provided, amend the previous commit to include the task-list.json update:
+
+```bash
+git add _docs/task-list.json
+git commit --amend --no-edit --no-verify
+```
+
+**Rationale:**
+- Task completion tracking should travel with the implementation work
+- Avoids separate "update task list" commits
+- `--no-verify` skips pre-commit hook (implementation already validated)
+- Ad-hoc work (no taskId) is unaffected
+
+Capture the new amended SHA for output reporting.
+
 ## Active Context Format
 
 ```markdown
@@ -162,11 +179,13 @@ Only modify these fields in task-list.json:
 ### Files Modified
 - _docs/memory/progress.md: Updated Active Context; added Session Log entry for [task]
 - _docs/memory/decisions.md: [Added N entries / No updates needed]
-- _docs/task-list.json: [Marked task [ID] complete / Not updated (ad-hoc work)]
+- _docs/task-list.json: [Marked task [ID] complete (amended to commit [SHA]) / Not updated (ad-hoc work)]
 
 ### Summary
 [One sentence describing what was recorded]
 ```
+
+If commit was amended, report the final SHA (post-amend).
 
 ## Rules
 
@@ -188,3 +207,4 @@ Only modify these fields in task-list.json:
 - ONLY modify status and completedAt fields
 - Skip if no taskId provided (ad-hoc work)
 - Never modify task descriptions, priorities, references, or acceptance criteria
+- If commitSha provided, amend the commit with task-list.json update using `--no-verify`
