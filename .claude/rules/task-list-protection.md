@@ -17,6 +17,7 @@ NEVER modify these fields on any task:
 - `priority`: Task ordering
 - `acceptanceCriteria`: Definition of done
 - `references`: Documentation pointers for agent context
+- `affectedPaths`: File paths for batch parallelization
 - `blockedBy`: Dependency list
 
 ## Mutable Fields
@@ -39,9 +40,9 @@ ONLY these fields may be modified:
 ## Status Transitions
 
 ```
-pending → in-progress    (via /next-from-task-list command)
-in-progress → complete   (via /commit-task command)
-in-progress → pending    (only if task is abandoned, requires user approval)
+pending → in-progress    (via /next-from-task-list or /batch-execute-task-auto)
+in-progress → complete   (via /commit-task or memory-updater in batch mode)
+in-progress → pending    (if task fails in batch mode, or abandoned with user approval)
 ```
 
 ## Validation

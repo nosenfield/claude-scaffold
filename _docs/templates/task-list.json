@@ -17,6 +17,7 @@
         "[Criterion 3]"
       ],
       "references": [],
+      "affectedPaths": [],
       "blockedBy": [],
       "completedAt": null
     },
@@ -34,6 +35,10 @@
         "architecture.md#[relevant-section]",
         "PRD.md#[relevant-section]"
       ],
+      "affectedPaths": [
+        "src/[module]/[file].ts",
+        "src/[module]/[file].test.ts"
+      ],
       "blockedBy": ["TASK-001"],
       "completedAt": null
     }
@@ -47,10 +52,11 @@
       "status": "string - One of: pending, in-progress, complete",
       "acceptanceCriteria": "array - List of criteria that define done",
       "references": "array - Paths to relevant documentation sections for agent context",
+      "affectedPaths": "array - File paths this task will create or modify. Used for batch parallelization. Tasks with overlapping paths cannot run in parallel.",
       "blockedBy": "array - Task IDs that must complete first",
       "completedAt": "string|null - ISO timestamp when completed"
     },
     "mutableFields": ["status", "completedAt"],
-    "immutableFields": ["id", "title", "description", "priority", "acceptanceCriteria", "references", "blockedBy"]
+    "immutableFields": ["id", "title", "description", "priority", "acceptanceCriteria", "references", "affectedPaths", "blockedBy"]
   }
 }

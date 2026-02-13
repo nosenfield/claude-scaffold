@@ -2,6 +2,8 @@
 
 Commit completed work and update the memory bank.
 
+Composes `/commit-implementation` with memory update.
+
 ## Prerequisites
 
 - Implementation must be complete
@@ -12,56 +14,31 @@ If review isn't approved, run `/review-task` first.
 
 ## Steps
 
-1. **Verify Prerequisites**
-   Confirm:
-   - Tests pass: `npm run test`
-   - Lint passes: `npm run lint`
-   - Types check: `npm run typecheck`
+1. **Execute Commit Implementation**
+   Run `/commit-implementation`.
 
-   **If lint/typecheck fails**:
-   - Spawn `implementer` subagent with mode: ADDRESS_LINT_ERRORS
-   - Provide lintErrors: [error output]
-   - Re-verify: `npm run lint && npm run typecheck`
-   - If still failing, stop and report
+   **If COMMIT_FAILED**: Stop and report the error.
 
-   **If tests fail**: Stop and report the issue.
-
-2. **Stage Changes**
-   ```bash
-   git add -A
-   git status
+   **If COMMIT_SUCCESS**: Continue with result:
    ```
-   Review staged files match expected `filesModified`.
-
-3. **Generate Commit Message**
-   Format: `<type>(<scope>): <description> (<taskId>)`
-   
-   Derive from task:
-   - type: feat, fix, refactor, docs, test (based on task category)
-   - scope: primary module affected
-   - description: task title (lowercase, imperative)
-   - taskId: task identifier
-   
-   Example: `feat(auth): implement login endpoint (TASK-001)`
-
-4. **Execute Commit**
-   ```bash
-   git commit -m "[generated message]"
+   taskId: [from result]
+   taskTitle: [from result]
+   commitSha: [from result]
+   filesCommitted: [from result]
    ```
-   Capture the commit SHA.
 
-5. **Prepare Memory Update Payload**
+2. **Prepare Memory Update Payload**
    ```
    taskId: [currentTask.id]
    taskTitle: [currentTask.title]
    status: "complete"
-   commitSha: [captured SHA]
-   filesModified: [list with descriptions]
+   commitSha: [from commit result]
+   filesModified: [filesCommitted with descriptions]
    decisions: [accumulated decisions from implementation]
    notes: [any additional context]
    ```
 
-6. **Spawn memory-updater Subagent**
+3. **Spawn memory-updater Subagent**
    Invoke the `memory-updater` agent with the payload.
 
    The subagent will:
@@ -72,10 +49,10 @@ If review isn't approved, run `/review-task` first.
 
    **Note:** For task-list workflow, the commit will be amended with `--no-verify` to include the task-list.json update. This ensures task completion tracking travels with the work itself. The final SHA (post-amend) will be reported.
 
-7. **Receive Update Confirmation**
+4. **Receive Update Confirmation**
    Confirm memory bank files were updated.
 
-8. **Clear Session Context**
+5. **Clear Session Context**
    Remove task-specific state:
    - `currentTask`
    - `implementationPlan`
@@ -85,7 +62,7 @@ If review isn't approved, run `/review-task` first.
    - `reviewFeedback`
    - `previousReviewIssues`
 
-9. **Report Completion**
+6. **Report Completion**
    ```
    ## Task Complete
 
@@ -112,3 +89,9 @@ Optionally verify clean state:
 git status
 npm run test
 ```
+
+## Notes
+
+- This command is for single-task workflow
+- For batch workflow, teammates use `/commit-implementation` directly
+- Orchestrator handles memory updates for batch workflow

@@ -1,79 +1,106 @@
 ---
 name: task-selector
-description: Use when the /next-from-task-list skill is invoked. Reads task-list.json, selects highest-priority unblocked task, marks it in-progress, and returns task details. Returns TASK_SELECTED with full task object, NO_PENDING_TASKS if all complete, or ALL_TASKS_BLOCKED if pending tasks have unmet dependencies. Uses haiku for fast, deterministic selection logic.
+description: Use when /next-from-task-list or /next-batch-from-list is invoked. Reads task-list.json and selects tasks. Single mode returns one task and marks it in-progress. Batch mode returns all parallelizable tasks without marking in-progress. Uses haiku for fast, deterministic selection logic.
 tools: Read, Edit
 model: haiku
 ---
 
 # Task Selection Protocol
 
-Analyze the task list and select the highest-priority unblocked task.
+Analyze the task list and select tasks based on mode.
 
 ## Input
 
-The orchestrator provides no payload. Read directly from project files.
+The orchestrator provides:
+```
+mode: single | batch
+```
+
+If no mode specified, default to `single`.
 
 ## Process
 
-1. **Load Task List**
-   Read `_docs/task-list.json`.
+### 1. Load Task List
 
-2. **Filter Candidates**
-   Select tasks where:
-   - `status` is `"pending"`
-   - `blockedBy` array is empty OR all referenced tasks have `status: "complete"`
+Read `_docs/task-list.json`.
 
-3. **Handle Edge Cases**
+### 2. Filter Candidates
 
-   If no pending tasks exist:
-   ```
-   NO_PENDING_TASKS
-   completedCount: [N]
-   totalCount: [N]
-   ```
+Select tasks where:
+- `status` is `"pending"`
+- `blockedBy` array is empty OR all referenced tasks have `status: "complete"`
 
-   If all pending tasks are blocked:
-   ```
-   ALL_TASKS_BLOCKED
-   blockedTasks:
-     - id: [taskId]
-       title: [title]
-       blockedBy: [list of blocking task IDs]
-   ```
+### 3. Handle Edge Cases
 
-4. **Sort and Select**
-   Order candidates by `priority` field (lower number = higher priority).
-   Select the first task.
+If no pending tasks exist:
+```
+NO_PENDING_TASKS
+completedCount: [N]
+totalCount: [N]
+```
 
-5. **Update Task Status**
-   Edit `_docs/task-list.json` to set selected task's status to `"in-progress"`.
+If all pending tasks are blocked:
+```
+ALL_TASKS_BLOCKED
+blockedTasks:
+  - id: [taskId]
+    title: [title]
+    blockedBy: [list of blocking task IDs]
+```
 
-6. **Return Selected Task**
-   Return the complete task object:
-   ```
-   TASK_SELECTED
-   id: [task.id]
-   title: [task.title]
-   priority: [task.priority]
-   description: [task.description]
-   acceptanceCriteria:
-     - [criterion 1]
-     - [criterion 2]
-   references:
-     - [doc path 1]
-     - [doc path 2]
-   blockedBy: [list or empty]
-   ```
+### 4. Sort Candidates
 
-## Output Format
+Order candidates by `priority` field (lower number = higher priority).
 
-Always return one of three response types:
-- `TASK_SELECTED` - with full task details
-- `NO_PENDING_TASKS` - all tasks complete
-- `ALL_TASKS_BLOCKED` - pending tasks exist but all are blocked
+### 5. Select Based on Mode
+
+#### Single Mode (default)
+
+Select the first (highest priority) task.
+
+**Update Task Status**:
+Edit `_docs/task-list.json` to set selected task's status to `"in-progress"`.
+
+**Return**:
+```
+TASK_SELECTED
+id: [task.id]
+title: [task.title]
+priority: [task.priority]
+description: [task.description]
+acceptanceCriteria:
+  - [criterion 1]
+  - [criterion 2]
+references:
+  - [doc path 1]
+  - [doc path 2]
+affectedPaths:
+  - [path 1]
+  - [path 2]
+blockedBy: [list or empty]
+```
+
+#### Batch Mode
+
+Build batch by iterating candidates (priority order). For each task:
+- If `affectedPaths` empty: add only if batch empty (single-task batch), otherwise skip
+- If `affectedPaths` overlaps with batch: skip (conflict)
+- Otherwise: add to batch, mark paths as used
+
+Do NOT update task status (orchestrator handles after spawning).
+
+**Return**: `BATCH_SELECTED` with task array, `remainingTasks` count, and warnings for tasks missing `affectedPaths`.
+
+## Output
+
+| Result | When | Status Update |
+|--------|------|---------------|
+| `TASK_SELECTED` / `BATCH_SELECTED` | Tasks available | Single mode only |
+| `NO_PENDING_TASKS` | All complete | None |
+| `ALL_TASKS_BLOCKED` | All pending blocked | None |
 
 ## Rules
 
-- Do not modify task content, only status field
-- Return complete task object for orchestrator context
-- Keep response concise; orchestrator will format for display
+- Modify only `status` field, only in single mode
+- Return complete task objects for orchestrator
+- Warn about tasks missing `affectedPaths` in batch mode
