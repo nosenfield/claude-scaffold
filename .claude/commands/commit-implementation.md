@@ -34,10 +34,10 @@ From session context:
 
 2. **Stage Changes**
    ```bash
-   git add -A
+   git add [filesModified...]
    git status
    ```
-   Review staged files match expected `filesModified`.
+   Stage only the specific files from `filesModified` to prevent race conditions in parallel execution.
 
 3. **Generate Commit Message**
    Format: `<type>(<scope>): <description> (<taskId>)`

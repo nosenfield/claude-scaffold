@@ -16,7 +16,7 @@ This command acts as team lead to:
 ## Prerequisites
 
 - Repository must be initialized (run `/init-repo` first if not)
-- `task-list.json` must contain pending tasks with `affectedPaths`
+- `task-list.json` must contain pending tasks (tasks missing `affectedPaths` run as single-task batches)
 - Agent Teams must be enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`)
 
 ## Workflow

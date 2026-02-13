@@ -123,7 +123,7 @@ Same as single mode with these differences:
 | Session Log | ONE entry for entire batch listing all completed/failed tasks |
 | Decisions | Aggregate from all tasks; tag each with `(from [taskId])` |
 | task-list.json | Update all tasks; reset failed to `pending` for retry |
-| Commit Amend | **Skip** - teammates committed separately |
+| Commit Amend | **Skip** - each teammate already committed; no single SHA to amend |
 
 ## Output Format
 

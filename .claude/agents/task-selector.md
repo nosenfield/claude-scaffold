@@ -80,6 +80,8 @@ affectedPaths:
 blockedBy: [list or empty]
 ```
 
+Note: `affectedPaths` included for consistency; only required in batch mode.
+
 #### Batch Mode
 
 Build batch by iterating candidates (priority order). For each task:
