@@ -8,19 +8,38 @@ Used by `/batch-execute-task-auto` to get tasks that can run concurrently.
 
 Spawns the `task-selector` agent in batch mode to:
 1. Read task-list.json
-2. Identify all unblocked pending tasks
-3. Group tasks with non-overlapping `affectedPaths`
+2. Filter tasks with `status: "ready"`
+3. Use `waveSummary.contentions` to avoid file conflicts
 4. Return batch of parallelizable tasks
+
+## Prerequisites
+
+- `task-list.json` must exist with `waveSummary` computed
+- Run `/compute-waves` if `waveSummary` is missing or stale
 
 ## Steps
 
-1. **Spawn task-selector in Batch Mode**
+1. **Check for waveSummary**
+
+   Read `_docs/task-list.json` and verify `waveSummary` exists.
+
+   **If missing**:
+   ```
+   ## Waves Not Computed
+
+   task-list.json does not have waveSummary.
+   Run `/compute-waves` before batch selection.
+   ```
+   Stop.
+
+2. **Spawn task-selector in Batch Mode**
+
    Invoke `task-selector` agent with:
    ```
    mode: batch
    ```
 
-2. **Receive Batch Result**
+3. **Receive Batch Result**
 
    **If NO_PENDING_TASKS**:
    ```
@@ -46,75 +65,85 @@ Spawns the `task-selector` agent in batch mode to:
      - id: TASK-003
        title: Add auth middleware
        priority: 1
+       executionWave: 1
        description: [description]
        acceptanceCriteria:
          - [criterion 1]
        references:
          - [doc path]
-       affectedPaths:
+       filesTouched:
          - src/middleware/auth.ts
          - src/types/auth.ts
      - id: TASK-005
        title: Create user model
        priority: 2
+       executionWave: 1
        description: [description]
        acceptanceCriteria:
          - [criterion 1]
        references:
          - [doc path]
-       affectedPaths:
+       filesTouched:
          - src/models/user.ts
          - src/types/user.ts
-   remainingTasks: [count of pending tasks not in batch]
+   remainingTasks: [count of ready tasks not in batch]
+   contentionsAvoided:
+     - [TASK-003, TASK-007]: src/routes/index.ts
    ```
 
-3. **Report Result**
+4. **Report Result**
 
    For BATCH_SELECTED:
    ```
    ## Batch Selected
 
+   **Wave**: [current wave from tasks]
    **Batch Size**: [N] tasks
-   **Remaining**: [M] pending tasks
+   **Remaining in Wave**: [M] ready tasks
 
    ### Tasks in Batch
    1. [TASK-003] Add auth middleware (priority 1)
-      - Affects: src/middleware/auth.ts, src/types/auth.ts
+      - Files: src/middleware/auth.ts, src/types/auth.ts
    2. [TASK-005] Create user model (priority 2)
-      - Affects: src/models/user.ts, src/types/user.ts
+      - Files: src/models/user.ts, src/types/user.ts
 
-   No file conflicts detected. Tasks can run in parallel.
+   ### Contentions Avoided
+   - TASK-003 and TASK-007 share src/routes/index.ts (TASK-007 deferred)
+
+   No file conflicts in batch. Tasks can run in parallel.
    ```
 
 ## Batch Selection Rules
 
 The task-selector agent applies these rules:
 
-1. **Unblocked only**: Task's `blockedBy` must be empty or all resolved
-2. **No file conflicts**: Tasks in same batch must have non-overlapping `affectedPaths`
-3. **Priority order**: Higher priority tasks selected first
-4. **Greedy grouping**: Add tasks to batch while no conflicts exist
+1. **Ready status only**: Task must have `status: "ready"`
+2. **Contention check**: Use `waveSummary.contentions` to identify conflicting pairs
+3. **File overlap check**: Defense in depth - compare `filesTouched` arrays
+4. **Priority order**: Higher priority tasks selected first
+5. **Concurrency limit**: Respect `metadata.maxConcurrency`
 
-### Conflict Detection
+### Contention Handling
 
-Two tasks conflict if their `affectedPaths` arrays share any path:
-```
-TASK-003.affectedPaths: [src/auth.ts, src/types.ts]
-TASK-004.affectedPaths: [src/auth.ts, src/config.ts]
-→ Conflict: src/auth.ts appears in both
-→ TASK-004 excluded from batch
+Tasks listed in `waveSummary.contentions` cannot run in the same batch:
+```json
+"contentions": [["TASK-005", "TASK-006"]]
 ```
 
-### Missing affectedPaths
+If both TASK-005 and TASK-006 are ready:
+- TASK-005 (higher priority) enters batch
+- TASK-006 excluded, noted in `contentionsAvoided`
 
-If a task lacks `affectedPaths`:
-- Treat as conflicting with all other tasks
-- Task runs in its own single-task batch
+### Empty filesTouched
+
+If a task lacks `filesTouched`:
+- Include in batch only if batch is empty (single-task batch)
 - Log warning for orchestrator
+- Recommend running `/compute-waves` to update
 
 ## Notes
 
-- This command does NOT mark tasks as in-progress (orchestrator handles after spawning)
-- Batch size depends on task independence, not a fixed limit
-- Single-task batches are valid (when no parallelization possible)
+- This command does NOT mark tasks as in-progress (orchestrator handles after claiming)
+- Batch size depends on task independence and `maxConcurrency`, not a fixed limit
+- Single-task batches are valid (when contentions prevent parallelization)
 - Use `/next-from-task-list` for single-task workflow

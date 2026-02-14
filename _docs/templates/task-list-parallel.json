@@ -1,0 +1,217 @@
+{
+  "metadata": {
+    "project": "[PROJECT_NAME]",
+    "createdAt": "[ISO_TIMESTAMP]",
+    "version": "2.0.0",
+    "maxConcurrency": 4
+  },
+  "waveSummary": [
+    {
+      "wave": 0,
+      "tasks": ["TASK-001"],
+      "maxParallelism": 1,
+      "contentions": []
+    },
+    {
+      "wave": 1,
+      "tasks": ["TASK-002", "TASK-003", "TASK-004"],
+      "maxParallelism": 3,
+      "contentions": []
+    },
+    {
+      "wave": 2,
+      "tasks": ["TASK-005", "TASK-006"],
+      "maxParallelism": 2,
+      "contentions": [["TASK-005", "TASK-006"]]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "[First task - typically environment setup]",
+      "description": "[Detailed description of what this task accomplishes]",
+      "priority": 1,
+      "executionWave": 0,
+      "status": "ready",
+      "acceptanceCriteria": [
+        "[Criterion 1]",
+        "[Criterion 2]"
+      ],
+      "references": [],
+      "filesTouched": [
+        "package.json",
+        "tsconfig.json"
+      ],
+      "blockedBy": [],
+      "assignedAgent": null,
+      "result": null,
+      "completedAt": null
+    },
+    {
+      "id": "TASK-002",
+      "title": "[Data layer task A]",
+      "description": "[Detailed description]",
+      "priority": 2,
+      "executionWave": 1,
+      "status": "blocked",
+      "acceptanceCriteria": [
+        "[Criterion 1]"
+      ],
+      "references": [
+        "architecture.md#data-models"
+      ],
+      "filesTouched": [
+        "src/models/user.ts",
+        "src/types/user.ts"
+      ],
+      "blockedBy": ["TASK-001"],
+      "assignedAgent": null,
+      "result": null,
+      "completedAt": null
+    },
+    {
+      "id": "TASK-003",
+      "title": "[Data layer task B - parallel with TASK-002]",
+      "description": "[Detailed description]",
+      "priority": 2,
+      "executionWave": 1,
+      "status": "blocked",
+      "acceptanceCriteria": [
+        "[Criterion 1]"
+      ],
+      "references": [
+        "architecture.md#data-models"
+      ],
+      "filesTouched": [
+        "src/models/product.ts",
+        "src/types/product.ts"
+      ],
+      "blockedBy": ["TASK-001"],
+      "assignedAgent": null,
+      "result": null,
+      "completedAt": null
+    },
+    {
+      "id": "TASK-004",
+      "title": "[Data layer task C - parallel with TASK-002, TASK-003]",
+      "description": "[Detailed description]",
+      "priority": 2,
+      "executionWave": 1,
+      "status": "blocked",
+      "acceptanceCriteria": [
+        "[Criterion 1]"
+      ],
+      "references": [
+        "architecture.md#data-models"
+      ],
+      "filesTouched": [
+        "src/models/order.ts",
+        "src/types/order.ts"
+      ],
+      "blockedBy": ["TASK-001"],
+      "assignedAgent": null,
+      "result": null,
+      "completedAt": null
+    },
+    {
+      "id": "TASK-005",
+      "title": "[API layer task A]",
+      "description": "[Detailed description]",
+      "priority": 3,
+      "executionWave": 2,
+      "status": "blocked",
+      "acceptanceCriteria": [
+        "[Criterion 1]"
+      ],
+      "references": [
+        "architecture.md#api-design"
+      ],
+      "filesTouched": [
+        "src/api/users.ts",
+        "src/routes/index.ts"
+      ],
+      "blockedBy": ["TASK-002"],
+      "assignedAgent": null,
+      "result": null,
+      "completedAt": null
+    },
+    {
+      "id": "TASK-006",
+      "title": "[API layer task B - contention with TASK-005 on routes/index.ts]",
+      "description": "[Detailed description]",
+      "priority": 3,
+      "executionWave": 2,
+      "status": "blocked",
+      "acceptanceCriteria": [
+        "[Criterion 1]"
+      ],
+      "references": [
+        "architecture.md#api-design"
+      ],
+      "filesTouched": [
+        "src/api/products.ts",
+        "src/routes/index.ts"
+      ],
+      "blockedBy": ["TASK-003"],
+      "assignedAgent": null,
+      "result": null,
+      "completedAt": null
+    }
+  ],
+  "_schema": {
+    "metadata": {
+      "project": "string - Project name",
+      "createdAt": "string - ISO timestamp of task list creation",
+      "version": "string - Schema version (2.0.0 for parallel execution)",
+      "maxConcurrency": "number - Maximum concurrent agents (system limit)"
+    },
+    "waveSummary": {
+      "_description": "Pre-computed execution waves. Regenerate after modifying tasks or dependencies.",
+      "wave": "number - Execution wave index (0-based). Wave N requires all tasks in waves 0 through N-1 that appear in blockedBy to be complete",
+      "tasks": "array - Task IDs in this wave",
+      "maxParallelism": "number - Count of tasks in wave (upper bound on concurrent agents)",
+      "contentions": "array - Pairs of task IDs with overlapping filesTouched. These tasks should not run simultaneously"
+    },
+    "task": {
+      "id": "string - Unique identifier (TASK-NNN format)",
+      "title": "string - Brief task name",
+      "description": "string - Detailed task description",
+      "priority": "number - Lower number = higher priority. Tiebreaker when multiple tasks are ready",
+      "executionWave": "number - DAG depth level computed from dependency graph. Tasks in same wave can execute in parallel if no file contention",
+      "status": "string - One of: blocked, ready, in-progress, complete, failed",
+      "acceptanceCriteria": "array - List of criteria that define done",
+      "references": "array - Paths to relevant documentation sections for agent context",
+      "filesTouched": "array - File paths this task reads or writes. Used to detect contention between concurrent tasks",
+      "blockedBy": "array - Task IDs that must complete first",
+      "assignedAgent": "string|null - Agent instance ID set at dispatch time. Prevents double-dispatch",
+      "result": "object|null - Structured output from agent. See result schema below",
+      "completedAt": "string|null - ISO timestamp when task completed"
+    },
+    "result": {
+      "_description": "Written by agent on completion. Enables machine-readable success/failure detection and audit trail.",
+      "status": "string - success | failure",
+      "summary": "string - Brief description of what was done or why it failed",
+      "filesModified": "array - Actual files changed (may differ from filesTouched)",
+      "blockers": "array - Unresolved issues preventing completion (empty on success)"
+    },
+    "statusTransitions": {
+      "blocked": "Task is in a future wave. Cannot execute until wave activated.",
+      "ready": "Task is in current wave. Eligible for dispatch.",
+      "in-progress": "Dispatched to agent and executing.",
+      "complete": "Agent reported success.",
+      "failed": "Agent reported failure. May be retried within wave."
+    },
+    "transitionRules": {
+      "blocked -> ready": "Orchestrator activates wave (all wave tasks at once)",
+      "ready -> in-progress": "Orchestrator dispatches and sets assignedAgent",
+      "in-progress -> complete": "Agent returns result.status = success",
+      "in-progress -> failed": "Agent returns result.status = failure",
+      "failed -> ready": "Orchestrator retry within wave (clears assignedAgent, result)"
+    },
+    "mutableFields": ["status", "assignedAgent", "result", "completedAt"],
+    "immutableFields": ["id", "title", "description", "priority", "executionWave", "acceptanceCriteria", "references", "filesTouched", "blockedBy"],
+    "computedFields": {
+      "waveSummary": "Regenerate via /compute-waves after any change to tasks, blockedBy, or filesTouched"
+    }
+  }
+}

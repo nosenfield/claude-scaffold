@@ -1,6 +1,6 @@
 ---
 name: memory-updater
-description: Use after task completion to persist session state. Supports single task or batch mode. Updates Active Context section, appends entry to Session Log in _docs/memory/progress.md, records significant decisions in _docs/memory/decisions.md, and marks tasks complete in task-list.json.
+description: Use after task completion to persist session state. Supports single task or batch mode. Updates Active Context section, appends entry to Session Log in _docs/memory/progress.md, records significant decisions in _docs/memory/decisions.md, marks tasks complete in task-list.json, and writes result objects.
 tools: Read, Write, Edit, Glob, Bash
 model: sonnet
 ---
@@ -34,10 +34,20 @@ The orchestrator provides:
   - commitSha: Git commit hash
   - filesModified: List of files changed
   - decisions: List of decisions made
+  - result: Structured result object:
+    - status: "success"
+    - summary: Brief description
+    - filesModified: Actual files changed
+    - blockers: [] (empty for success)
 - **failedTasks** (optional): Array of failed task info:
   - taskId: Task identifier
   - taskTitle: Task name
   - error: Error description
+  - result: Structured result object:
+    - status: "failure"
+    - summary: Why it failed
+    - filesModified: Any partial work
+    - blockers: Issues preventing completion
 - **nextSteps** (optional): Immediate next steps after batch
 
 ## Memory Bank Files
@@ -46,7 +56,7 @@ The orchestrator provides:
 |------|---------|----------------|
 | _docs/memory/progress.md | Active context + session history | **Replace** Active Context; **Append** to Session Log |
 | _docs/memory/decisions.md | Significant decisions | Append if decisions were made |
-| _docs/task-list.json | Task completion status | Update status field only |
+| _docs/task-list.json | Task status and results | Update status, result, completedAt; advance blocked tasks |
 
 ## Process
 
@@ -97,12 +107,21 @@ Append to _docs/memory/decisions.md if significant decisions were made.
 
 #### Step 4: Update task-list.json (if taskId provided)
 
+Update the task:
 ```json
 {
   "status": "complete",
+  "result": {
+    "status": "success",
+    "summary": "[from payload]",
+    "filesModified": ["[actual files]"],
+    "blockers": []
+  },
   "completedAt": "[ISO timestamp]"
 }
 ```
+
+Note: Wave advancement (blocked → ready) is handled by the orchestrator, not memory-updater.
 
 #### Step 5: Amend Commit (if taskId and commitSha provided)
 
@@ -122,8 +141,42 @@ Same as single mode with these differences:
 | Active Context | Current Focus lists completed task IDs; notes failed tasks |
 | Session Log | ONE entry for entire batch listing all completed/failed tasks |
 | Decisions | Aggregate from all tasks; tag each with `(from [taskId])` |
-| task-list.json | Update all tasks; reset failed to `pending` for retry |
+| task-list.json | Update all tasks with result objects |
+| Failed Tasks | Set `status: "failed"` with result object (do NOT reset to pending) |
 | Commit Amend | **Skip** - each teammate already committed; no single SHA to amend |
+| Wave Advancement | **Skip** - orchestrator handles blocked → ready at wave boundaries |
+
+#### Batch task-list.json Updates
+
+For successful tasks:
+```json
+{
+  "status": "complete",
+  "assignedAgent": "[preserved from dispatch]",
+  "result": {
+    "status": "success",
+    "summary": "[from teammate]",
+    "filesModified": ["[actual files]"],
+    "blockers": []
+  },
+  "completedAt": "[ISO timestamp]"
+}
+```
+
+For failed tasks:
+```json
+{
+  "status": "failed",
+  "assignedAgent": "[preserved from dispatch]",
+  "result": {
+    "status": "failure",
+    "summary": "[from teammate]",
+    "filesModified": ["[any partial work]"],
+    "blockers": ["[issues]"]
+  },
+  "completedAt": null
+}
+```
 
 ## Output Format
 
@@ -140,7 +193,7 @@ Same as single mode with these differences:
 ### Files Modified
 - _docs/memory/progress.md: Updated Active Context; added Session Log entry
 - _docs/memory/decisions.md: [Added N entries / No updates needed]
-- _docs/task-list.json: [status updates]
+- _docs/task-list.json: [status and result updates]
 
 ### Summary
 [One sentence describing what was recorded]
@@ -151,4 +204,6 @@ Same as single mode with these differences:
 - **Active Context**: REPLACE entirely on each update; include only recent decisions (2-3)
 - **Session Log**: APPEND only; in batch mode create ONE entry for entire batch
 - **decisions.md**: APPEND only
-- **task-list.json**: ONLY modify `status` and `completedAt` fields; skip amend in batch mode
+- **task-list.json**: Update `status`, `result`, `completedAt` only; skip amend in batch mode
+- **Failed tasks**: Set to `failed` status (orchestrator decides retry logic)
+- **Wave advancement**: NOT handled by memory-updater; orchestrator manages blocked → ready at wave boundaries
