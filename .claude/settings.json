@@ -51,7 +51,9 @@
       "Bash(ls *)",
       "Bash(pwd)",
       "Bash(head *)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Bash(touch .claude/.test-writing-mode*)",
+      "Bash(rm -f .claude/.test-writing-mode*)"
     ],
     "deny": [
       "Bash(rm -rf *)",
