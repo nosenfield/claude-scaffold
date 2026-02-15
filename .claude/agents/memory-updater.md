@@ -148,56 +148,11 @@ Same as single mode with these differences:
 
 #### Batch task-list.json Updates
 
-For successful tasks:
-```json
-{
-  "status": "complete",
-  "assignedAgent": "[preserved from dispatch]",
-  "result": {
-    "status": "success",
-    "summary": "[from teammate]",
-    "filesModified": ["[actual files]"],
-    "blockers": []
-  },
-  "completedAt": "[ISO timestamp]"
-}
-```
-
-For failed tasks:
-```json
-{
-  "status": "failed",
-  "assignedAgent": "[preserved from dispatch]",
-  "result": {
-    "status": "failure",
-    "summary": "[from teammate]",
-    "filesModified": ["[any partial work]"],
-    "blockers": ["[issues]"]
-  },
-  "completedAt": null
-}
-```
+Use same JSON structure as Step 4. For failed tasks: `status: "failed"`, `result.status: "failure"`, `completedAt: null`.
 
 ## Output Format
 
-```
-## Memory Bank Updated [Batch]
-
-### [Batch Summary - if batch mode]
-- Completed: [N] tasks | Failed: [M] tasks
-
-### Active Context
-- Current Focus: [updated focus]
-- Next Steps: [N items]
-
-### Files Modified
-- _docs/memory/progress.md: Updated Active Context; added Session Log entry
-- _docs/memory/decisions.md: [Added N entries / No updates needed]
-- _docs/task-list.json: [status and result updates]
-
-### Summary
-[One sentence describing what was recorded]
-```
+Report: files modified, Active Context summary, batch stats (if batch mode), one-sentence summary.
 
 ## Rules
 

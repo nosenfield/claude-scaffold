@@ -94,43 +94,11 @@ This prevents other orchestrators from claiming these tasks.
 
 #### 3c. Spawn Teammates
 
-For each task, spawn teammate with prompt:
-```
-You are executing task [taskId] as part of a batch.
-Task: [title]
-Description: [description]
-Acceptance Criteria: [criteria]
-References: [references]
-Files Expected: [filesTouched]
-
-Run /execute-task-from-batch with this task. Return result when complete.
-```
+For each task, spawn teammate with task details and instruction to run `/execute-task-from-batch`.
 
 #### 3d. Collect Results
 
-Wait for all teammates to report structured results:
-
-**On success**:
-```
-TASK_COMPLETE
-taskId: [id]
-result:
-  status: success
-  summary: [what was done]
-  filesModified: [actual files changed]
-  blockers: []
-```
-
-**On failure**:
-```
-TASK_FAILED
-taskId: [id]
-result:
-  status: failure
-  summary: [why it failed]
-  filesModified: [any partial work]
-  blockers: [issues preventing completion]
-```
+Wait for all teammates to report `TASK_COMPLETE` or `TASK_FAILED` with structured result objects (see `/execute-task-from-batch` for schema).
 
 #### 3e. Check for Failures (Pause Point)
 
@@ -156,21 +124,13 @@ After all teammates report (or timeout), check for any TASK_FAILED results.
 |------|-------|----------|
 | TASK-007 | implementation | [blocker description] |
 
-### Completed Tasks (This Batch)
-| Task | Summary |
-|------|---------|
-| TASK-003 | Implemented auth middleware |
-
 ### Options
-
-1. **Retry failed tasks**: Reset failed tasks to eligible, continue wave
-2. **Skip failed tasks**: Mark as failed, continue to next wave
-3. **Abort execution**: Stop batch workflow for manual intervention
-
-Select option (1/2/3):
+1. **Retry**: Reset failed tasks to eligible, continue wave
+2. **Skip**: Mark as failed, continue to next wave
+3. **Abort**: Stop for manual intervention
 ```
 
-Wait for user response before proceeding.
+Wait for user response.
 
 **User response handling**:
 - **Option 1 (Retry)**: Continue to 3g, then loop to 3a
@@ -205,60 +165,19 @@ Loop back to 3a to include retried tasks in next batch selection.
 
 #### 3h. Report Batch
 
-```
-## Batch Complete
-
-**Wave**: [N] | **Batch**: [B]
-**Completed**: [X] tasks
-
-| Task | Summary |
-|------|---------|
-| TASK-003 | Implemented auth middleware |
-| TASK-005 | Created user model |
-```
-
-Loop back to 3a if wave has remaining eligible tasks.
+Report completed tasks. Loop back to 3a if wave has remaining eligible tasks.
 
 ### Phase 4: Verify Wave Complete
 
 Check all tasks in current wave:
-
-**If all tasks `status === "complete"`**: Wave successful, continue to Phase 5.
-
-**If any tasks `status === "failed"`** (user selected "Skip" in 3e):
-```
-## Wave [N] Complete (With Skipped Tasks)
-
-**Completed**: [X] tasks | **Skipped**: [Y] tasks
-
-Skipped tasks (marked failed):
-- TASK-007: [blockers]
-
-Continuing to next wave...
-```
+- **All complete**: Continue to Phase 5
+- **Any failed** (user selected "Skip"): Note skipped tasks, continue to Phase 5
 
 ### Phase 5: Advance to Next Wave
 
-```
-## Wave [N] Complete
-
-**Tasks Completed**: [count]
-**Advancing to Wave**: [N+1]
-```
-
-Continue outer loop (back to Phase 1).
+Report wave completion. Continue outer loop (back to Phase 1).
 
 ## Error Handling
-
-### Task Failure (Pause Behavior)
-When ANY task fails:
-1. Allow all in-progress teammates to complete their current task
-2. Collect all results (success and failure)
-3. Update memory with results
-4. Pause and prompt user with options: Retry, Skip, or Abort
-5. Do NOT auto-retry - user decides next action
-
-This ensures human oversight on failures while preserving work from successful teammates.
 
 ### Teammate Timeout
 - Log warning, shutdown teammate

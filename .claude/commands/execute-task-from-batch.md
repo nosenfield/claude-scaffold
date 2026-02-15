@@ -128,39 +128,19 @@ partialWork:
 
 ## Result Object Schema
 
-The `result` object is the key artifact consumed by memory-updater:
+The `result` object is consumed by memory-updater:
 
 ```json
 {
   "status": "success | failure",
   "summary": "Brief description of outcome",
   "filesModified": ["actual files changed"],
-  "blockers": ["issues preventing completion"]
+  "blockers": ["issues preventing completion (empty on success)"]
 }
 ```
 
-### Success Result
-- `status`: "success"
-- `summary`: What was implemented (matches acceptance criteria)
-- `filesModified`: Actual files created/modified (may differ from `filesTouched`)
-- `blockers`: Empty array
-
-### Failure Result
-- `status`: "failure"
-- `summary`: Why the task could not be completed
-- `filesModified`: Any partial work (may be empty)
-- `blockers`: Specific issues that blocked completion
-
-### Blocker Categories
-
-When reporting blockers, categorize them:
-
-| Category | Example | Implication |
-|----------|---------|-------------|
-| Upstream deficiency | "TASK-002 does not export UserModel" | Wait for upstream fix |
-| Missing requirement | "Acceptance criteria ambiguous for edge case X" | Needs clarification |
-| Technical issue | "Cannot resolve dependency: package@version" | May be retryable |
-| Test failure | "3 tests failing after implementation" | Code issue |
+- **Success**: `status: "success"`, `blockers: []`
+- **Failure**: `status: "failure"`, `blockers` lists specific issues
 
 ## Autonomous Behavior
 
@@ -188,32 +168,13 @@ This warning helps the orchestrator detect potential contention drift.
 
 ## Error Handling
 
-### Lint/Typecheck Failures (Pre-Commit)
+| Error | Action | Max Retries |
+|-------|--------|-------------|
+| Lint/Typecheck | Spawn implementer with ADDRESS_LINT_ERRORS mode | 1 |
+| Test failures | Attempt fix | 2 |
+| Review REQUEST_CHANGES | Loop back to implementation | 3 |
 
-Delegate to implementer subagent:
-- Spawn `implementer` with mode: ADDRESS_LINT_ERRORS
-- Provide lintErrors: [error output]
-- Re-verify
-- If still failing, return TASK_FAILED with blockers
-
-### Test Failures
-
-If tests fail after implementation:
-1. Attempt fix (max 2 retries)
-2. If still failing, return TASK_FAILED with:
-   ```
-   blockers:
-     - "Test failure: [test name] - [assertion error]"
-   ```
-
-### Review Loops
-
-Max 3 review-fix iterations. If still REQUEST_CHANGES after 3 loops:
-- Return TASK_FAILED with:
-  ```
-  blockers:
-    - "Review loop exceeded: [remaining issues]"
-  ```
+If retries exhausted, return TASK_FAILED with specific blockers.
 
 ## Notes
 
