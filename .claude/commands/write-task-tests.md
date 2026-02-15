@@ -21,9 +21,12 @@ If no plan exists, run `/plan-task` first.
 2. **Enable Test-Writing Mode**
    Create marker file to allow test file modifications:
    ```bash
-   touch .claude/.test-writing-mode
+   # Use agent-specific marker for batch-safe execution
+   # Falls back to generic marker if CLAUDE_AGENT_ID not available
+   touch ".claude/.test-writing-mode${CLAUDE_AGENT_ID:+-$CLAUDE_AGENT_ID}"
    ```
    This signals to the test-file-guard hook that test writes are permitted.
+   Agent-specific markers prevent race conditions when multiple teammates write tests concurrently.
 
 3. **Prepare Handoff Payload**
    ```
@@ -51,7 +54,8 @@ If no plan exists, run `/plan-task` first.
 6. **Disable Test-Writing Mode**
    Remove marker file to re-enable test protection:
    ```bash
-   rm -f .claude/.test-writing-mode
+   # Remove agent-specific marker (or generic if no agent ID)
+   rm -f ".claude/.test-writing-mode${CLAUDE_AGENT_ID:+-$CLAUDE_AGENT_ID}"
    ```
    This ensures tests cannot be modified during implementation.
 

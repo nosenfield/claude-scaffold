@@ -9,6 +9,10 @@
 #
 # This hook enforces test immutability as defined in test-protection.md.
 # Test files may only be created/modified by the test-writer subagent.
+#
+# Batch-safe: Uses agent-specific marker files (.test-writing-mode-{agentId})
+# to prevent race conditions when multiple teammates execute concurrently.
+# Falls back to legacy generic marker for single-agent workflows.
 
 set -o pipefail
 
@@ -50,12 +54,25 @@ is_test_writing_mode() {
     if [ "${CLAUDE_TEST_WRITING_MODE:-false}" = "true" ]; then
         return 0
     fi
-    
-    # Check for marker file (alternative approach)
-    if [ -f ".claude/.test-writing-mode" ]; then
-        return 0
+
+    # Check for agent-specific marker file (batch-safe)
+    # Pattern: .test-writing-mode-{agentId} or legacy .test-writing-mode
+    if ls .claude/.test-writing-mode* 1>/dev/null 2>&1; then
+        # Extract agent ID from marker filename if present
+        local marker_file
+        marker_file=$(ls .claude/.test-writing-mode* 2>/dev/null | head -1)
+
+        # If CLAUDE_AGENT_ID is set, verify it matches the marker
+        if [ -n "${CLAUDE_AGENT_ID:-}" ] && [ -f ".claude/.test-writing-mode-${CLAUDE_AGENT_ID}" ]; then
+            return 0
+        fi
+
+        # Legacy: allow any marker if no agent ID context
+        if [ -z "${CLAUDE_AGENT_ID:-}" ] && [ -f "$marker_file" ]; then
+            return 0
+        fi
     fi
-    
+
     return 1
 }
 

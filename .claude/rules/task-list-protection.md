@@ -13,7 +13,7 @@ The task list is the authoritative source for project work items. It must remain
 | Version | Status Field Values | Key Differences |
 |---------|---------------------|-----------------|
 | 1.x | pending, in-progress, complete | Legacy schema |
-| 2.x | blocked, ready, in-progress, complete, failed | Parallel execution support |
+| 2.x | blocked, eligible, in-progress, complete, failed | Parallel execution support |
 
 ## Immutable Fields
 
@@ -54,11 +54,11 @@ ONLY these fields may be modified:
 ## Status Transitions (v2.x - Wave Execution)
 
 ```
-blocked → ready        (orchestrator activates wave)
-ready → in-progress    (orchestrator dispatches task)
+blocked → eligible     (orchestrator activates wave)
+eligible → in-progress (orchestrator dispatches task)
 in-progress → complete (memory-updater on success)
 in-progress → failed   (memory-updater on failure)
-failed → ready         (orchestrator retry within wave)
+failed → eligible      (orchestrator retry within wave)
 ```
 
 ## Status Semantics (v2.x)
@@ -66,7 +66,7 @@ failed → ready         (orchestrator retry within wave)
 | Status | Meaning |
 |--------|---------|
 | blocked | Task is in a future wave. Activated when wave begins. |
-| ready | Task is in current wave and eligible for dispatch. |
+| eligible | Task is in current wave and eligible for dispatch to an agent. |
 | in-progress | Task dispatched to agent. |
 | complete | Agent reported success. |
 | failed | Agent reported failure. May be retried within wave. |
@@ -118,6 +118,6 @@ Before any write to task-list.json:
 
 To migrate from v1.x to v2.x:
 1. Rename `affectedPaths` to `filesTouched`
-2. Change `pending` status to `blocked` or `ready` based on dependencies
+2. Change `pending` status to `blocked` or `eligible` based on dependencies
 3. Add `assignedAgent: null` and `result: null` to each task
 4. Run `/compute-waves` to generate `waveSummary` and `executionWave`

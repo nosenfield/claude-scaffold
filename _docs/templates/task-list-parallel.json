@@ -32,7 +32,7 @@
       "description": "[Detailed description of what this task accomplishes]",
       "priority": 1,
       "executionWave": 0,
-      "status": "ready",
+      "status": "eligible",
       "acceptanceCriteria": [
         "[Criterion 1]",
         "[Criterion 2]"
@@ -176,9 +176,9 @@
       "id": "string - Unique identifier (TASK-NNN format)",
       "title": "string - Brief task name",
       "description": "string - Detailed task description",
-      "priority": "number - Lower number = higher priority. Tiebreaker when multiple tasks are ready",
+      "priority": "number - Lower number = higher priority. Tiebreaker when multiple tasks are eligible",
       "executionWave": "number - DAG depth level computed from dependency graph. Tasks in same wave can execute in parallel if no file contention",
-      "status": "string - One of: blocked, ready, in-progress, complete, failed",
+      "status": "string - One of: blocked, eligible, in-progress, complete, failed",
       "acceptanceCriteria": "array - List of criteria that define done",
       "references": "array - Paths to relevant documentation sections for agent context",
       "filesTouched": "array - File paths this task reads or writes. Used to detect contention between concurrent tasks",
@@ -196,17 +196,17 @@
     },
     "statusTransitions": {
       "blocked": "Task is in a future wave. Cannot execute until wave activated.",
-      "ready": "Task is in current wave. Eligible for dispatch.",
+      "eligible": "Task is in current wave. Eligible for dispatch to an agent.",
       "in-progress": "Dispatched to agent and executing.",
       "complete": "Agent reported success.",
       "failed": "Agent reported failure. May be retried within wave."
     },
     "transitionRules": {
-      "blocked -> ready": "Orchestrator activates wave (all wave tasks at once)",
-      "ready -> in-progress": "Orchestrator dispatches and sets assignedAgent",
+      "blocked -> eligible": "Orchestrator activates wave (all wave tasks at once)",
+      "eligible -> in-progress": "Orchestrator dispatches and sets assignedAgent",
       "in-progress -> complete": "Agent returns result.status = success",
       "in-progress -> failed": "Agent returns result.status = failure",
-      "failed -> ready": "Orchestrator retry within wave (clears assignedAgent, result)"
+      "failed -> eligible": "Orchestrator retry within wave (clears assignedAgent, result)"
     },
     "mutableFields": ["status", "assignedAgent", "result", "completedAt"],
     "immutableFields": ["id", "title", "description", "priority", "executionWave", "acceptanceCriteria", "references", "filesTouched", "blockedBy"],

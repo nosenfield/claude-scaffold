@@ -9,7 +9,7 @@ Orchestrates teammates to complete batches of parallelizable tasks until the tas
 This command acts as team lead executing waves sequentially with parallel tasks within each wave:
 
 1. Determine current wave
-2. Activate wave (set blocked tasks to ready)
+2. Activate wave (set blocked tasks to eligible)
 3. Execute wave batches until wave complete
 4. Advance to next wave
 5. Repeat until all waves complete
@@ -58,18 +58,18 @@ Stop execution.
 ### Phase 2: Activate Wave
 
 For all tasks where `executionWave === currentWave AND status === "blocked"`:
-- Set `status: "ready"`
+- Set `status: "eligible"`
 
 ```
 ## Wave [N] Activated
 
 **Tasks in Wave**: [count]
-**Set to Ready**: [count]
+**Set to Eligible**: [count]
 ```
 
 ### Phase 3: Execute Wave (Inner Loop)
 
-While wave has ready tasks:
+While wave has eligible tasks:
 
 #### 3a. Batch Selection
 
@@ -132,52 +132,92 @@ result:
   blockers: [issues preventing completion]
 ```
 
-#### 3e. Update Memory
+#### 3e. Check for Failures (Pause Point)
+
+After all teammates report (or timeout), check for any TASK_FAILED results.
+
+**If ANY task failed**:
+
+1. **Allow in-progress teammates to complete**: Do NOT terminate teammates still executing. Wait for all spawned teammates in this batch to finish their current work.
+
+2. **Collect all results**: Gather both success and failure results from the batch.
+
+3. **Update memory**: Spawn `memory-updater` with `batchMode: true` and collected results.
+
+4. **Pause for user input**:
+```
+## Batch Paused - Task Failure Detected
+
+**Wave**: [N] | **Batch**: [B]
+**Completed**: [X] tasks | **Failed**: [Y] tasks
+
+### Failed Tasks
+| Task | Phase | Blockers |
+|------|-------|----------|
+| TASK-007 | implementation | [blocker description] |
+
+### Completed Tasks (This Batch)
+| Task | Summary |
+|------|---------|
+| TASK-003 | Implemented auth middleware |
+
+### Options
+
+1. **Retry failed tasks**: Reset failed tasks to eligible, continue wave
+2. **Skip failed tasks**: Mark as failed, continue to next wave
+3. **Abort execution**: Stop batch workflow for manual intervention
+
+Select option (1/2/3):
+```
+
+Wait for user response before proceeding.
+
+**User response handling**:
+- **Option 1 (Retry)**: Continue to 3g, then loop to 3a
+- **Option 2 (Skip)**: Failed tasks remain "failed"; exit inner loop to Phase 4
+- **Option 3 (Abort)**: Stop execution, preserve context for manual intervention
+
+**If ALL tasks succeeded**: Continue to 3f (skip pause).
+
+#### 3f. Update Memory (Success Path)
 
 Spawn `memory-updater` with `batchMode: true` and collected results.
 
 The agent will:
 - Update task-list.json:
   - Successful tasks: `status: "complete"`, write `result` object, set `completedAt`
-  - Failed tasks: `status: "failed"`, write `result` object
 - Update progress.md and decisions.md
 
-Note: Wave advancement (blocked → ready) is handled by the orchestrator at Phase 2, not memory-updater.
+Note: Wave advancement (blocked → eligible) is handled by the orchestrator at Phase 2, not memory-updater.
 
-#### 3f. Handle Failures
+#### 3g. Handle Retry (User-Initiated)
 
-For failed tasks within the wave:
+If user selected "Retry failed tasks" in 3e:
+
 ```
-if result.blockers references upstream task:
-    # Upstream deficiency - do not retry
-    keep status: "failed"
-else if retry_count < 2:
-    # Retriable failure - reset for next batch
-    set status: "ready"
+for each failed task:
+    set status: "eligible"
     clear assignedAgent
     clear result
-    retry_count++
-else:
-    # Max retries exceeded
-    keep status: "failed"
 ```
 
-#### 3g. Report Batch
+Loop back to 3a to include retried tasks in next batch selection.
+
+#### 3h. Report Batch
 
 ```
 ## Batch Complete
 
 **Wave**: [N] | **Batch**: [B]
-**Completed**: [X] tasks | **Failed**: [Y] tasks | **Retrying**: [Z] tasks
+**Completed**: [X] tasks
 
-| Task | Status | Summary |
-|------|--------|---------|
-| TASK-003 | complete | Implemented auth middleware |
-| TASK-005 | complete | Created user model |
-| TASK-007 | retry | Test failure (attempt 1/2) |
+| Task | Summary |
+|------|---------|
+| TASK-003 | Implemented auth middleware |
+| TASK-005 | Created user model |
 ```
 
-Loop back to 3a if wave has remaining ready tasks.
+Loop back to 3a if wave has remaining eligible tasks.
 
 ### Phase 4: Verify Wave Complete
 
@@ -185,20 +225,16 @@ Check all tasks in current wave:
 
 **If all tasks `status === "complete"`**: Wave successful, continue to Phase 5.
 
-**If any tasks `status === "failed"` after max retries**:
+**If any tasks `status === "failed"`** (user selected "Skip" in 3e):
 ```
-## Wave [N] Incomplete
+## Wave [N] Complete (With Skipped Tasks)
 
-**Completed**: [X] tasks | **Failed**: [Y] tasks
+**Completed**: [X] tasks | **Skipped**: [Y] tasks
 
-Failed tasks:
+Skipped tasks (marked failed):
 - TASK-007: [blockers]
 
-Options:
-1. Skip failed tasks and continue to next wave
-2. Abort execution for manual intervention
-
-[Prompt user for decision]
+Continuing to next wave...
 ```
 
 ### Phase 5: Advance to Next Wave
@@ -214,20 +250,25 @@ Continue outer loop (back to Phase 1).
 
 ## Error Handling
 
+### Task Failure (Pause Behavior)
+When ANY task fails:
+1. Allow all in-progress teammates to complete their current task
+2. Collect all results (success and failure)
+3. Update memory with results
+4. Pause and prompt user with options: Retry, Skip, or Abort
+5. Do NOT auto-retry - user decides next action
+
+This ensures human oversight on failures while preserving work from successful teammates.
+
 ### Teammate Timeout
 - Log warning, shutdown teammate
 - Set task `status: "failed"` with `result.blockers: ["Agent timeout"]`
-- Continue with other teammates
-
-### Partial Failure
-- Process successes normally
-- Failed tasks retried within wave (up to 2 attempts per task)
-- After max retries, prompt user: skip or abort
+- Triggers pause behavior (above)
 
 ### Full Batch Failure
+- All tasks in batch failed
 - Report details
-- Stop execution
-- Preserve context for manual intervention
+- Pause for user decision (same options as partial failure)
 
 ### Contention Detected at Runtime
 If teammate reports modifying files outside `filesTouched`:

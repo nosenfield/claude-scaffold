@@ -121,7 +121,7 @@ Update the task:
 }
 ```
 
-Note: Wave advancement (blocked → ready) is handled by the orchestrator, not memory-updater.
+Note: Wave advancement (blocked → eligible) is handled by the orchestrator, not memory-updater.
 
 #### Step 5: Amend Commit (if taskId and commitSha provided)
 
@@ -144,7 +144,7 @@ Same as single mode with these differences:
 | task-list.json | Update all tasks with result objects |
 | Failed Tasks | Set `status: "failed"` with result object (do NOT reset to pending) |
 | Commit Amend | **Skip** - each teammate already committed; no single SHA to amend |
-| Wave Advancement | **Skip** - orchestrator handles blocked → ready at wave boundaries |
+| Wave Advancement | **Skip** - orchestrator handles blocked → eligible at wave boundaries |
 
 #### Batch task-list.json Updates
 
@@ -206,4 +206,4 @@ For failed tasks:
 - **decisions.md**: APPEND only
 - **task-list.json**: Update `status`, `result`, `completedAt` only; skip amend in batch mode
 - **Failed tasks**: Set to `failed` status (orchestrator decides retry logic)
-- **Wave advancement**: NOT handled by memory-updater; orchestrator manages blocked → ready at wave boundaries
+- **Wave advancement**: NOT handled by memory-updater; orchestrator manages blocked → eligible at wave boundaries

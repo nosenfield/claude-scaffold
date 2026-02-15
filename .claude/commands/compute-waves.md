@@ -52,10 +52,10 @@ Write updated `task-list.json` with:
 - `executionWave` set on each task
 - `waveSummary` array at root level
 - Initial `status` set based on wave:
-  - Wave 0 tasks: `status: "ready"` (eligible for immediate execution)
+  - Wave 0 tasks: `status: "eligible"` (eligible for immediate execution)
   - Wave 1+ tasks: `status: "blocked"` (awaiting wave activation by orchestrator)
 
-Note: "blocked" means the task is in a future wave, not that individual dependencies are unmet. The orchestrator activates each wave by transitioning all its tasks from blocked to ready at once.
+Note: "blocked" means the task is in a future wave, not that individual dependencies are unmet. The orchestrator activates each wave by transitioning all its tasks from blocked to eligible at once.
 
 ## Output
 
@@ -80,7 +80,7 @@ Note: "blocked" means the task is in a future wave, not that individual dependen
 
 ### Status Updates
 
-- [N] tasks set to `ready` (wave 0)
+- [N] tasks set to `eligible` (wave 0)
 - [M] tasks set to `blocked` (waves 1+)
 ```
 
@@ -134,5 +134,5 @@ Wave 2: [TASK-004]
 - Run after any modification to task dependencies
 - Run after adding or removing tasks
 - The command modifies `task-list.json` in place
-- Existing `status` values are preserved for `in-progress` and `complete` tasks
-- Only `blocked` and `ready` are set based on wave computation
+- Existing `status` values are preserved for `in-progress`, `complete`, and `failed` tasks
+- Only `blocked` and `eligible` are set based on wave computation

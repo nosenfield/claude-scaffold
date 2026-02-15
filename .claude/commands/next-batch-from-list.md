@@ -8,7 +8,7 @@ Used by `/batch-execute-task-auto` to get tasks that can run concurrently.
 
 Spawns the `task-selector` agent in batch mode to:
 1. Read task-list.json
-2. Filter tasks with `status: "ready"`
+2. Filter tasks with `status: "eligible"`
 3. Use `waveSummary.contentions` to avoid file conflicts
 4. Return batch of parallelizable tasks
 
@@ -86,7 +86,7 @@ Spawns the `task-selector` agent in batch mode to:
        filesTouched:
          - src/models/user.ts
          - src/types/user.ts
-   remainingTasks: [count of ready tasks not in batch]
+   remainingTasks: [count of eligible tasks not in batch]
    contentionsAvoided:
      - [TASK-003, TASK-007]: src/routes/index.ts
    ```
@@ -99,7 +99,7 @@ Spawns the `task-selector` agent in batch mode to:
 
    **Wave**: [current wave from tasks]
    **Batch Size**: [N] tasks
-   **Remaining in Wave**: [M] ready tasks
+   **Remaining in Wave**: [M] eligible tasks
 
    ### Tasks in Batch
    1. [TASK-003] Add auth middleware (priority 1)
@@ -117,7 +117,7 @@ Spawns the `task-selector` agent in batch mode to:
 
 The task-selector agent applies these rules:
 
-1. **Ready status only**: Task must have `status: "ready"`
+1. **Eligible status only**: Task must have `status: "eligible"`
 2. **Contention check**: Use `waveSummary.contentions` to identify conflicting pairs
 3. **File overlap check**: Defense in depth - compare `filesTouched` arrays
 4. **Priority order**: Higher priority tasks selected first
@@ -130,7 +130,7 @@ Tasks listed in `waveSummary.contentions` cannot run in the same batch:
 "contentions": [["TASK-005", "TASK-006"]]
 ```
 
-If both TASK-005 and TASK-006 are ready:
+If both TASK-005 and TASK-006 are eligible:
 - TASK-005 (higher priority) enters batch
 - TASK-006 excluded, noted in `contentionsAvoided`
 

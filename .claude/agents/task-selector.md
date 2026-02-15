@@ -57,7 +57,7 @@ blockedTasks:
 
 #### Single Mode (default)
 
-1. Filter tasks where `status === "ready"`
+1. Filter tasks where `status === "eligible"`
 2. Sort by `priority` (lower number = higher priority)
 3. Select the first task
 
@@ -94,7 +94,7 @@ blockedBy: [list or empty]
 
 2. Filter candidates:
    ```
-   candidates = tasks where executionWave === currentWave AND status === "ready"
+   candidates = tasks where executionWave === currentWave AND status === "eligible"
    ```
 
 3. Sort by `priority` (lower number = higher priority)
@@ -155,7 +155,7 @@ tasks:
     filesTouched:
       - src/models/user.ts
       - src/types/user.ts
-remainingTasks: [count of ready tasks not in batch]
+remainingTasks: [count of eligible tasks not in batch]
 contentionsAvoided:
   - [TASK-003, TASK-007]: src/routes/index.ts
 warnings:
