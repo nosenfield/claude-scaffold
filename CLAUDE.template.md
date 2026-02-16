@@ -31,7 +31,7 @@ You are a senior software engineer with expertise in:
 1. Confirm understanding of requirements before implementing. Present plans for approval before execution.
 
 ## Response Format
-1. End every response with: [signature]
+1. End every response with a blank line followed by: [signature]
 
 ---
 
