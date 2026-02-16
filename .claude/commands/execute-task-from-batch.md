@@ -7,6 +7,7 @@ Used by teammates spawned from `/batch-execute-task-auto`.
 ## Overview
 
 This command executes the development cycle for an assigned task:
+0. Load project context
 1. Plan implementation (`/plan-task`)
 2. Write tests (`/write-task-tests`)
 3. Implement (`/implement-task`)
@@ -36,6 +37,16 @@ filesTouched:
 Set `currentTask` in session context from input.
 
 ## Workflow
+
+### Phase 0: Load Project Context
+
+Read the following files to establish project awareness before starting work:
+
+1. **`_docs/architecture.md`** -- project structure, tech stack, component boundaries
+2. **`_docs/memory/decisions.md`** -- architectural decisions to respect (do not contradict these)
+3. **Each file in the task's `references` array** -- design constraints specific to this task
+
+This replaces the `/dev` session start used in the single-task workflow. Teammates do not need session management but do need project context.
 
 ### Phase 1: Planning
 
@@ -83,47 +94,55 @@ Execute `/commit-implementation` to commit code changes.
 
 ### Phase 6: Return Result
 
-Send structured result to orchestrator.
+Send structured result to orchestrator using the **SendMessage tool**. You MUST call this tool before finishing, whether the task succeeded or failed.
 
-**On success**:
+**On success** -- call the SendMessage tool:
 ```
-TASK_COMPLETE
-taskId: [currentTask.id]
-taskTitle: [currentTask.title]
-commitSha: [from commit result]
-commitMessage: [from commit result]
-result:
-  status: success
-  summary: [1-2 sentence description of what was implemented]
-  filesModified:
-    - [file1]
-    - [file2]
-  blockers: []
-decisions:
-  - [decision 1]
-  - [decision 2]
-testsWritten: [count]
-reviewVerdict: [APPROVE]
-reviewNotes: [any non-blocking issues deferred]
+type: "message"
+recipient: "team-lead"
+summary: "[currentTask.id] complete"
+content: |
+  TASK_COMPLETE
+  taskId: [currentTask.id]
+  taskTitle: [currentTask.title]
+  commitSha: [from commit result]
+  commitMessage: [from commit result]
+  result:
+    status: success
+    summary: [1-2 sentence description of what was implemented]
+    filesModified:
+      - [file1]
+      - [file2]
+    blockers: []
+  decisions:
+    - [decision 1]
+    - [decision 2]
+  testsWritten: [count]
+  reviewVerdict: [APPROVE]
+  reviewNotes: [any non-blocking issues deferred]
 ```
 
-**On failure**:
+**On failure** -- call the SendMessage tool:
 ```
-TASK_FAILED
-taskId: [currentTask.id]
-taskTitle: [currentTask.title]
-phase: [planning|testing|implementation|review|commit]
-result:
-  status: failure
-  summary: [why it failed - 1-2 sentences]
-  filesModified:
-    - [any partial work]
-  blockers:
-    - [issue 1]
-    - [issue 2]
-partialWork:
-  testsWritten: [count or 0]
-  filesModified: [list or empty]
+type: "message"
+recipient: "team-lead"
+summary: "[currentTask.id] failed at [phase]"
+content: |
+  TASK_FAILED
+  taskId: [currentTask.id]
+  taskTitle: [currentTask.title]
+  phase: [planning|testing|implementation|review|commit]
+  result:
+    status: failure
+    summary: [why it failed - 1-2 sentences]
+    filesModified:
+      - [any partial work]
+    blockers:
+      - [issue 1]
+      - [issue 2]
+  partialWork:
+    testsWritten: [count or 0]
+    filesModified: [list or empty]
 ```
 
 ## Result Object Schema
@@ -181,6 +200,6 @@ If retries exhausted, return TASK_FAILED with specific blockers.
 - This command is for batch workflow only
 - Task is assigned by orchestrator, not selected from task-list.json
 - Memory updates are handled by orchestrator after batch completes
-- Result must be sent to orchestrator (via Agent Teams messaging)
+- Result MUST be sent via `SendMessage` tool with `recipient: "team-lead"` before finishing
 - Session context is cleared after returning result
 - Always return structured `result` object for machine consumption
