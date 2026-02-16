@@ -83,8 +83,10 @@ Read _docs/memory/progress.md and **replace** the Active Context section:
 - [Previous decision, if relevant]
 
 ### Immediate Next Steps
-1. [From nextSteps payload, or inferred]
+1. [From nextSteps payload if provided]
 2. [...]
+
+If no nextSteps provided and no task is in progress, write "None -- see /dev for workflow recommendations" instead of inferring generic workflow commands.
 
 ---
 ```

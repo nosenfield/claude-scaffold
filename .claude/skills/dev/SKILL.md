@@ -148,14 +148,13 @@ Note uncommitted changes. Git log is verification only; trust memory files as au
 - [from Active Context section]
 
 **Immediate Next Steps**:
-1. [from Active Context]
-2. [from Active Context]
+[from Active Context -- omit this subsection entirely if Active Context says "None"]
 
 ### Recent Session Log
 [Last 1-2 entries from Session Log section, summarized]
 
 ### Recommended Action
-[Based on Current Task and Next Steps from Active Context, or:
+[If Current Task has specific next steps, use those. Otherwise:
   - If batchMode = true: "Run `/batch-execute-task-auto` for parallel task execution"
   - If batchMode = false: "Run `/next-from-task-list` to select a task"]
 ```

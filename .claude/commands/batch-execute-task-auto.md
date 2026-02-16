@@ -11,8 +11,9 @@ This command acts as team lead executing waves sequentially with parallel tasks 
 1. Determine current wave
 2. Activate wave (set blocked tasks to eligible)
 3. Execute wave batches until wave complete
-4. Advance to next wave
-5. Repeat until all waves complete
+4. Commit wave progress (task-list.json + memory files)
+5. Advance to next wave
+6. Repeat until all waves complete
 
 **Design principle:** Execute waves linearly. Parallelize tasks within each wave.
 
@@ -33,7 +34,8 @@ while incomplete waves exist:
     Phase 2: Activate Wave
     Phase 3: Execute Wave (inner loop over batches)
     Phase 4: Verify Wave Complete
-    Phase 5: Advance to Next Wave
+    Phase 5: Commit Wave Progress
+    Phase 6: Advance to Next Wave
 
 Report Completion
 ```
@@ -179,11 +181,65 @@ Use the SendMessage tool with:
 - You MUST send a SendMessage to "team-lead" before finishing, whether you succeed or fail.
 ```
 
-The orchestrator constructs this prompt by substituting task fields from task-list.json, then passes it as the `prompt` parameter to the Task tool with `team_name` set to the active team.
+The orchestrator constructs this prompt by substituting task fields from task-list.json, then passes it as the `prompt` parameter to the Task tool with these parameters:
 
-#### 3d. Collect Results
+```
+Task tool parameters:
+  prompt: [constructed from template above]
+  name: "worker-[NNN]"           # Unique teammate name
+  subagent_type: "general-purpose"
+  team_name: [active team name]
+  mode: "bypassPermissions"
+  max_turns: 200                  # Full dev cycles need ample turn budget
+```
 
-Wait for all teammates to report `TASK_COMPLETE` or `TASK_FAILED` with structured result objects (see `/execute-task-from-batch` for schema).
+**Why `max_turns: 200`**: A full development cycle (context loading + plan + test + implement + review + commit + report) consumes 50-150 assistant turns depending on task complexity. The default (~25-30) is insufficient. Setting 200 provides headroom without risking runaway execution.
+
+#### 3d. Collect Results (Active Polling)
+
+**Do NOT end your turn after spawning teammates.** The automatic inbox delivery mechanism is unreliable for waking idle agents. Instead, actively poll your inbox file to collect results.
+
+**Polling loop** (execute immediately after spawning all teammates):
+
+```bash
+# Poll inbox every 30 seconds until all teammates report
+INBOX=~/.claude/teams/[team-name]/inboxes/team-lead.json
+EXPECTED=[number of spawned teammates]
+
+while true; do
+  sleep 30
+  # Count TASK_COMPLETE and TASK_FAILED messages
+  DONE=$(python3 -c "
+import json
+with open('$INBOX') as f:
+    msgs = json.load(f)
+completed = [m for m in msgs if not m.get('read', True) and ('TASK_COMPLETE' in m.get('text','') or 'TASK_FAILED' in m.get('text',''))]
+print(len(completed))
+  ")
+  echo "[$(date +%H:%M:%S)] $DONE of $EXPECTED teammates reported"
+  if [ "$DONE" -ge "$EXPECTED" ]; then
+    echo "All teammates reported. Collecting results."
+    break
+  fi
+done
+```
+
+**After the loop exits**, read the full inbox to extract each result:
+
+```bash
+python3 -c "
+import json
+with open('$INBOX') as f:
+    msgs = json.load(f)
+for m in msgs:
+    if not m.get('read', True) and ('TASK_COMPLETE' in m.get('text','') or 'TASK_FAILED' in m.get('text','')):
+        print(f'--- {m[\"from\"]} ({m[\"summary\"]}) ---')
+        print(m['text'])
+        print()
+"
+```
+
+Parse each result and proceed to 3e.
 
 #### 3e. Check for Failures (Pause Point)
 
@@ -258,7 +314,22 @@ Check all tasks in current wave:
 - **All complete**: Continue to Phase 5
 - **Any failed** (user selected "Skip"): Note skipped tasks, continue to Phase 5
 
-### Phase 5: Advance to Next Wave
+### Phase 5: Commit Wave Progress
+
+Commit task-list.json and memory file updates accumulated during the wave. This captures all status transitions (eligible -> in-progress -> complete), result objects, and memory updates in a single infrastructure commit per wave.
+
+```bash
+git add _docs/task-list.json _docs/memory/progress.md _docs/memory/decisions.md
+git commit -m "chore: complete wave [N] - [count] tasks done
+
+Tasks: [TASK-XXX, TASK-YYY, ...]
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
+```
+
+**Why per-wave**: The single-task workflow amends the implementation commit (decision 2026-02-11). In batch mode, multiple teammates make separate implementation commits, so amending is not applicable. One infrastructure commit per wave keeps history clean without per-batch clutter.
+
+### Phase 6: Advance to Next Wave
 
 Report wave completion. Continue outer loop (back to Phase 1).
 
