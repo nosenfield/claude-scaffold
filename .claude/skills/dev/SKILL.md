@@ -80,7 +80,16 @@ If memory files exist, read them:
 - Recent Decisions (last 2-3)
 - Immediate Next Steps
 
-Verify `_docs/task-list.json` exists (do not read contents; task list access is handled by `task-selector` subagent via `/next-from-task-list`).
+Verify `_docs/task-list.json` exists. Check whether it uses the batch-capable schema:
+
+```bash
+grep -c '"waveSummary"' _docs/task-list.json
+```
+
+- **If `waveSummary` is present** (v2.0 schema): Set `batchMode = true`
+- **If absent** (v1.x schema): Set `batchMode = false`
+
+Do not read the full task list contents; task list access is handled by subagents.
 
 ### 5. Check Repository State
 
@@ -146,7 +155,9 @@ Note uncommitted changes. Git log is verification only; trust memory files as au
 [Last 1-2 entries from Session Log section, summarized]
 
 ### Recommended Action
-[Based on Current Task and Next Steps from Active Context, or "Run `/next-from-task-list` to select a task"]
+[Based on Current Task and Next Steps from Active Context, or:
+  - If batchMode = true: "Run `/batch-execute-task-auto` for parallel task execution"
+  - If batchMode = false: "Run `/next-from-task-list` to select a task"]
 ```
 
 ## Notes

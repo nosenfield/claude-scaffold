@@ -78,6 +78,16 @@ Run setup-project.sh again or copy from _docs/templates/:
 - backlog.json → _docs/
 ```
 
+### 3b. Replace Date Placeholders
+
+Replace `[DATE]` placeholders in memory files with today's date:
+
+```bash
+sed -i '' "s/\[DATE\]/$(date +%Y-%m-%d)/g" _docs/memory/progress.md
+```
+
+This ensures the initial progress log has real dates instead of template placeholders.
+
 ### 4. Report Initialized State
 
 ```
