@@ -68,7 +68,8 @@
       "Edit",
       "Write",
       "MultiEdit",
-      "Bash"
+      "Bash",
+      "Skill"
     ],
     "deny": [
       "Bash(rm -rf *)",
