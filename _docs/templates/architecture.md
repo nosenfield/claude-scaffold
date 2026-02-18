@@ -27,6 +27,21 @@
 2. **[Principle]**: [Description]
 3. **[Principle]**: [Description]
 
+## Conventions
+
+Cross-cutting conventions that all modules must follow. These prevent inconsistency when multiple agents implement in parallel.
+
+| Convention | Standard | Example |
+|------------|----------|---------|
+| Time units | [ms / seconds] | `update(delta)` uses [unit] |
+| Event payloads | [raw values / full state objects] | `emit('points-changed', [example])` |
+| Enum encoding | [string / numeric] | `enum Status { Active = 'active' }` |
+| Service access | [registry / DI / direct import] | `this.registry.get('serviceName')` |
+| Interface declarations | Explicit `implements IFoo` on all classes that fulfill an interface | `class UserService implements IUserService { ... }` |
+| Config location | All tunable parameters in `src/config/` modules; no magic numbers in source | `import { APP_CONFIG } from '../config/app.config'` |
+
+Add project-specific conventions as needed. Agents read this section during Phase 0 context loading.
+
 ## Project Structure
 
 ```
@@ -96,6 +111,8 @@ Location: `src/config/constants.ts`
 |----------|-------|---------|
 | `MAX_PAGE_SIZE` | 100 | Pagination limit |
 | `REQUEST_TIMEOUT` | 30000 | Request timeout (ms) |
+
+**Config Centralization Rule**: All tunable parameters must live in dedicated `src/config/` modules. Source files import from config; they do not define magic numbers or inline constants that could be config. This is critical for parallel development -- multiple agents modifying the same parameter in different files creates inconsistency.
 
 ## Error Handling
 

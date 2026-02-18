@@ -77,12 +77,14 @@ You receive a list of modified files. You MUST:
 - [ ] No inappropriate coupling
 - [ ] Clear interfaces (could be reimplemented from interface alone)
 - [ ] Input/output contracts are explicit
+- [ ] Classes declare `implements InterfaceName` when a matching interface exists in the types layer
 
 ### Code Quality
 - [ ] Follows project conventions
 - [ ] Clear naming and structure
 - [ ] No code duplication
 - [ ] Appropriate comments where needed
+- [ ] Public APIs have JSDoc with @param and @returns
 
 ### Security
 - [ ] Input validation present
