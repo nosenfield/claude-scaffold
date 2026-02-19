@@ -75,7 +75,7 @@ Execute `/review-task` to perform code review.
 **If APPROVE with non-blocking issues**:
 Apply auto-triage rules:
 - **Low effort issues**: Address now (loop back to Phase 3)
-- **Medium/High effort issues**: Note in result for orchestrator
+- **Medium/High effort issues**: Add to `backlog` field in result message
 
 Max 3 review-fix loops to prevent infinite cycles.
 
@@ -118,10 +118,9 @@ content: |
     - [decision 1]
     - [decision 2]
   backlog:
-    - [any bugs, improvements, or tech debt discovered during implementation -- or empty]
+    - [any deferred non-blocking issues from code review, or bugs/tech debt discovered during implementation -- or empty]
   testsWritten: [count]
   reviewVerdict: [APPROVE]
-  reviewNotes: [any non-blocking issues deferred]
 ```
 
 **On failure** -- call the SendMessage tool:
