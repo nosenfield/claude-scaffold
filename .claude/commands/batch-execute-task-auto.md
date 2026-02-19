@@ -151,6 +151,7 @@ Use the SendMessage tool with:
       filesModified: [list of files]
       blockers: []
     decisions: [list any decisions made]
+    backlog: [list any bugs, improvements, or tech debt discovered during implementation -- or empty]
     testsWritten: [count]
     reviewVerdict: APPROVE
 
@@ -178,6 +179,7 @@ Use the SendMessage tool with:
 - Do NOT update memory files (progress.md, decisions.md). The orchestrator handles this.
 - Do NOT modify task-list.json directly.
 - Do NOT expand scope beyond the assigned task.
+- Note any bugs, improvements, or tech debt you discover during implementation in the `backlog` field of your result message.
 - You MUST send a SendMessage to "team-lead" before finishing, whether you succeed or fail.
 ```
 

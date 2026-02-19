@@ -117,6 +117,8 @@ content: |
   decisions:
     - [decision 1]
     - [decision 2]
+  backlog:
+    - [any bugs, improvements, or tech debt discovered during implementation -- or empty]
   testsWritten: [count]
   reviewVerdict: [APPROVE]
   reviewNotes: [any non-blocking issues deferred]

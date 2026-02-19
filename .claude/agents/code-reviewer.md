@@ -84,7 +84,7 @@ You receive a list of modified files. You MUST:
 - [ ] Clear naming and structure
 - [ ] No code duplication
 - [ ] Appropriate comments where needed
-- [ ] Public APIs have JSDoc with @param and @returns
+- [ ] Public API documentation meets project standard (see best-practices.md)
 
 ### Security
 - [ ] Input validation present

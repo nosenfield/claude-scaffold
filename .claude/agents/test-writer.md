@@ -96,6 +96,11 @@ Failure reasons: [expected failures due to missing implementation]
 - [any testing decisions or patterns used]
 ```
 
+## Assertion Philosophy
+
+- **Assert behavior, not implementation.** Verify return values and observable state (`expect(result).toBe(42)`) over mock call patterns (`expect(mock).toHaveBeenCalledWith(42)`).
+- **Mock at system boundaries** (external services, I/O, framework APIs). Use real instances for internal collaborators when construction is lightweight.
+
 ## Rules
 
 - Write tests BEFORE implementation exists
