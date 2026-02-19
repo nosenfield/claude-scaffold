@@ -32,14 +32,20 @@ From session context:
 
    **If tests fail**: Return error result.
 
-2. **Stage Changes**
+2. **Acquire Commit Lock**
+   ```bash
+   _scripts/git-commit-lock.sh acquire [agentId or "single"] [taskId or "adhoc"]
+   ```
+   **If LOCK_TIMEOUT**: Return COMMIT_FAILED with `phase: staging`, `error: "commit lock timeout"`.
+
+3. **Stage Changes**
    ```bash
    git add [filesModified...]
    git status
    ```
    Stage only the specific files from `filesModified` to prevent race conditions in parallel execution.
 
-3. **Generate Commit Message**
+4. **Generate Commit Message**
    Format: `<type>(<scope>): <description> (<taskId>)`
 
    Derive from task:
@@ -50,13 +56,19 @@ From session context:
 
    Example: `feat(auth): implement login endpoint (TASK-001)`
 
-4. **Execute Commit**
+5. **Execute Commit**
    ```bash
    git commit -m "[generated message]"
    ```
    Capture the commit SHA.
 
-5. **Return Result**
+6. **Release Commit Lock**
+   ```bash
+   _scripts/git-commit-lock.sh release
+   ```
+   Release on success and on any failure path in steps 3-5.
+
+7. **Return Result**
 
    On success:
    ```
@@ -70,7 +82,7 @@ From session context:
      - [file2]: [description]
    ```
 
-   On failure:
+   On failure (release lock first, then return):
    ```
    COMMIT_FAILED
    taskId: [currentTask.id or null]

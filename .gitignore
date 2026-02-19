@@ -16,6 +16,10 @@ _logs/*
 
 subagent.log
 
+# Ephemeral lock/marker files (batch execution)
+.claude/.git-commit-lock.d/
+.claude/.test-writing-mode*
+
 # dim .git directory in the explorer
 .git/
 

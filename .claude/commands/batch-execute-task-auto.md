@@ -59,6 +59,11 @@ Stop execution.
 
 ### Phase 2: Activate Wave
 
+Clear any stale commit lock from a previous wave:
+```bash
+_scripts/git-commit-lock.sh force-release
+```
+
 For all tasks where `executionWave === currentWave AND status === "blocked"`:
 - Set `status: "eligible"`
 
