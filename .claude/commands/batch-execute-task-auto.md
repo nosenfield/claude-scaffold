@@ -293,6 +293,20 @@ The agent will:
 
 Note: Wave advancement (blocked → eligible) is handled by the orchestrator at Phase 2, not memory-updater.
 
+After memory update, collect `backlog` entries from all teammate results. For each non-empty backlog item, append to `_docs/backlog.json`:
+
+```json
+{
+  "id": "BACKLOG-[next]",
+  "sourceTask": "[teammate's taskId]",
+  "category": "maintainability",
+  "description": "[backlog item text]",
+  "createdAt": "[ISO timestamp]"
+}
+```
+
+Skip this step if no teammates reported backlog items.
+
 #### 3g. Handle Retry (User-Initiated)
 
 If user selected "Retry failed tasks" in 3e:
@@ -321,7 +335,7 @@ Check all tasks in current wave:
 Commit task-list.json and memory file updates accumulated during the wave. This captures all status transitions (eligible -> in-progress -> complete), result objects, and memory updates in a single infrastructure commit per wave.
 
 ```bash
-git add _docs/task-list.json _docs/memory/progress.md _docs/memory/decisions.md
+git add _docs/task-list.json _docs/memory/progress.md _docs/memory/decisions.md _docs/backlog.json
 git commit -m "chore: complete wave [N] - [count] tasks done
 
 Tasks: [TASK-XXX, TASK-YYY, ...]

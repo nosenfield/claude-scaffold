@@ -6,7 +6,7 @@ paths:
 
 # Backlog Protection Rules
 
-The backlog tracks deferred non-blocking issues from code reviews. It serves as a tech debt registry.
+The backlog tracks deferred non-blocking issues from code reviews and teammate-discovered observations. It serves as a tech debt registry.
 
 ## Structure
 
@@ -28,6 +28,8 @@ The backlog tracks deferred non-blocking issues from code reviews. It serves as 
 
 ## Workflow
 
+### From Code Review (interactive)
+
 When code-reviewer identifies non-blocking issues:
 1. Orchestrator presents each suggestion to the user
 2. User chooses one of:
@@ -36,12 +38,19 @@ When code-reviewer identifies non-blocking issues:
    - **Skip**: Ignore the suggestion (not recorded)
 3. Deferred items are appended to backlog.json
 
+### From Batch Teammates (autonomous)
+
+When teammates report `backlog` items in their result messages:
+1. Orchestrator collects backlog entries from all teammate results after each batch
+2. Each entry is appended to backlog.json with `category: "maintainability"` (default)
+3. `file` and `lineHint` are omitted (teammate observations are typically cross-cutting)
+
 ## Permitted Operations
 
 | Operation | Permitted | Actor |
 |-----------|-----------|-------|
 | Read backlog | Yes | Any agent |
-| Append new item | Yes | Orchestrator (when user chooses "defer") |
+| Append new item | Yes | Orchestrator (user defer or batch teammate backlog) |
 | Delete resolved item | Yes | User or orchestrator when addressed |
 | Modify item details | No | User only (manual edit) |
 
@@ -67,6 +76,20 @@ When user chooses "defer" for a non-blocking issue:
   "createdAt": "[current ISO timestamp]"
 }
 ```
+
+When batch orchestrator processes teammate backlog items:
+
+```json
+{
+  "id": "BACKLOG-[next]",
+  "sourceTask": "[teammate's taskId]",
+  "category": "maintainability",
+  "description": "[from teammate backlog field]",
+  "createdAt": "[current ISO timestamp]"
+}
+```
+
+`file` and `lineHint` are omitted when not applicable.
 
 ## Resolving Items
 
