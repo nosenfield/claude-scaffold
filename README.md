@@ -125,14 +125,13 @@ Or use `/execute-task` to run the full workflow (steps 2-7) autonomously for a s
 Use for unplanned work or when task list doesn't apply:
 
 1. `/dev [summary]` - Start development session
-2. `/map <target>` - Explore relevant codebase area
-3. "Plan this" or describe what to build - Orchestrator invokes task-planner
-4. `/write-task-tests` - Write failing tests
-5. `/implement-task` - Make tests pass
-6. `/review-task` - Code review
-7. `/commit-task` - Commit changes
+2. `/plan-task <description>` - Plan implementation (runs `/map` internally, then invokes task-planner)
+3. `/write-task-tests` - Write failing tests
+4. `/implement-task` - Make tests pass
+5. `/review-task` - Code review
+6. `/commit-task` - Commit changes
 
-The ad-hoc workflow skips `/next-from-task-list` (no task selection) and uses `/map` exploration as input to planning. Both workflows share the same TDD cycle from `/write-task-tests` onward.
+The ad-hoc workflow skips `/next-from-task-list` (no task selection). `/plan-task` accepts a description argument directly, runs `/map` exploration, and invokes the task-planner agent without requiring a task-list entry. Both workflows share the same TDD cycle from `/write-task-tests` onward.
 
 **Note**: Run `/init-repo` once after placing project documentation to initialize memory files (`_docs/memory/progress.md`, `_docs/memory/decisions.md`) and validate core docs. Environment setup (dependency installation, dev server configuration) is handled through the first tasks in `task-list.json`.
 
