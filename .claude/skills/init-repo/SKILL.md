@@ -88,7 +88,33 @@ sed -i '' "s/\[DATE\]/$(date +%Y-%m-%d)/g" _docs/memory/progress.md
 
 This ensures the initial progress log has real dates instead of template placeholders.
 
-### 4. Report Initialized State
+### 4. Protect Git Hooks Path
+
+If the project has a `package.json`, inject the `postprepare` script to guard against Husky/lefthook overwriting `core.hooksPath`:
+
+```bash
+ls package.json 2>/dev/null
+```
+
+**If `package.json` exists:**
+
+Check whether `postprepare` is already defined. If not, add it to the `scripts` section:
+
+```json
+"postprepare": "./.githooks/protect-hookspath.sh"
+```
+
+If the `scripts` object doesn't exist, create it. If `postprepare` already exists, append the guard using `&&`:
+
+```json
+"postprepare": "<existing> && ./.githooks/protect-hookspath.sh"
+```
+
+Report whether the injection was performed.
+
+**If `package.json` does not exist**, skip this step silently.
+
+### 5. Report Initialized State
 
 ```
 ## Repository Initialized
@@ -103,6 +129,9 @@ This ensures the initial progress log has real dates instead of template placeho
 - _docs/memory/progress.md: Present
 - _docs/memory/decisions.md: Present
 - _docs/backlog.json: Present
+
+### Git Hooks Protection
+- [Injected postprepare guard / Already present / No package.json]
 
 ---
 
