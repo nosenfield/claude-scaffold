@@ -33,8 +33,8 @@ Generate an implementation plan for a task.
    - Keywords that indicate affected code areas
 
    Example targets:
-   - Task "Add user authentication" -> target: "authentication"
-   - Task "Fix checkout validation" -> target: "checkout validation"
+   - Task "Add user authentication" → target: "authentication"
+   - Task "Fix checkout validation" → target: "checkout validation"
 
 3. **Invoke /map for Exploration**
    Run `/map <target> --depth medium` to create exploration artifact.

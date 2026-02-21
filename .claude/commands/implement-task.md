@@ -29,22 +29,24 @@ If tests don't exist, run `/write-task-tests` first.
    
    For INITIAL mode:
    ```
-   taskId: [currentTask.id]
+   taskId: [currentTask.id, if present]
    taskTitle: [currentTask.title]
    implementationPlan: [full plan with affected files and steps]
    testFiles: [list of test file paths]
    mode: "INITIAL"
    ```
-   
+
    For ADDRESS_REVIEW_FEEDBACK mode:
    ```
-   taskId: [currentTask.id]
+   taskId: [currentTask.id, if present]
    taskTitle: [currentTask.title]
    implementationPlan: [full plan]
    testFiles: [list of test file paths]
    mode: "ADDRESS_REVIEW_FEEDBACK"
    reviewFeedback: [blocking issues from code review]
    ```
+
+   Omit `taskId` when not present on currentTask (ad-hoc tasks have no id).
 
 4. **Spawn implementer Subagent**
    Invoke the `implementer` agent with the payload.

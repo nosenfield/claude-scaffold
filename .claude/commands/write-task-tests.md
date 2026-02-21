@@ -30,11 +30,12 @@ If no plan exists, run `/plan-task` first.
 
 3. **Prepare Handoff Payload**
    ```
-   taskId: [currentTask.id]
+   taskId: [currentTask.id, if present]
    taskTitle: [currentTask.title]
    implementationPlan: [full plan including affected files and test scenarios]
-   acceptanceCriteria: [currentTask.acceptanceCriteria]
+   acceptanceCriteria: [currentTask.acceptanceCriteria, if present]
    ```
+   Omit fields marked "if present" when not on currentTask (ad-hoc tasks have no id or acceptanceCriteria).
 
 4. **Spawn test-writer Subagent**
    Invoke the `test-writer` agent with the payload.

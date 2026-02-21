@@ -32,22 +32,24 @@ If tests aren't passing, run `/implement-task` first.
    
    For initial review:
    ```
-   taskId: [currentTask.id]
+   taskId: [currentTask.id, if present]
    taskTitle: [currentTask.title]
    implementationPlan: [full plan with expected behavior]
    filesModified: [list of changed file paths]
    isReReview: false
    ```
-   
+
    For re-review:
    ```
-   taskId: [currentTask.id]
+   taskId: [currentTask.id, if present]
    taskTitle: [currentTask.title]
    implementationPlan: [full plan]
    filesModified: [list of changed file paths]
    isReReview: true
    previousIssues: [blocking issues from last review]
    ```
+
+   Omit `taskId` when not present on currentTask (ad-hoc tasks have no id).
 
 4. **Spawn code-reviewer Subagent**
    Invoke the `code-reviewer` agent with the payload.
@@ -112,7 +114,7 @@ If tests aren't passing, run `/implement-task` first.
        ```json
        {
          "id": "BACKLOG-[next]",
-         "sourceTask": "[currentTask.id]",
+         "sourceTask": "[currentTask.id or currentTask.title]",
          "category": "[issue.category]",
          "description": "[issue.description]",
          "file": "[issue.file]",
