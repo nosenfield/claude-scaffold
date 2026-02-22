@@ -34,7 +34,7 @@ From session context:
 
 2. **Acquire Commit Lock**
    ```bash
-   _scripts/git-commit-lock.sh acquire [agentId or "single"] [taskId or "adhoc"]
+   .githooks/git-commit-lock.sh acquire [agentId or "single"] [taskId or "adhoc"]
    ```
    **If LOCK_TIMEOUT**: Return COMMIT_FAILED with `phase: staging`, `error: "commit lock timeout"`.
 
@@ -64,7 +64,7 @@ From session context:
 
 6. **Release Commit Lock**
    ```bash
-   _scripts/git-commit-lock.sh release
+   .githooks/git-commit-lock.sh release
    ```
    Release on success and on any failure path in steps 3-5.
 

@@ -61,7 +61,7 @@ Stop execution.
 
 Clear any stale commit lock from a previous wave:
 ```bash
-_scripts/git-commit-lock.sh force-release
+.githooks/git-commit-lock.sh force-release
 ```
 
 For all tasks where `executionWave === currentWave AND status === "blocked"`:
