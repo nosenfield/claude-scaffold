@@ -69,7 +69,11 @@
       "Write",
       "MultiEdit",
       "Bash",
-      "Skill"
+      "Skill",
+      "WebFetch",
+      "mcp__context7__*",
+      "mcp__claude_ai_Context7__*",
+      "mcp__github__*"
     ],
     "deny": [
       "Bash(rm -rf *)",
