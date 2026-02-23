@@ -101,98 +101,15 @@ This prevents other orchestrators from claiming these tasks.
 
 #### 3c. Spawn Teammates
 
-For each task, use the Task tool to spawn a teammate with a **self-contained prompt** constructed from the template below.
+For each task, use the Task tool to spawn a teammate with a **self-contained prompt**:
 
-**Prompt template** (orchestrator fills bracketed values from task-list.json):
-
-```
-You are a teammate executing a development task. Complete the full cycle below, then report your result.
-
-## Assigned Task
-
-- **taskId**: [taskId]
-- **title**: [title]
-- **description**: [description]
-- **acceptanceCriteria**:
-  [each criterion as a bullet]
-- **references**:
-  [each reference path as a bullet, or "None"]
-- **filesTouched**:
-  [each file path as a bullet]
-
-## Workflow
-
-Execute these phases in order. Proceed automatically; do not pause for input.
-
-0. **Load Context**: Read these files before starting work:
-   - `_docs/architecture.md` (project structure, tech stack, component boundaries)
-   - `_docs/memory/decisions.md` (architectural decisions -- do not contradict these)
-   - Each file listed in **references** above (task-specific design constraints)
-1. **Plan**: Run `/plan-task` with the task above. Auto-approve the plan.
-2. **Test**: Run `/write-task-tests` to create failing tests. Verify they fail for expected reasons.
-3. **Implement**: Run `/implement-task` to make tests pass. Verify all tests pass.
-4. **Review**: Run `/review-task`. If APPROVE, continue. If REQUEST_CHANGES, loop back to Implement (max 3 loops).
-5. **Commit**: Run `/commit-implementation` to commit changes.
-6. **Report**: Send your result to the orchestrator using the SendMessage tool (see below).
-
-## Reporting Result
-
-After completing (or failing), you MUST send a message to the orchestrator:
-
-**On success:**
-Use the SendMessage tool with:
-  type: "message"
-  recipient: "team-lead"
-  summary: "[taskId] complete"
-  content: |
-    TASK_COMPLETE
-    taskId: [taskId]
-    taskTitle: [title]
-    commitSha: [sha from commit step]
-    commitMessage: [message from commit step]
-    result:
-      status: success
-      summary: [1-2 sentence description]
-      filesModified: [list of files]
-      blockers: []
-    decisions: [list any decisions made]
-    backlog: [list any deferred non-blocking issues from code review, or bugs/tech debt discovered during implementation -- or empty]
-    testsWritten: [count]
-    reviewVerdict: APPROVE
-
-**On failure:**
-Use the SendMessage tool with:
-  type: "message"
-  recipient: "team-lead"
-  summary: "[taskId] failed at [phase]"
-  content: |
-    TASK_FAILED
-    taskId: [taskId]
-    taskTitle: [title]
-    phase: [planning|testing|implementation|review|commit]
-    result:
-      status: failure
-      summary: [why it failed]
-      filesModified: [any partial work]
-      blockers: [specific issues]
-    partialWork:
-      testsWritten: [count or 0]
-      filesModified: [list or empty]
-
-## Constraints
-
-- Do NOT update memory files (progress.md, decisions.md). The orchestrator handles this.
-- Do NOT modify task-list.json directly.
-- Do NOT expand scope beyond the assigned task.
-- Add any deferred non-blocking code review issues, bugs, improvements, or tech debt to the `backlog` field of your result message.
-- You MUST send a SendMessage to "team-lead" before finishing, whether you succeed or fail.
-```
-
-The orchestrator constructs this prompt by substituting task fields from task-list.json, then passes it as the `prompt` parameter to the Task tool with these parameters:
+1. Read `.claude/partials/teammate-prompt.md`
+2. Substitute bracketed placeholders with task values from task-list.json
+3. Pass the filled template as the `prompt` parameter
 
 ```
 Task tool parameters:
-  prompt: [constructed from template above]
+  prompt: [filled template from above]
   name: "worker-[NNN]"           # Unique teammate name
   subagent_type: "general-purpose"
   team_name: [active team name]
@@ -206,47 +123,13 @@ Task tool parameters:
 
 **Do NOT end your turn after spawning teammates.** The automatic inbox delivery mechanism is unreliable for waking idle agents. Instead, actively poll your inbox file to collect results.
 
-**Polling loop** (execute immediately after spawning all teammates):
+Execute immediately after spawning all teammates:
 
 ```bash
-# Poll inbox every 30 seconds until all teammates report
-INBOX=~/.claude/teams/[team-name]/inboxes/team-lead.json
-EXPECTED=[number of spawned teammates]
-
-while true; do
-  sleep 30
-  # Count TASK_COMPLETE and TASK_FAILED messages
-  DONE=$(python3 -c "
-import json
-with open('$INBOX') as f:
-    msgs = json.load(f)
-completed = [m for m in msgs if not m.get('read', True) and ('TASK_COMPLETE' in m.get('text','') or 'TASK_FAILED' in m.get('text',''))]
-print(len(completed))
-  ")
-  echo "[$(date +%H:%M:%S)] $DONE of $EXPECTED teammates reported"
-  if [ "$DONE" -ge "$EXPECTED" ]; then
-    echo "All teammates reported. Collecting results."
-    break
-  fi
-done
+_scripts/poll-inbox.sh "[team-name]" [number of spawned teammates]
 ```
 
-**After the loop exits**, read the full inbox to extract each result:
-
-```bash
-python3 -c "
-import json
-with open('$INBOX') as f:
-    msgs = json.load(f)
-for m in msgs:
-    if not m.get('read', True) and ('TASK_COMPLETE' in m.get('text','') or 'TASK_FAILED' in m.get('text','')):
-        print(f'--- {m[\"from\"]} ({m[\"summary\"]}) ---')
-        print(m['text'])
-        print()
-"
-```
-
-Parse each result and proceed to 3e.
+This polls every 30 seconds until all teammates report, then prints all results. Parse each result and proceed to 3e.
 
 #### 3e. Check for Failures (Pause Point)
 
