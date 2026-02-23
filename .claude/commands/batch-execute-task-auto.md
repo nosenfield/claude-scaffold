@@ -379,3 +379,7 @@ If teammate reports modifying files outside `filesTouched`:
 - Memory updates happen once per batch, not per task
 - Use `/execute-task-auto` for single-task workflow
 - Run `/compute-waves` after manual task list edits
+
+## Session Chaining (Large Task Lists)
+
+For task lists that may exceed the context window (~28+ tasks across multiple waves), use `/batch-execute-chained`. It runs each wave in a separate `claude -p` session with a fresh context window while the super-orchestrator stays lean.
