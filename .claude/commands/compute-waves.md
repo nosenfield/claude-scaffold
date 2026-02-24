@@ -53,9 +53,9 @@ Write updated `task-list.json` with:
 - `waveSummary` array at root level
 - Initial `status` set based on wave:
   - Wave 0 tasks: `status: "eligible"` (eligible for immediate execution)
-  - Wave 1+ tasks: `status: "blocked"` (awaiting wave activation by orchestrator)
+  - Wave 1+ tasks: `status: "blocked"` (awaiting wave activation by task-selector)
 
-Note: "blocked" means the task is in a future wave, not that individual dependencies are unmet. The orchestrator activates each wave by transitioning all its tasks from blocked to eligible at once.
+Note: "blocked" means the task is in a future wave, not that individual dependencies are unmet. The task-selector agent activates each wave by transitioning all its tasks from blocked to eligible at once when prior wave dependencies are complete.
 
 ## Output
 

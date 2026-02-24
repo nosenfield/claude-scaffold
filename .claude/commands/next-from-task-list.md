@@ -9,7 +9,7 @@ Identify and select the highest-priority unblocked task.
 
    The subagent will:
    - Read and parse task-list.json
-   - Filter for pending, unblocked tasks
+   - Filter for eligible tasks (activate next wave if needed)
    - Sort by priority
    - Update selected task status to in-progress
    - Return selected task or edge case status

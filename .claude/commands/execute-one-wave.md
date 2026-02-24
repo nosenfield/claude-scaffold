@@ -7,11 +7,10 @@ Designed for session chaining: the super-orchestrator (`/batch-execute-chained`)
 ## Overview
 
 1. Determine current wave
-2. Activate wave (blocked -> eligible)
-3. Create team
-4. Execute all batches in wave (inner loop)
-5. Commit wave progress
-6. Shutdown team and exit
+2. Create team
+3. Execute all batches in wave (inner loop)
+4. Commit wave progress
+5. Shutdown team and exit
 
 **Non-interactive**: This command runs autonomously. It does NOT pause for user input. Failures are recorded in task-list.json for the super-orchestrator to handle.
 
@@ -36,39 +35,34 @@ ALL_WAVES_COMPLETE total=[N]
 ```
 Stop execution.
 
-### Phase 2: Activate Wave
-
 Clear any stale commit lock from a previous wave:
 ```bash
 .githooks/git-commit-lock.sh force-release
 ```
 
-For all tasks where `executionWave === currentWave AND status === "blocked"`:
-- Set `status: "eligible"` in task-list.json
-
-### Phase 3: Create Team
+### Phase 2: Create Team
 
 ```
 TeamCreate: name = "wave-[currentWave]"
 ```
 
-### Phase 4: Execute Wave Batches (Inner Loop)
+### Phase 3: Execute Wave Batches (Inner Loop)
 
 While wave has eligible tasks:
 
-#### 4a. Batch Selection
+#### 3a. Batch Selection
 
 Execute `/next-batch-from-list` to get parallelizable tasks from current wave.
 
 **If NO_PENDING_TASKS or ALL_TASKS_BLOCKED in current wave**: Wave complete, exit inner loop.
 
-#### 4b. Claim Tasks
+#### 3b. Claim Tasks
 
 For each task in batch, update task-list.json:
 - Set `status: "in-progress"`
 - Set `assignedAgent: "[teammate-name]"`
 
-#### 4c. Spawn Teammates
+#### 3c. Spawn Teammates
 
 For each task, use the Task tool to spawn a teammate with a **self-contained prompt**:
 
@@ -86,7 +80,7 @@ mode: "bypassPermissions"
 max_turns: 200
 ```
 
-#### 4d. Collect Results (Active Polling)
+#### 3d. Collect Results (Active Polling)
 
 **Do NOT end your turn after spawning teammates.** Actively poll your inbox file to collect results.
 
@@ -96,9 +90,9 @@ Execute immediately after spawning all teammates:
 _scripts/poll-inbox.sh "wave-[currentWave]" [number of spawned teammates]
 ```
 
-This polls every 30 seconds until all teammates report, then prints all results. Parse each result and proceed to 4e.
+This polls every 30 seconds until all teammates report, then prints all results. Parse each result and proceed to 3e.
 
-#### 4e. Handle Results
+#### 3e. Handle Results
 
 Separate results into successes and failures.
 
@@ -118,9 +112,9 @@ Separate results into successes and failures.
 
 **Do NOT pause on failure.** The super-orchestrator handles user interaction for failures.
 
-Continue to 4f with whatever results were collected (mix of success and failure is fine).
+Continue to 3f with whatever results were collected (mix of success and failure is fine).
 
-#### 4f. Update Memory
+#### 3f. Update Memory
 
 Spawn `memory-updater` agent with `batchMode: true` and collected results:
 
@@ -130,7 +124,7 @@ tasks: [successful task results]
 failedTasks: [failed task results]
 ```
 
-#### 4g. Append Backlog Items
+#### 3g. Append Backlog Items
 
 Collect `backlog` entries from all teammate results. For each non-empty backlog item, append to `_docs/backlog.json`:
 
@@ -146,11 +140,11 @@ Collect `backlog` entries from all teammate results. For each non-empty backlog 
 
 Skip this step if no teammates reported backlog items.
 
-#### 4h. Report Batch
+#### 3h. Report Batch
 
-Report completed tasks. Loop back to 4a if wave has remaining eligible tasks.
+Report completed tasks. Loop back to 3a if wave has remaining eligible tasks.
 
-### Phase 5: Commit Wave Progress
+### Phase 4: Commit Wave Progress
 
 Commit task-list.json and memory file updates accumulated during the wave:
 
@@ -163,7 +157,7 @@ Tasks: [TASK-XXX, TASK-YYY, ...]
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 ```
 
-### Phase 6: Shutdown and Cleanup
+### Phase 5: Shutdown and Cleanup
 
 1. Send `shutdown_request` (via SendMessage) to each active teammate
 2. Wait up to 30 seconds for shutdown responses
@@ -171,7 +165,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 
 If TeamDelete fails (active members not yet deregistered), wait 5 seconds and retry once.
 
-### Phase 7: Exit
+### Phase 6: Exit
 
 Output the structured exit marker:
 
@@ -200,4 +194,5 @@ Where:
 - Do NOT use this command directly in interactive sessions
 - Each invocation gets a fresh context window via `claude -p`
 - State continuity is through task-list.json and memory files on disk
-- The super-orchestrator handles wave advancement, failure recovery, and user interaction
+- Wave advancement (blocked → eligible) is handled by the task-selector agent, not this command
+- The super-orchestrator handles failure recovery and user interaction

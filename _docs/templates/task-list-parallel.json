@@ -202,8 +202,8 @@
       "failed": "Agent reported failure. May be retried within wave."
     },
     "transitionRules": {
-      "blocked -> eligible": "Orchestrator activates wave (all wave tasks at once)",
-      "eligible -> in-progress": "Orchestrator dispatches and sets assignedAgent",
+      "blocked -> eligible": "task-selector activates wave (all wave tasks at once)",
+      "eligible -> in-progress": "task-selector in single mode; orchestrator in batch mode",
       "in-progress -> complete": "Agent returns result.status = success",
       "in-progress -> failed": "Agent returns result.status = failure",
       "failed -> eligible": "Orchestrator retry within wave (clears assignedAgent, result)"

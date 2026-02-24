@@ -54,8 +54,8 @@ ONLY these fields may be modified:
 ## Status Transitions (v2.x - Wave Execution)
 
 ```
-blocked → eligible     (orchestrator activates wave)
-eligible → in-progress (orchestrator dispatches task)
+blocked → eligible     (task-selector activates wave)
+eligible → in-progress (task-selector in single mode; orchestrator in batch mode)
 in-progress → complete (memory-updater on success)
 in-progress → failed   (memory-updater on failure)
 failed → eligible      (orchestrator retry within wave)
@@ -65,7 +65,7 @@ failed → eligible      (orchestrator retry within wave)
 
 | Status | Meaning |
 |--------|---------|
-| blocked | Task is in a future wave. Activated when wave begins. |
+| blocked | Task is in a future wave. Activated by task-selector when prior wave completes. |
 | eligible | Task is in current wave and eligible for dispatch to an agent. |
 | in-progress | Task dispatched to agent. |
 | complete | Agent reported success. |

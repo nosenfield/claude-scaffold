@@ -44,7 +44,7 @@ completedCount: [N]
 totalCount: [N]
 ```
 
-**If all non-complete tasks are blocked**:
+**If all non-complete tasks are blocked** (single mode: only after wave activation attempt fails; see Single Mode step 2):
 ```
 ALL_TASKS_BLOCKED
 blockedTasks:
@@ -58,8 +58,14 @@ blockedTasks:
 #### Single Mode (default)
 
 1. Filter tasks where `status === "eligible"`
-2. Sort by `priority` (lower number = higher priority)
-3. Select the first task
+2. If no eligible tasks found, attempt wave activation:
+   a. Find the lowest `executionWave` among tasks where `status === "blocked"`
+   b. For every task in that wave, check that all `blockedBy` task IDs have `status === "complete"`
+   c. If ALL tasks in the wave pass the check, set each to `status: "eligible"`
+   d. If any task's blockers are incomplete, do NOT activate (return `ALL_TASKS_BLOCKED`)
+   e. Re-filter tasks where `status === "eligible"`
+3. Sort by `priority` (lower number = higher priority)
+4. Select the first task
 
 **Update Task Status**:
 Edit `_docs/task-list.json`:
@@ -89,7 +95,7 @@ blockedBy: [list or empty]
 
 1. Determine current wave:
    ```
-   currentWave = min(executionWave) among tasks where status !== "complete"
+   currentWave = min(executionWave) among tasks where status NOT IN ("complete", "failed")
    ```
 
 2. Filter candidates:
@@ -97,11 +103,18 @@ blockedBy: [list or empty]
    candidates = tasks where executionWave === currentWave AND status === "eligible"
    ```
 
-3. Sort by `priority` (lower number = higher priority)
+3. If no eligible tasks found, attempt wave activation:
+   a. Filter tasks where `executionWave === currentWave AND status === "blocked"`
+   b. For every such task, check that all `blockedBy` task IDs have `status === "complete"`
+   c. If ALL tasks in the wave pass the check, set each to `status: "eligible"`
+   d. If any task's blockers are incomplete, do NOT activate (return `ALL_TASKS_BLOCKED`)
+   e. Re-filter candidates where `status === "eligible"`
 
-4. Read `waveSummary[currentWave].contentions`
+4. Sort by `priority` (lower number = higher priority)
 
-5. Build batch avoiding contentions:
+5. Read `waveSummary[currentWave].contentions`
+
+6. Build batch avoiding contentions:
 
 ```
 batch = []
@@ -188,8 +201,9 @@ If `metadata.version` starts with "1.":
 
 ## Rules
 
-- In single mode: modify only `status` field
-- In batch mode: do NOT modify any fields
+- In single mode: modify only `status` field (wave activation + in-progress)
+- In batch mode: modify only `status` field for wave activation (`blocked` → `eligible`); do NOT set `in-progress` (orchestrator handles after spawn)
+- Wave activation sets an entire wave to `eligible` at once (not individual tasks)
 - Return complete task objects for orchestrator
 - Report contentions avoided in batch mode
 - Warn about tasks missing `filesTouched`
