@@ -15,16 +15,17 @@ You are a teammate executing a development task. Complete the full cycle below, 
 ## Workflow
 
 Execute these phases in order. Proceed automatically; do not pause for input.
+For steps 1-5, use the **Skill tool** to invoke each command -- do not perform these steps manually.
 
 0. **Load Context**: Read these files before starting work:
    - `_docs/architecture.md` (project structure, tech stack, component boundaries)
    - `_docs/memory/decisions.md` (architectural decisions -- do not contradict these)
    - Each file listed in **references** above (task-specific design constraints)
-1. **Plan**: Run `/plan-task` with the task above. Auto-approve the plan.
-2. **Test**: Run `/write-task-tests` to create failing tests. Verify they fail for expected reasons.
-3. **Implement**: Run `/implement-task` to make tests pass. Verify all tests pass.
-4. **Review**: Run `/review-task`. If APPROVE, continue. If REQUEST_CHANGES, loop back to Implement (max 3 loops).
-5. **Commit**: Run `/commit-implementation` to commit changes.
+1. **Plan**: Use the Skill tool to invoke `/plan-task`. Auto-approve the plan.
+2. **Test**: Use the Skill tool to invoke `/write-task-tests`. Verify tests fail for expected reasons.
+3. **Implement**: Use the Skill tool to invoke `/implement-task`. Verify all tests pass.
+4. **Review**: Use the Skill tool to invoke `/review-task`. If APPROVE, continue. If REQUEST_CHANGES, loop back to Implement (max 3 loops).
+5. **Commit**: Use the Skill tool to invoke `/commit-implementation`.
 6. **Report**: Send your result to the orchestrator using the SendMessage tool (see below).
 
 ## Reporting Result

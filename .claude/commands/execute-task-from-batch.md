@@ -50,25 +50,25 @@ This replaces the `/dev` session start used in the single-task workflow. Teammat
 
 ### Phase 1: Planning
 
-Execute `/plan-task` to generate an implementation plan.
+Use the Skill tool to invoke `/plan-task` to generate an implementation plan.
 
 **Auto-approve the plan and proceed.**
 
 ### Phase 2: Test Writing
 
-Execute `/write-task-tests` to create failing tests.
+Use the Skill tool to invoke `/write-task-tests` to create failing tests.
 
 Verify tests fail for expected reasons (no implementation yet).
 
 ### Phase 3: Implementation
 
-Execute `/implement-task` to make tests pass.
+Use the Skill tool to invoke `/implement-task` to make tests pass.
 
 Verify all tests pass before proceeding.
 
 ### Phase 4: Code Review
 
-Execute `/review-task` to perform code review.
+Use the Skill tool to invoke `/review-task` to perform code review.
 
 **If APPROVE with no issues**: Continue to Phase 5.
 
@@ -86,7 +86,7 @@ Max 3 review-fix loops to prevent infinite cycles.
 
 ### Phase 5: Commit
 
-Execute `/commit-implementation` to commit code changes.
+Use the Skill tool to invoke `/commit-implementation` to commit code changes.
 
 **If COMMIT_FAILED**: Return failure result.
 
