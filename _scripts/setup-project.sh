@@ -80,6 +80,11 @@ cp -r "$SCAFFOLD_DIR/.claude" .
 rm -f .claude/settings.local.json  # User-specific settings
 rm -f .claude/subagent.log         # Session log
 
+# Copy _scripts directory (poll-inbox.sh, etc.)
+mkdir -p _scripts
+cp "$SCAFFOLD_DIR"/_scripts/poll-inbox.sh _scripts/
+chmod +x _scripts/*
+
 # Copy configuration files
 cp "$SCAFFOLD_DIR/.gitignore" .
 cp "$SCAFFOLD_DIR/.mcp.json" .
