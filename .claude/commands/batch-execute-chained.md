@@ -124,7 +124,7 @@ Report progress:
 Launch `claude -p` in the background:
 
 ```bash
-claude -p --dangerously-skip-permissions "You are executing one wave of batch tasks. Run /execute-one-wave and follow its instructions exactly. Proceed autonomously. Do not ask for user input." 2>&1
+env -u CLAUDECODE claude -p --dangerously-skip-permissions "You are executing one wave of batch tasks. Run /execute-one-wave and follow its instructions exactly. Proceed autonomously. Do not ask for user input." 2>&1
 ```
 
 Use the Bash tool with `run_in_background: true` to launch this. Capture the task_id.
