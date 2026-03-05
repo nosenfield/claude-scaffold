@@ -60,6 +60,7 @@ Review conversation to extract:
 
 **Open questions**:
 - Unresolved items needing user input
+- Mark each as `[BLOCKING]` (requires human answer before work can continue) or `[NON-BLOCKING]` (deferred decision, work can proceed without it)
 
 ### 5. Collect Key Resources
 
@@ -145,7 +146,10 @@ Create `_docs/context-summaries/[timestamp].md`:
 
 ## Open Questions
 
-[Unresolved items for user to address, or "None"]
+[Structured list of unresolved items, or "None"]
+
+- `[BLOCKING]` [Question requiring human input before work can continue]
+- `[NON-BLOCKING]` [Deferred decision; work can proceed without it]
 
 ---
 

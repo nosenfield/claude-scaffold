@@ -38,6 +38,7 @@ If `$ARGUMENTS` is provided:
 - Verify the file exists
 - Read the summary file
 - Extract:
+  - **Open Questions**: Unresolved items from prior session (blocking and non-blocking). Any non-"None" content should be surfaced.
   - **Previous Session**: Chain link
   - **Session Chain**: Count of prior sessions
   - **In-Progress Work**: Current task state, next steps
@@ -110,6 +111,17 @@ Note uncommitted changes. Git log is verification only; trust memory files as au
 **From Summary**: [summary filename]
 **Session Chain**: [N] prior sessions
 **Work Stream**: [topic from summary]
+
+### Open Questions (from prior session)
+
+[Include only when summary has non-"None" open questions.
+ Show [BLOCKING] items first, then [NON-BLOCKING]. Treat unlabeled items as blocking.]
+
+**Blocking** (answer before continuing):
+- [question]
+
+**Non-blocking** (can proceed, decide later):
+- [question]
 
 ### Resumed State
 
