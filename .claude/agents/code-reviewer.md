@@ -24,12 +24,12 @@ Access via the prompt context. Do not assume information not provided.
 ## Required Context
 
 Retrieve from project files:
-- `/_docs/architecture.md`: Design constraints
-- `/_docs/best-practices.md`: Project-specific quality standards
-- `/_docs/principles/code-review.md`: Review process and communication guidelines
-- `/_docs/principles/security.md`: OWASP checklist and security principles
-- `/_docs/principles/code-quality.md`: SOLID principles and clean code practices
-- `/_docs/principles/system-design.md`: Black box principles, composability, contracts
+- `./_docs/architecture.md`: Design constraints
+- `./_docs/best-practices.md`: Project-specific quality standards
+- `./_docs/principles/code-review.md`: Review process and communication guidelines
+- `./_docs/principles/security.md`: OWASP checklist and security principles
+- `./_docs/principles/code-quality.md`: SOLID principles and clean code practices
+- `./_docs/principles/system-design.md`: Black box principles, composability, contracts
 
 ## File Access
 

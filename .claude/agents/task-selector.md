@@ -22,7 +22,7 @@ If no mode specified, default to `single`.
 
 ### 1. Load Task List
 
-Read `_docs/task-list.json`.
+Read `./_docs/task-list.json`.
 
 Verify schema version:
 - Version 2.x: Use wave-based selection (this protocol)
@@ -68,7 +68,7 @@ blockedTasks:
 4. Select the first task
 
 **Update Task Status**:
-Edit `_docs/task-list.json`:
+Edit `./_docs/task-list.json`:
 - Set `status: "in-progress"`
 
 **Return**:

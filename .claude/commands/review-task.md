@@ -110,7 +110,7 @@ If tests aren't passing, run `/implement-task` first.
      - Instruct user to run `/implement-task`
    
    - **Defer**:
-     - Append selected issues to `/_docs/backlog.json`:
+     - Append selected issues to `./_docs/backlog.json`:
        ```json
        {
          "id": "BACKLOG-[next]",

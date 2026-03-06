@@ -42,8 +42,8 @@ Set `currentTask` in session context from input.
 
 Read the following files to establish project awareness before starting work:
 
-1. **`_docs/architecture.md`** -- project structure, tech stack, component boundaries
-2. **`_docs/memory/decisions.md`** -- architectural decisions to respect (do not contradict these)
+1. **`./_docs/architecture.md`** -- project structure, tech stack, component boundaries
+2. **`./_docs/memory/decisions.md`** -- architectural decisions to respect (do not contradict these)
 3. **Each file in the task's `references` array** -- design constraints specific to this task
 
 This replaces the `/dev` session start used in the single-task workflow. Teammates do not need session management but do need project context.

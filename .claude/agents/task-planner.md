@@ -36,10 +36,10 @@ Read in this order:
    Read each path in `references` array. These are task-specific documentation sections that define constraints and requirements for this task.
 
 3. **Project Documentation**
-   - `/_docs/architecture.md`: System design and module structure
-   - `/_docs/best-practices.md`: Project-specific coding conventions
-   - `/_docs/principles/system-design.md`: Black box principles, composability, contracts
-   - `/_docs/principles/design-patterns.md`: Common patterns (reference when relevant)
+   - `./_docs/architecture.md`: System design and module structure
+   - `./_docs/best-practices.md`: Project-specific coding conventions
+   - `./_docs/principles/system-design.md`: Black box principles, composability, contracts
+   - `./_docs/principles/design-patterns.md`: Common patterns (reference when relevant)
 
 4. **Specific Files** (from exploration artifact)
    Read entry point files identified in the exploration artifact.

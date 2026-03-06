@@ -1,6 +1,6 @@
 ---
 name: memory-updater
-description: Use after task completion to persist session state. Supports single task or batch mode. Updates Active Context section, appends entry to Session Log in _docs/memory/progress.md, records significant decisions in _docs/memory/decisions.md, marks tasks complete in task-list.json, and writes result objects.
+description: Use after task completion to persist session state. Supports single task or batch mode. Updates Active Context section, appends entry to Session Log in ./_docs/memory/progress.md, records significant decisions in ./_docs/memory/decisions.md, marks tasks complete in task-list.json, and writes result objects.
 tools: Read, Write, Edit, Glob, Bash
 model: sonnet
 ---
@@ -54,9 +54,9 @@ The orchestrator provides:
 
 | File | Purpose | Update Pattern |
 |------|---------|----------------|
-| _docs/memory/progress.md | Active context + session history | **Replace** Active Context; **Append** to Session Log |
-| _docs/memory/decisions.md | Significant decisions | Append if decisions were made |
-| _docs/task-list.json | Task status and results | Update status, result, completedAt; advance blocked tasks |
+| ./_docs/memory/progress.md | Active context + session history | **Replace** Active Context; **Append** to Session Log |
+| ./_docs/memory/decisions.md | Significant decisions | Append if decisions were made |
+| ./_docs/task-list.json | Task status and results | Update status, result, completedAt; advance blocked tasks |
 
 ## Process
 
@@ -64,7 +64,7 @@ The orchestrator provides:
 
 #### Step 1: Update Active Context Section
 
-Read _docs/memory/progress.md and **replace** the Active Context section:
+Read ./_docs/memory/progress.md and **replace** the Active Context section:
 
 ```markdown
 ## Active Context
@@ -105,7 +105,7 @@ Add entry after `<!-- New entries are added below this line -->`:
 
 #### Step 3: Record Decisions (if any)
 
-Append to _docs/memory/decisions.md if significant decisions were made.
+Append to ./_docs/memory/decisions.md if significant decisions were made.
 
 #### Step 4: Update task-list.json (if taskId provided)
 
@@ -128,7 +128,7 @@ Note: Wave advancement (blocked → eligible) is handled by the task-selector ag
 #### Step 5: Amend Commit (if taskId and commitSha provided)
 
 ```bash
-git add _docs/task-list.json
+git add ./_docs/task-list.json
 git commit --amend --no-edit --no-verify
 ```
 

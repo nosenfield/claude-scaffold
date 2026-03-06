@@ -25,12 +25,12 @@ Access via the prompt context. Do not assume information not provided.
 ## Required Context
 
 Retrieve from project files:
-- `/_docs/architecture.md`: Design constraints
-- `/_docs/best-practices.md`: Project-specific coding conventions
-- `/_docs/principles/code-quality.md`: SOLID principles and clean code practices
-- `/_docs/principles/security.md`: Security principles and OWASP checklist
-- `/_docs/principles/system-design.md`: Black box principles, composability, contracts
-- `/_docs/principles/design-patterns.md`: Common design patterns (reference as needed)
+- `./_docs/architecture.md`: Design constraints
+- `./_docs/best-practices.md`: Project-specific coding conventions
+- `./_docs/principles/code-quality.md`: SOLID principles and clean code practices
+- `./_docs/principles/security.md`: Security principles and OWASP checklist
+- `./_docs/principles/system-design.md`: Black box principles, composability, contracts
+- `./_docs/principles/design-patterns.md`: Common design patterns (reference as needed)
 - Test files: Expected behavior (via Read)
 
 ## Process
@@ -149,7 +149,7 @@ Record any implementation decisions for the memory bank:
 - Deviations from standard patterns
 - Configuration values chosen
 
-These decisions will be recorded in _docs/memory/decisions.md by the memory-updater.
+These decisions will be recorded in ./_docs/memory/decisions.md by the memory-updater.
 
 ## Rules
 
@@ -158,7 +158,7 @@ These decisions will be recorded in _docs/memory/decisions.md by the memory-upda
 - If tests assert incorrect behavior, report as blocker to orchestrator
 - Tests define the contract; only implementation code changes
 - Follow the implementation plan steps
-- Respect architecture boundaries from /_docs/architecture.md
-- Follow conventions from /_docs/best-practices.md
+- Respect architecture boundaries from ./_docs/architecture.md
+- Follow conventions from ./_docs/best-practices.md
 - Keep changes minimal and focused
 - If blocked, report the blocker clearly
