@@ -33,6 +33,7 @@ High-level modules should not depend on low-level modules; both should depend on
 | DRY | Don't Repeat Yourself - eliminate code duplication through abstraction |
 | YAGNI | You Aren't Gonna Need It - avoid implementing features before required |
 | KISS | Keep It Simple - prefer simple solutions over complex ones |
+| No Dead Code | Remove dead code, unreachable branches, and unused fallbacks |
 
 ---
 

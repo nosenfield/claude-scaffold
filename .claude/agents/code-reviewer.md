@@ -83,6 +83,7 @@ You receive a list of modified files. You MUST:
 - [ ] Follows project conventions
 - [ ] Clear naming and structure
 - [ ] No code duplication
+- [ ] No dead code or unreachable branches
 - [ ] Appropriate comments where needed
 - [ ] Public API documentation meets project standard (see best-practices.md)
 
