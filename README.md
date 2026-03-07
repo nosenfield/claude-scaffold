@@ -6,11 +6,10 @@ A scaffolding system for AI-driven software development with Claude Code agents.
 
 This scaffold provides a structured workflow for greenfield project development using Claude Code. It implements:
 
-- **Two-agent architecture**: Initialization and development loop separation
+- **Subagent orchestration**: Specialized agents for planning, testing, implementation, review, and memory updates
 - **TDD enforcement**: Tests before implementation with immutable test contracts
 - **Memory persistence**: Session history and architectural decisions across context windows
 - **Quality gates**: Hook-based enforcement at workflow boundaries
-- **Subagent orchestration**: Specialized agents for planning, testing, implementation, review, and memory updates
 
 ## Scaffold Structure
 
@@ -26,10 +25,12 @@ scaffold/
 │   │   ├── init-repo/   # One-time scaffold initialization
 │   │   ├── map/         # Codebase exploration with artifacts
 │   │   └── summarize/   # Context handoff
-│   └── settings.json    # Hook configuration
+│   └── settings.json    # Hooks, permissions, and environment variables
 ├── .githooks/           # Git hooks (version-controlled)
 │   ├── pre-commit       # Quality gates (test, lint, typecheck)
-│   └── post-commit      # Commit logging, bypass detection
+│   ├── post-commit      # Commit logging, bypass detection
+│   ├── git-commit-lock.sh # Serialize parallel commits (batch workflow)
+│   └── protect-hookspath.sh # Guard against Husky overwriting core.hooksPath
 ├── _docs/               # Project documentation
 │   ├── templates/       # Document templates (source of truth)
 │   │   ├── prd.md           # Product requirements structure
@@ -46,8 +47,9 @@ scaffold/
 │   └── memory/          # Persistent memory (scaffold development only)
 │       ├── progress.md  # Session state + history
 │       └── decisions.md # Append-only decision log
-├── _scripts/            # Setup scripts (scaffold-only)
-│   └── setup-project.sh # Create new project from scaffold
+├── _scripts/            # Setup and utility scripts
+│   ├── setup-project.sh # Create new project from scaffold
+│   └── poll-inbox.sh   # Poll teammate message inbox (batch workflow)
 ├── CLAUDE.md            # Project context for Claude Code
 └── .mcp.json            # MCP server configuration
 ```
@@ -104,6 +106,92 @@ Required fields: `id`, `title`, `description`, `priority`, `status`, `acceptance
 
 See `_docs/templates/task-list.json` for full schema documentation.
 
+### Batch Schema (v2.0)
+
+For batch/parallel execution, `/compute-waves` extends the task list with wave assignments:
+
+```json
+{
+  "version": "2.0.0",
+  "waveSummary": [
+    { "wave": 0, "taskIds": ["TASK-001"], "taskCount": 1 },
+    { "wave": 1, "taskIds": ["TASK-002", "TASK-003"], "taskCount": 2 }
+  ],
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "Task name",
+      "description": "Detailed description",
+      "priority": 1,
+      "status": "eligible",
+      "executionWave": 0,
+      "assignedAgent": null,
+      "affectedPaths": ["src/module.ts", "src/module.test.ts"],
+      "acceptanceCriteria": ["Criterion 1"],
+      "references": ["architecture.md#relevant-section"],
+      "blockedBy": [],
+      "completedAt": null
+    }
+  ]
+}
+```
+
+**Additional v2.0 fields**:
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `waveSummary` | array (root) | Wave-to-task mapping computed by `/compute-waves` |
+| `executionWave` | int | Wave assignment (0-based); tasks in the same wave run in parallel |
+| `assignedAgent` | string\|null | Teammate name (set during batch execution) |
+| `affectedPaths` | array | Expected file paths for contention detection across parallel tasks |
+
+**Status values** (v2.0 extends v1.x):
+
+| Status | Meaning |
+|--------|---------|
+| `pending` | Not yet processed by `/compute-waves` |
+| `eligible` | Ready to execute (all dependencies met) |
+| `blocked` | Waiting on `blockedBy` dependencies |
+| `in-progress` | Currently being executed by an agent |
+| `complete` | Successfully finished |
+| `failed` | Execution failed |
+
+## Commands and Skills
+
+### Skills (User-Invocable)
+
+| Skill | Purpose |
+|-------|---------|
+| `/dev [summary]` | Start development session; optionally resume from context summary |
+| `/init-repo` | One-time scaffold initialization (validates docs, creates memory files) |
+| `/map <target>` | Codebase exploration with artifact output (runs in forked context) |
+| `/summarize` | Session handoff summary for context window management |
+
+### Commands — Single-Task Workflow
+
+| Command | Purpose |
+|---------|---------|
+| `/next-from-task-list` | Select next task via task-selector subagent |
+| `/plan-task [description]` | Plan implementation (task-list mode or ad-hoc with argument) |
+| `/write-task-tests` | Write failing tests from implementation plan |
+| `/implement-task` | Implement code to pass tests |
+| `/review-task` | Code review via code-reviewer subagent |
+| `/commit-task` | Commit implementation + update memory |
+| `/commit-implementation` | Commit implementation only (no memory update; used by batch teammates) |
+| `/execute-task` | Run full single-task workflow with plan approval pause |
+| `/execute-task-auto` | Run full single-task workflow autonomously (no pauses) |
+
+### Commands — Batch Workflow
+
+| Command | Purpose |
+|---------|---------|
+| `/compute-waves` | Compute execution waves from dependency graph (prerequisite for batch) |
+| `/next-batch-from-list` | Select parallelizable tasks from current wave |
+| `/batch-execute-task-auto` | Single-session batch orchestrator (spawns teammate agents per wave) |
+| `/batch-execute-chained` | Multi-session super-orchestrator (launches `claude -p` per wave) |
+| `/execute-one-wave` | Execute one wave in a `claude -p` subprocess (used by `/batch-execute-chained`) |
+| `/execute-task-from-batch` | Full dev cycle for a single task (teammate workflow) |
+
 ## Development Workflow
 
 ### Task-List Workflow (Structured)
@@ -118,7 +206,9 @@ Use when working through predefined tasks in `task-list.json`:
 6. `/review-task` - Code review
 7. `/commit-task` - Commit and update memory
 
-Or use `/execute-task` to run the full workflow (steps 2-7) autonomously for a single task.
+Or use shorthand commands:
+- `/execute-task` - Runs steps 2-7 with a plan approval pause
+- `/execute-task-auto` - Runs steps 2-7 fully autonomously (no pauses)
 
 ### Ad-hoc Workflow (Exploratory)
 
@@ -133,7 +223,35 @@ Use for unplanned work or when task list doesn't apply:
 
 The ad-hoc workflow skips `/next-from-task-list` (no task selection). `/plan-task` accepts a description argument directly, runs `/map` exploration, and invokes the task-planner agent without requiring a task-list entry. Both workflows share the same TDD cycle from `/write-task-tests` onward.
 
-**Note**: Run `/init-repo` once after placing project documentation to initialize memory files (`_docs/memory/progress.md`, `_docs/memory/decisions.md`) and validate core docs. Environment setup (dependency installation, dev server configuration) is handled through the first tasks in `task-list.json`.
+### Batch Workflow (Parallel Execution)
+
+Use when executing multiple tasks in parallel from a wave-based task list (v2.0 schema with `waveSummary`):
+
+**Prerequisites**: Run `/compute-waves` once after creating `task-list.json` to compute the dependency graph and assign execution waves.
+
+**Option A — Single-session** (up to ~5 waves):
+```
+/dev -> /compute-waves -> /batch-execute-task-auto
+```
+Spawns teammate agents within the current session. Each teammate runs `/execute-task-from-batch` (plan -> tests -> implement -> review -> commit). Good for smaller task lists where context overflow is not a concern.
+
+**Option B — Session-chained** (any number of waves):
+```
+/dev -> /compute-waves -> /batch-execute-chained
+```
+Launches a fresh `claude -p` subprocess per wave. Each subprocess runs `/execute-one-wave`, which creates a team, spawns teammates, collects results, updates memory, then exits. The super-orchestrator monitors completion and advances to the next wave. Recommended for large task lists (28+ tasks / 5+ waves) to avoid context overflow.
+
+**Teammate lifecycle** (within each wave):
+```
+TeamCreate -> Spawn worker teammates -> Workers execute /execute-task-from-batch
+  -> SendMessage delivers result -> Shutdown handshake -> TeamDelete
+```
+
+**Commit distinction**: Teammates use `/commit-implementation` (commit only, no memory update). The orchestrator handles memory updates centrally after collecting all teammate results.
+
+### Setup Note
+
+Run `/init-repo` once after placing project documentation to initialize memory files (`_docs/memory/progress.md`, `_docs/memory/decisions.md`) and validate core docs. Environment setup (dependency installation, dev server configuration) is handled through the first tasks in `task-list.json`.
 
 ## Context Management
 
@@ -196,12 +314,27 @@ Decisions made during scaffold development are recorded below.
 **Decision**: Use git pre-commit hook as the single enforcement point.
 
 **Implementation**:
-| Hook | Location | Trigger | Purpose |
-|------|----------|---------|---------|
-| pre-commit | `.githooks/pre-commit` | `git commit` | Runs test, lint, typecheck before commit |
-| post-commit | `.githooks/post-commit` | After commit | Logs commits, detects `--no-verify` bypass |
 
-**Configuration**: Hooks use `core.hooksPath` (Git 2.9+) for version-controlled hooks:
+Git hooks (`.githooks/`, via `core.hooksPath`):
+
+| Hook | Trigger | Purpose |
+|------|---------|---------|
+| `pre-commit` | `git commit` | Runs test, lint, typecheck before commit |
+| `post-commit` | After commit | Logs commits, detects `--no-verify` bypass |
+| `git-commit-lock.sh` | Called by batch orchestrator | Serializes parallel commits to prevent staging contamination |
+| `protect-hookspath.sh` | Called by pre-commit | Guards against Husky or other tools overwriting `core.hooksPath` |
+
+Claude Code hooks (`.claude/settings.json`):
+
+| Event | Script | Matcher | Mode |
+|-------|--------|---------|------|
+| `PostToolUse` | `quality-gate.sh` | `Write\|Edit\|MultiEdit` | Advisory (warns, does not block) |
+| `PreToolUse` | `test-file-guard.sh` | `Write\|Edit\|MultiEdit` | Blocking (denies test file edits outside test-writer) |
+| `SubagentStop` | `log-subagent.sh` | All | Logs agent completion with prompt/output excerpts |
+| `TeammateIdle` | `log-subagent.sh` | All | Logs teammate idle events |
+| `TaskCompleted` | `log-subagent.sh` | All | Logs task completion events |
+
+**Configuration**: Git hooks use `core.hooksPath` (Git 2.9+) for version-controlled hooks:
 ```bash
 git config core.hooksPath .githooks
 ```
@@ -321,7 +454,7 @@ This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Ke
 | Agent descriptions = when-to-use | All 6 agents lead with timing triggers |
 | Test immutability | Triple enforcement: rule + hook + agent instruction |
 | Persistent memory | _docs/memory/progress.md (Active Context replaced; Session Log appended) and _docs/memory/decisions.md (appended) |
-| Hook-based quality gates | Advisory (PostToolUse) + Git pre-commit |
+| Hook-based quality gates | Git pre-commit (enforcement) + PostToolUse (advisory) + PreToolUse (test guard) + SubagentStop/TeammateIdle/TaskCompleted (logging) |
 
 ## Personal Overrides (CLAUDE.local.md)
 
@@ -346,15 +479,20 @@ Create a `CLAUDE.local.md` file in the project root for personal project-specifi
 
 ## Known Gaps and Future Improvements
 
-Items identified for potential enhancement:
+### Resolved
 
-- [x] ~~Extract initializer subagent from /init command~~ (resolved: /init-repo skill for scaffold setup; task-selector subagent for context isolation)
+- [x] ~~Extract initializer subagent from /init command~~ (R5: /init-repo skill + task-selector subagent)
 - [x] ~~Add CLAUDE.local.md template for personal overrides~~ (documented above)
 - [x] ~~Document context clearing strategy~~ (consolidated into /dev; removed /catchup)
-- [x] ~~Integrate Explore subagent for read-only context gathering~~ (R6 resolved: `/map` skill with `context: fork` and artifact output)
-- [x] ~~Strengthen agent descriptions with when-to-use framing~~ (R7 resolved: all 6 agents updated with trigger conditions, payload requirements, and output expectations)
-- [x] ~~Add SubagentStop hook for progress tracking~~ (R8 resolved: `.claude/hooks/log-subagent.sh` logs agent type, prompt excerpt, and output excerpt to `.claude/subagent.log`)
+- [x] ~~Integrate Explore subagent for read-only context gathering~~ (R6: `/map` skill with `context: fork`)
+- [x] ~~Strengthen agent descriptions with when-to-use framing~~ (R7: all 6 agents updated)
+- [x] ~~Add SubagentStop hook for progress tracking~~ (R8: `log-subagent.sh` handles SubagentStop, TeammateIdle, TaskCompleted)
+- [x] ~~Prevent Husky from overriding core.hooksPath~~ (D-011: `protect-hookspath.sh`)
+
+### Open
+
 - [ ] Add end-to-end testing guidance with puppeteer MCP (R9)
+- [ ] Update `_docs/templates/task-list.json` to include v2.0 batch fields (template still uses v1.x schema; batch commands populate v2.0 fields at runtime via `/compute-waves`)
 
 ## References
 

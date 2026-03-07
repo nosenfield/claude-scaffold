@@ -1,42 +1,34 @@
-# SnakeBreaker-Claude-Batched: Quickstart Guide
+# Project Setup Quickstart
 
-This document tracks the setup and workflow execution for validating the batch workflow scaffold.
+Guide for setting up and running a new project using the claude-project-template scaffold.
 
 ---
 
-## Phase 1: Project Setup (Completed)
+## Phase 1: Project Setup
 
 ### Step 1: Run setup-project.sh
 
 ```bash
 cd /path/to/claude-project-template/scaffold
-./_scripts/setup-project.sh SnakeBreaker-Claude-Batched
+./_scripts/setup-project.sh <project-name>
 ```
 
-**Expected**: Creates new project directory with scaffold infrastructure.
-
-**Actual**: Project created at `/Users/nosenfield/Desktop/Cursor Projects/SnakeBreaker-Claude-Batched`
-
-**Discrepancies**: None observed.
+Creates a new project directory with scaffold infrastructure (commands, agents, hooks, rules, settings).
 
 ---
 
 ### Step 2: Add Core Documentation
 
-Added project-specific documentation:
-- `_docs/prd.md` - Product requirements
-- `_docs/architecture.md` - System design
-- `_docs/task-list.json` - Development tasks (37 tasks, 14 waves)
-- `_docs/best-practices.md` - Coding standards
+Add project-specific documentation to `_docs/`, using the corresponding template in `_docs/templates/` as a starting point:
 
-Set Claude signature in CLAUDE.md.
+- `prd.md` - Product requirements (supports Features, User Stories, or Systems structure)
+- `architecture.md` - System design (tech stack, components, data models)
+- `task-list.json` - Development tasks (see template for required schema fields)
+- `best-practices.md` - Coding standards and project conventions
 
-**Commits**:
-- `b827639` - adds starting documentation
-- `12681c4` - reset task-list.json
-- `b033677` - sets signature divider
+Update `CLAUDE.md` with project-specific instructions.
 
-**Discrepancies**: None observed.
+Commit changes.
 
 ---
 
@@ -46,16 +38,11 @@ Set Claude signature in CLAUDE.md.
 /init-repo
 ```
 
-**Expected**: Initializes scaffold memory files, validates documentation.
-
-**Actual**: Memory files created/updated in `_docs/memory/`.
-
-**Discrepancies**:
-- Memory files have template placeholders (`[DATE]`) that were not replaced with actual dates.
+Initializes scaffold memory files (`_docs/memory/progress.md`, `_docs/memory/decisions.md`) and validates documentation structure.
 
 ---
 
-## Phase 2: Development Workflow (In Progress)
+## Phase 2: Development Workflow
 
 ### Step 4: Start Development Session
 
@@ -63,79 +50,60 @@ Set Claude signature in CLAUDE.md.
 /dev
 ```
 
-**Expected**: Loads memory files, reports session status, shows current task and next steps.
+Loads memory files, reports session status, and recommends next action.
 
-**Actual**: Session started successfully. Memory files loaded.
-
-**Discrepancy D-002**: Recommended `/next-from-task-list` (single-task) instead of `/next-batch-from-list` (batch) despite v2.0.0 schema with waveSummary present.
-
----
-
-### Step 5: Execute Batch (Autonomous)
-
+To resume from a prior session:
 ```bash
-/batch-execute-task-auto
+/dev _docs/context-summaries/<timestamp>.md
 ```
 
-**Note**: This command handles task selection internally (no need for separate `/next-batch-from-list`).
-
-**Expected**: Spawns teammate agents for each task, executes in parallel, collects results.
-
-**Actual**:
-- TASK-001 assigned to `worker-001`
-- Task marked `in-progress` in task-list.json
-- Teammate stalled silently - no files created, no result reported
-
-**Root Cause (D-004)**: Orchestrator prompt to teammate is underspecified. See analysis below.
-
 ---
 
-### Step 5a: Diagnose Teammate Stall
+### Step 5: Execute Tasks
 
-**Investigation**:
-1. Researched Claude Code hooks for teammate logging
-2. Empirically verified `SubagentStop` fires for teammates (spawned test teammate in scaffold repo)
-3. Analyzed `batch-execute-task-auto.md` and `execute-task-from-batch.md` communication flow
+**Single task (autonomous)**:
+```
+/dev -> /execute-task-auto
+```
+Or `/execute-task` for autonomous execution with pauses for plan approval and non-blocking code review issues.
 
-**Findings**:
-- `SubagentStop` hook already captures teammate events (name, ID, prompt)
-- D-003 revised: `TeammateIdle` IS valid but not needed (SubagentStop suffices)
-- D-004 identified: orchestrator prompt construction is the root cause
-
-**D-004 Details**: The orchestrator tells the teammate to "run `/execute-task-from-batch`" but:
-1. Does not construct a self-contained prompt with task context
-2. Does not include explicit `SendMessage` instruction for result reporting
-3. Teammate is an independent Claude Code process that needs everything in the prompt
-
-**Required Fix**: Update `batch-execute-task-auto.md` step 3c and `execute-task-from-batch.md` Phase 6.
-
----
-
-## Discrepancy Log
-
-See [scaffold-run-0-notes.md](_docs/context-summaries/scaffold-run-0-notes.md) for detailed discrepancy tracking.
-
-**Summary**: 4 issues found
-- D-001 (LOW): `/init-repo` does not replace `[DATE]` placeholders
-- D-002 (MEDIUM): `/dev` recommends single-task instead of batch workflow
-- D-003 (LOW, revised): `TeammateIdle` hook not configured; `SubagentStop` already covers teammates
-- D-004 (HIGH): Teammate stall - underspecified prompt in batch orchestrator
-
----
-
-## Workflow Reference
-
-### Single Task Workflow
+**Single task (manual steps)**:
 ```
 /dev -> /next-from-task-list -> /plan-task -> /write-task-tests -> /implement-task -> /review-task -> /commit-task
 ```
 
-### Batch Workflow
+**Batch (session-chained, for large task lists)**:
 ```
-/dev -> /next-batch-from-list -> /batch-execute-task-auto
+/dev -> /compute-waves -> /batch-execute-chained
+```
+Launches a fresh `claude -p` subprocess per wave, avoiding context overflow. Recommended for 28+ tasks / 5+ waves.
+
+**Batch (parallel execution)**:
+```
+/dev -> /compute-waves -> /batch-execute-task-auto
+```
+`/compute-waves` converts the linear task list into a wave-based parallel schema (v2.0) by computing a dependency graph from `blockedBy` fields. You can run it manually to review parallelization before execution, or skip it -- the batch orchestrator will run it automatically if needed.
+
+Spawns teammate agents for each task in the current wave. Good for smaller task lists (up to ~5 waves).
+
+**Ad-hoc (no task list)**:
+```
+/dev -> /plan-task <description> -> /write-task-tests -> /implement-task -> /review-task -> /commit-task
 ```
 
-Each teammate in batch workflow executes:
-```
-/execute-task-from-batch (includes: plan -> tests -> implement -> review -> commit)
-```
+---
+
+### Commit Distinction
+
+| Command | Scope | Used By |
+|---------|-------|---------|
+| `/commit-task` | Commit + memory update | Single-task orchestrator |
+| `/commit-implementation` | Commit only (no memory update) | Batch teammates |
+
+In batch workflows, teammates use `/commit-implementation`. The orchestrator handles memory updates centrally after collecting results.
+
+---
+
+## Context Management
+
+When context fills (~70%), run `/summarize` to hand off to a new session. Resume with `/dev _docs/context-summaries/<timestamp>.md`.

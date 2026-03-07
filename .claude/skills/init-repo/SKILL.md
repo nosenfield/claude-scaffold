@@ -43,7 +43,7 @@ Templates are available in `_docs/templates/`:
 - task-list.json
 - best-practices.md
 
-See README.md for documentation requirements.
+See _docs/templates/ for document templates and schema documentation.
 ```
 
 ### 2. Validate Task List Structure
