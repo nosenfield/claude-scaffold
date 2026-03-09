@@ -7,7 +7,7 @@ Autonomously execute the full development workflow for a single task from the ta
 This command orchestrates the complete development cycle:
 1. Select next task (`/next-from-task-list`)
 2. Plan implementation (`/plan-task`)
-3. Write tests (`/write-task-tests`)
+3. Write tests (`/write-task-tests`) -- conditional on plan
 4. Implement (`/implement-task`)
 5. Review (`/review-task`)
 6. Commit (`/commit-task`)
@@ -35,15 +35,18 @@ Present the plan and wait for user approval:
 - "approve" → Continue to Phase 3
 - Feedback → Revise plan and re-present
 
-### Phase 3: Test Writing
+### Phase 3: Test Writing (Conditional)
 
+**If plan includes `Tests Required: yes`:**
 Execute `/write-task-tests` to create failing tests.
-
 Verify tests fail for expected reasons (no implementation yet).
+
+**If plan includes `Tests Required: no`:**
+Skip to Phase 4.
 
 ### Phase 4: Implementation
 
-Execute `/implement-task` to make tests pass.
+Execute `/implement-task`.
 
 Verify all tests pass before proceeding.
 
@@ -82,8 +85,8 @@ Report task completion:
 
 ### Workflow Summary
 - Plan: Approved
-- Tests: [N] written, all failing initially
-- Implementation: All tests passing
+- Tests: [N] written, all failing initially (or skipped if not required)
+- Implementation: All tests passing (or plan-based if no new tests)
 - Review: Approved
 - Memory: Updated
 

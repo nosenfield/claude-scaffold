@@ -52,7 +52,8 @@ Read in this order:
 4. Identify affected files and modules
 5. Determine dependencies and integration points
 6. Decompose into ordered implementation steps
-7. Identify test scenarios
+7. Determine whether the task requires new tests. Tasks that are config-only, documentation-only, or pure refactors covered by existing tests do not need new tests.
+8. If tests are required, identify test scenarios
 
 ## Output Format
 
@@ -64,6 +65,7 @@ Return your analysis in this exact format:
 - **Task**: [taskId if provided, otherwise taskTitle]
 - **Summary**: [one-sentence task description]
 - **Confidence**: [high/medium/low]
+- **Tests Required**: [yes/no] -- [rationale if no]
 
 ### Affected Files
 
@@ -81,6 +83,8 @@ Return your analysis in this exact format:
 3. [action] in [file path]
 
 ### Test Scenarios
+
+(Include when Tests Required is yes. Omit section entirely when no.)
 
 1. [behavior to verify]
 2. [edge case to cover]

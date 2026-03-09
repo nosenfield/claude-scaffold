@@ -76,7 +76,8 @@ Generate an implementation plan for a task.
    Confirm the plan includes:
    - Affected files list
    - Implementation steps
-   - Test scenarios
+   - Tests Required field (yes/no)
+   - Test scenarios (when tests required)
    - Risk assessment
 
 7. **Present Plan for Approval**
@@ -90,21 +91,25 @@ Generate an implementation plan for a task.
    ---
 
    **Approve this plan?**
-   - Reply "approve" to proceed to test writing
+   - Reply "approve" to proceed
    - Reply with feedback to request plan changes
    ```
 
-8. **Store Plan**
-   On approval, retain the implementation plan for subsequent stages.
+8. **Route Next Action**
+   On approval, retain the implementation plan in session context.
 
-   Recommend next action:
-   ```
-   Plan approved. Run `/write-task-tests` to write tests.
-   ```
+   **If plan includes `Tests Required: yes`:**
+   Invoke `/write-task-tests` to write tests before implementation.
+
+   **If plan includes `Tests Required: no`:**
+   Invoke `/implement-task` directly (skip test writing phase).
+
+   Do NOT implement directly without invoking the appropriate command.
+   The commands provide subagent isolation (test-writer, implementer agents).
 
 ## State Management
 
 Store in session context:
 - `currentTask`: Full task object (task-list mode) or `{ title: $ARGUMENTS, description: $ARGUMENTS }` (ad-hoc mode)
 - `explorationArtifact`: Path to exploration artifact
-- `implementationPlan`: Approved plan from subagent
+- `implementationPlan`: Approved plan from subagent (includes Tests Required field used for routing)

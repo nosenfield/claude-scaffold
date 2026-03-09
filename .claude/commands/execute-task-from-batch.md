@@ -9,7 +9,7 @@ Used by teammates spawned from `/batch-execute-task-auto`.
 This command executes the development cycle for an assigned task:
 0. Load project context
 1. Plan implementation (`/plan-task`)
-2. Write tests (`/write-task-tests`)
+2. Write tests (`/write-task-tests`) -- conditional on plan
 3. Implement (`/implement-task`)
 4. Review (`/review-task`)
 5. Commit (`/commit-implementation`)
@@ -54,15 +54,18 @@ Use the Skill tool to invoke `/plan-task` to generate an implementation plan.
 
 **Auto-approve the plan and proceed.**
 
-### Phase 2: Test Writing
+### Phase 2: Test Writing (Conditional)
 
+**If plan includes `Tests Required: yes`:**
 Use the Skill tool to invoke `/write-task-tests` to create failing tests.
-
 Verify tests fail for expected reasons (no implementation yet).
+
+**If plan includes `Tests Required: no`:**
+Skip to Phase 3.
 
 ### Phase 3: Implementation
 
-Use the Skill tool to invoke `/implement-task` to make tests pass.
+Use the Skill tool to invoke `/implement-task`.
 
 Verify all tests pass before proceeding.
 

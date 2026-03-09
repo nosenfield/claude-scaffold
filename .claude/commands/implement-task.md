@@ -1,14 +1,12 @@
 # Implement Task
 
-Write code to pass the tests for the current task.
+Write code to implement the current task.
 
 ## Prerequisites
 
 - A task must be in-progress
 - An implementation plan must be approved
-- Tests must be written
-
-If tests don't exist, run `/write-task-tests` first.
+- Tests should be written (unless plan specified `Tests Required: no`)
 
 ## Steps
 
@@ -16,9 +14,9 @@ If tests don't exist, run `/write-task-tests` first.
    Confirm session context contains:
    - `currentTask`: The in-progress task
    - `implementationPlan`: The approved plan
-   - `testFiles`: List of test file paths
-   
-   If missing, instruct user to run earlier commands.
+   - `testFiles`: List of test file paths (optional -- absent when plan specified Tests Required: no)
+
+   If `currentTask` or `implementationPlan` is missing, instruct user to run earlier commands.
 
 2. **Determine Mode**
    Check session context for `reviewFeedback`:
@@ -32,7 +30,7 @@ If tests don't exist, run `/write-task-tests` first.
    taskId: [currentTask.id, if present]
    taskTitle: [currentTask.title]
    implementationPlan: [full plan with affected files and steps]
-   testFiles: [list of test file paths]
+   testFiles: [list of test file paths, or omit if no tests written]
    mode: "INITIAL"
    ```
 
@@ -41,7 +39,7 @@ If tests don't exist, run `/write-task-tests` first.
    taskId: [currentTask.id, if present]
    taskTitle: [currentTask.title]
    implementationPlan: [full plan]
-   testFiles: [list of test file paths]
+   testFiles: [list of test file paths, or omit if no tests written]
    mode: "ADDRESS_REVIEW_FEEDBACK"
    reviewFeedback: [blocking issues from code review]
    ```
@@ -52,8 +50,8 @@ If tests don't exist, run `/write-task-tests` first.
    Invoke the `implementer` agent with the payload.
    
    The subagent will:
-   - Read tests to understand expected behavior
-   - Implement code incrementally
+   - Read tests to understand expected behavior (if testFiles provided)
+   - Implement code following the plan steps
    - Run tests after each change
    - Report completion status
 
@@ -99,6 +97,6 @@ If tests don't exist, run `/write-task-tests` first.
 Session context after this stage:
 - `currentTask`: Full task object
 - `implementationPlan`: Approved plan
-- `testFiles`: List of test file paths
+- `testFiles`: List of test file paths (may be absent)
 - `filesModified`: List of changed files
 - `decisions`: Implementation decisions for memory bank

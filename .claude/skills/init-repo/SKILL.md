@@ -37,13 +37,7 @@ The following required files are not present:
 
 Please create these files before running /init-repo.
 
-Templates are available in `_docs/templates/`:
-- prd.md
-- architecture.md
-- task-list.json
-- best-practices.md
-
-See _docs/templates/ for document templates and schema documentation.
+See `_docs/templates/` for document templates and schema documentation.
 ```
 
 ### 2. Validate Task List Structure
