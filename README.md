@@ -448,7 +448,7 @@ This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Ke
 
 | Practice | Implementation |
 |----------|----------------|
-| CLAUDE.md under 60 lines | ~53 lines |
+| CLAUDE.md under 60 lines | ~50 lines |
 | Path-scoped rules | 5 rules in `.claude/rules/` |
 | Structured subagent output | All agents define exact output format |
 | Agent descriptions = when-to-use | All 6 agents lead with timing triggers |
@@ -473,26 +473,9 @@ Create a `CLAUDE.local.md` file in the project root for personal project-specifi
 ```
 
 **Inappropriate content:**
-- Project architecture decisions (use CLAUDE.md)
+- Project architecture decisions (use `_docs/architecture.md`)
 - Code style rules (use linters and hooks)
 - Task-specific instructions (use path-scoped rules)
-
-## Known Gaps and Future Improvements
-
-### Resolved
-
-- [x] ~~Extract initializer subagent from /init command~~ (R5: /init-repo skill + task-selector subagent)
-- [x] ~~Add CLAUDE.local.md template for personal overrides~~ (documented above)
-- [x] ~~Document context clearing strategy~~ (consolidated into /dev; removed /catchup)
-- [x] ~~Integrate Explore subagent for read-only context gathering~~ (R6: `/map` skill with `context: fork`)
-- [x] ~~Strengthen agent descriptions with when-to-use framing~~ (R7: all 6 agents updated)
-- [x] ~~Add SubagentStop hook for progress tracking~~ (R8: `log-subagent.sh` handles SubagentStop, TeammateIdle, TaskCompleted)
-- [x] ~~Prevent Husky from overriding core.hooksPath~~ (D-011: `protect-hookspath.sh`)
-
-### Open
-
-- [ ] Add end-to-end testing guidance with puppeteer MCP (R9)
-- [ ] Update `_docs/templates/task-list.json` to include v2.0 batch fields (template still uses v1.x schema; batch commands populate v2.0 fields at runtime via `/compute-waves`)
 
 ## References
 
