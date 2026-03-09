@@ -54,6 +54,20 @@ scaffold/
 └── .mcp.json            # MCP server configuration
 ```
 
+### Claude Code Hooks
+
+Configured in `.claude/settings.json`:
+
+| Event | Script | Matcher | Mode |
+|-------|--------|---------|------|
+| `PostToolUse` | `quality-gate.sh` | `Write\|Edit\|MultiEdit` | Advisory (warns, does not block) |
+| `PreToolUse` | `test-file-guard.sh` | `Write\|Edit\|MultiEdit` | Blocking (denies test file edits outside test-writer) |
+| `SubagentStop` | `log-subagent.sh` | All | Logs agent completion with prompt/output excerpts |
+| `TeammateIdle` | `log-subagent.sh` | All | Logs teammate idle events |
+| `TaskCompleted` | `log-subagent.sh` | All | Logs task completion events |
+
+Git hooks use `core.hooksPath .githooks` (configured by `setup-project.sh`).
+
 ## Document Templates
 
 The `_docs/templates/` directory is the single source of truth for all document templates. When creating a new project with `setup-project.sh`:
@@ -285,163 +299,6 @@ Auto-compaction is lossy and may discard task-specific state. Manual `/summarize
 - Session chain traceable
 - Clean handoff to new agent
 
-## Design Decisions
-
-Decisions made during scaffold development are recorded below.
-
-### Decision Log
-
-#### 2025-01-25: Manual Context Loading via /dev
-
-**Context**: Evaluated whether to add a SessionStart hook for automatic context injection at session start.
-
-**Decision**: Keep manual context loading via `/dev` command.
-
-**Rationale**:
-- Not all orchestrator sessions require full project context
-- Some sessions may be quick questions or unrelated tasks
-- Explicit `/dev` command gives users control over when to initialize the orchestrator as a development partner
-- Reduces unnecessary token overhead for short sessions
-
-**Alternative Considered**: SessionStart hook to auto-inject progress.md and task state. Rejected because automatic injection assumes all sessions are development sessions.
-
----
-
-#### 2025-01-25: Git Pre-Commit Hook for Quality Gates
-
-**Context**: Quality gates need to run before code is committed. Initially considered a Claude Stop hook, but this would run on every response (including simple questions), causing unnecessary latency.
-
-**Decision**: Use git pre-commit hook as the single enforcement point.
-
-**Implementation**:
-
-Git hooks (`.githooks/`, via `core.hooksPath`):
-
-| Hook | Trigger | Purpose |
-|------|---------|---------|
-| `pre-commit` | `git commit` | Runs test, lint, typecheck before commit |
-| `post-commit` | After commit | Logs commits, detects `--no-verify` bypass |
-| `git-commit-lock.sh` | Called by batch orchestrator | Serializes parallel commits to prevent staging contamination |
-| `protect-hookspath.sh` | Called by pre-commit | Guards against Husky or other tools overwriting `core.hooksPath` |
-
-Claude Code hooks (`.claude/settings.json`):
-
-| Event | Script | Matcher | Mode |
-|-------|--------|---------|------|
-| `PostToolUse` | `quality-gate.sh` | `Write\|Edit\|MultiEdit` | Advisory (warns, does not block) |
-| `PreToolUse` | `test-file-guard.sh` | `Write\|Edit\|MultiEdit` | Blocking (denies test file edits outside test-writer) |
-| `SubagentStop` | `log-subagent.sh` | All | Logs agent completion with prompt/output excerpts |
-| `TeammateIdle` | `log-subagent.sh` | All | Logs teammate idle events |
-| `TaskCompleted` | `log-subagent.sh` | All | Logs task completion events |
-
-**Configuration**: Git hooks use `core.hooksPath` (Git 2.9+) for version-controlled hooks:
-```bash
-git config core.hooksPath .githooks
-```
-
-This is configured automatically by `setup-project.sh` when creating a new project.
-
-**Rationale**:
-- Git commit is the correct enforcement boundary—nothing commits without passing
-- Avoids unnecessary checks on non-commit operations (`/dev`, `/next`, Q&A)
-- Single source of truth for quality gate logic
-- Works regardless of commit source (Claude or human)
-- `core.hooksPath` keeps hooks version-controlled and visible (modern Husky-style pattern)
-
-**Alternative Rejected**: Claude Stop hook running on every response. This caused 10-30s delays after every interaction, even simple questions.
-
----
-
-#### 2026-01-26: /init-repo Skill for Scaffold Initialization
-
-**Context**: Setup responsibilities (doc validation, memory file creation, backlog.json) were initially placed in `task-list.json` as TASK-001 through TASK-003. However, these are scaffold infrastructure tasks, not project features -- they don't belong in the user's task list.
-
-**Decision**: Create `/init-repo` skill for one-time scaffold initialization. Remove setup tasks from `task-list.json`.
-
-**Implementation**:
-- `/init-repo` skill validates core docs, creates `progress.md`, `decisions.md`, `backlog.json`
-- `/dev` requires initialization (reports and stops if memory files missing)
-- `task-list.json` template contains only placeholder project tasks
-- Environment setup (dependencies, dev server) remains as first user task in task list
-
-**Rationale**:
-- Scaffold infrastructure tasks should not modify the user's task list
-- One-time setup is invoked explicitly, not discovered through `/next`
-- User controls when initialization runs
-- Clean separation: /init-repo = scaffold setup, task-list.json = project work
-
-**Alternative Rejected**: Keeping setup tasks in task-list.json. This modifies the user's file with scaffold concerns and conflates infrastructure with project work.
-
----
-
-#### 2026-01-26: Task-Selector Subagent for Context Isolation
-
-**Context**: The `/next-from-task-list` command previously read `task-list.json` directly, pulling the full task list into the orchestrator's context window.
-
-**Decision**: Create `task-selector` subagent to isolate task-list.json reads from the orchestrator.
-
-**Implementation**:
-- `.claude/agents/task-selector.md` reads task-list.json and returns only the selected task
-- `/next-from-task-list` spawns task-selector instead of reading the file directly
-- `/dev` verifies task-list.json exists but does not read contents
-
-**Rationale**:
-- Task list can be large; loading it pollutes the orchestrator's context
-- Subagent explores extensively but returns only a condensed selection
-- Aligns with context isolation principle from best practices manual
-
-**Alternative Rejected**: Continue reading task-list.json directly in /next-from-task-list. This pulls unnecessary content into the orchestrator's limited context window.
-
----
-
-#### 2026-01-30: /map Converted from Command to Skill (R6 Resolution)
-
-**Context**: The `/map` command was implemented as a simple command file. Analysis of Claude Code skills vs commands revealed skills offer additional capabilities: `context: fork` for isolated execution, `agent` specification, `allowed-tools` restrictions, and supporting files.
-
-**Decision**: Convert `/map` from command to skill with forked context and supporting files.
-
-**Implementation**:
-- `.claude/skills/map/SKILL.md` - Core skill with frontmatter: `context: fork`, `agent: general-purpose`, `allowed-tools: Read, Write, Grep, Glob, Bash(git *)`
-- `.claude/skills/map/template.md` - Standardized exploration artifact format
-- `.claude/skills/map/examples/sample.md` - Well-formed example output
-- Output artifacts: `_docs/maps/{target-slug}-{YYYYMMDD-HHMMSS}.md`
-- Deleted `.claude/commands/map.md`
-
-**Rationale**:
-- `context: fork` executes exploration in isolated subagent context, preventing orchestrator token bloat
-- `allowed-tools` enforces read-only exploration (Write only for artifact output)
-- Supporting files standardize artifact format and provide examples
-- Aligns with "orchestrator-managed exploration" pattern from session 7
-
-**Key Finding**: Skills are a strict superset of commands. Both are user-invocable via `/name`, but skills add frontmatter configuration, supporting files, and subagent execution.
-
-**Alternative Rejected**: Keep as command. While functional, commands cannot fork context or specify agent type, missing key architectural benefits.
-
----
-
-#### 2026-02-01: Dual Workflow Support via Agent Descriptions (R7 Resolution)
-
-**Context**: Subagent descriptions previously used rigid skill-triggered phrasing ("Use when /skill is invoked"), tightly coupling agents to specific skills. This prevented ad-hoc usage where the orchestrator might invoke agents directly after `/map` exploration.
-
-**Decision**: Strengthen agent descriptions with when-to-use framing and make `taskId` optional across workflow agents.
-
-**Implementation**:
-- All 6 agent descriptions updated to lead with timing triggers ("Use after...", "Use when...")
-- Changed from "Use when /skill is invoked" to "Typically invoked via /skill" (soft coupling)
-- Made `taskId` optional in task-planner, test-writer, implementer, code-reviewer
-- Output formats handle missing taskId: `Task: [taskId if provided, otherwise taskTitle]`
-- Established payload convention: unmarked fields = required; `(optional)` annotation = optional
-
-**Rationale**:
-- Descriptions should contain when-to-use information, not what-it-does (per best practices manual Section 6.4)
-- Soft coupling enables orchestrator to recognize when to use agents outside skill invocation
-- Optional `taskId` allows same agents to serve both task-list and ad-hoc workflows
-- Return types in descriptions (APPROVE/REQUEST_CHANGES, TASK_SELECTED) aid orchestrator routing
-
-**Alternative Rejected**: Modify `/plan-task` skill to accept ad-hoc requests. This would add complexity; strengthened descriptions achieve the same goal by enabling orchestrator recognition of the `/map` → task-planner pattern.
-
----
-
 ## Best Practices Alignment
 
 This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Key alignments:
@@ -471,12 +328,6 @@ Create a `CLAUDE.local.md` file in the project root for personal project-specifi
 # In CLAUDE.md
 @~/.claude/my-project-preferences.md
 ```
-
-**Inappropriate content:**
-- Project architecture decisions (use `_docs/architecture.md`)
-- Code style rules (use linters and hooks)
-- Task-specific instructions (use path-scoped rules)
-
 ## References
 
 - [AI-Assisted Development Best Practices Manual](../ai-development-best-practices-manual-v2.md)
