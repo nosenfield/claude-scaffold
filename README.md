@@ -13,46 +13,70 @@ This scaffold provides a structured workflow for greenfield project development 
 
 ## Scaffold Structure
 
+This repository is a **template**, not a project. Run `setup-project.sh` to create a new project from it.
+
+### Scaffold source (this repo)
+
 ```
 scaffold/
-├── .claude/
-│   ├── agents/          # Specialized subagents
-│   ├── commands/        # Workflow commands (/next-from-task-list, /plan-task, etc.)
-│   ├── hooks/           # Claude Code quality gate scripts
-│   ├── rules/           # File protection policies
-│   ├── skills/          # Extended capabilities
-│   │   ├── dev/         # Session start (with resume support)
-│   │   ├── init-repo/   # One-time scaffold initialization
-│   │   ├── map/         # Codebase exploration with artifacts
-│   │   └── summarize/   # Context handoff
-│   └── settings.json    # Hooks, permissions, and environment variables
-├── .githooks/           # Git hooks (version-controlled)
-│   ├── pre-commit       # Quality gates (test, lint, typecheck)
-│   ├── post-commit      # Commit logging, bypass detection
-│   ├── git-commit-lock.sh # Serialize parallel commits (batch workflow)
-│   └── protect-hookspath.sh # Guard against Husky overwriting core.hooksPath
-├── _docs/               # Project documentation
-│   ├── templates/       # Document templates (source of truth)
-│   │   ├── prd.md           # Product requirements structure
-│   │   ├── architecture.md  # System design structure
-│   │   ├── task-list.json   # Task schema (critical for task-selector agent)
-│   │   ├── best-practices.md # Coding standards skeleton
-│   │   ├── backlog.json     # Deferred issues schema
-│   │   ├── progress.md      # Memory file structure
-│   │   └── decisions.md     # Decision log structure
-│   ├── best-practices.md # Concrete example (copied to new projects)
-│   ├── principles/      # Project-agnostic engineering principles
-│   ├── maps/            # /map output artifacts (timestamped)
-│   ├── context-summaries/ # Session handoff summaries
-│   └── memory/          # Persistent memory (scaffold development only)
-│       ├── progress.md  # Session state + history
-│       └── decisions.md # Append-only decision log
-├── _scripts/            # Setup and utility scripts
-│   ├── setup-project.sh # Create new project from scaffold
-│   └── poll-inbox.sh   # Poll teammate message inbox (batch workflow)
-├── CLAUDE.md            # Project context for Claude Code
-└── .mcp.json            # MCP server configuration
+├── .claude/                 # Agents, commands, hooks, rules, skills, settings
+├── .githooks/               # Git hooks (pre-commit, post-commit, commit lock, hookspath guard)
+├── _docs/
+│   ├── templates/           # Source-of-truth document templates
+│   │   ├── prd.md
+│   │   ├── architecture.md
+│   │   ├── task-list.json
+│   │   ├── best-practices.md
+│   │   ├── backlog.json
+│   │   ├── progress.md
+│   │   ├── decisions.md
+│   │   └── git-exclude
+│   ├── principles/          # Project-agnostic engineering principles
+│   ├── context-summaries/   # Scaffold dev session summaries
+│   ├── maps/                # Scaffold dev /map artifacts
+│   ├── memory/              # Scaffold dev memory
+│   └── notes/               # Scaffold dev notes
+├── _scripts/
+│   ├── setup-project.sh     # Creates new projects
+│   └── poll-inbox.sh        # Batch workflow utility
+├── CLAUDE.md                # Scaffold dev instructions
+├── CLAUDE.template.md       # Template for new projects (becomes CLAUDE.md)
+├── QUICKSTART.md            # Getting started guide
+├── README.md                # This file
+└── .mcp.json                # MCP server configuration
 ```
+
+### New project (after `setup-project.sh`)
+
+```
+my-project/
+├── .claude/                 # Full copy of agents, commands, hooks, rules, skills, settings
+├── .githooks/               # Git hooks (core.hooksPath configured automatically)
+├── _docs/
+│   ├── principles/          # Engineering principles (read-only reference)
+│   ├── context-summaries/   # Empty -- populated by /summarize
+│   ├── maps/                # Empty -- populated by /map
+│   ├── memory/
+│   │   ├── progress.md      # From templates/ -- initialized by /init-repo
+│   │   └── decisions.md     # From templates/ -- initialized by /init-repo
+│   ├── prd.md               # From templates/ -- customize with project requirements
+│   ├── architecture.md      # From templates/ -- customize with system design
+│   ├── task-list.json       # From templates/ -- populate with project tasks
+│   ├── best-practices.md    # From templates/ -- customize coding standards
+│   └── backlog.json         # From templates/ -- initially empty
+├── _scripts/
+│   └── poll-inbox.sh        # Batch workflow teammate inbox polling
+├── _logs/                   # Empty -- populated by git hooks
+├── CLAUDE.md                # From CLAUDE.template.md -- customize for project
+└── .mcp.json                # MCP server configuration
+```
+
+**Key differences**:
+- `_docs/templates/` is not copied -- templates are placed at their target locations
+- Scaffold development files (memory, maps, context-summaries, notes) are not copied
+- `CLAUDE.template.md` becomes the project's `CLAUDE.md`
+- `setup-project.sh`, `README.md`, and `QUICKSTART.md` stay in the scaffold
+- Placeholders (`[PROJECT_NAME]`, `[ISO_TIMESTAMP]`) are replaced during setup
 
 ### Claude Code Hooks
 
