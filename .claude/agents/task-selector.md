@@ -32,14 +32,14 @@ Verify schema version:
 
 **If no tasks exist**:
 ```
-NO_PENDING_TASKS
+NO_ELIGIBLE_TASKS
 completedCount: 0
 totalCount: 0
 ```
 
 **If all tasks complete**:
 ```
-NO_PENDING_TASKS
+NO_ELIGIBLE_TASKS
 completedCount: [N]
 totalCount: [N]
 ```
@@ -180,13 +180,13 @@ warnings:
 If `metadata.version` starts with "1.":
 
 **Single Mode**:
-- Filter `status === "pending"`
+- Filter `status === "eligible"`
 - Check all `blockedBy` tasks have `status === "complete"`
 - Select highest priority unblocked task
 - Set status to `in-progress`
 
 **Batch Mode**:
-- Filter pending + unblocked tasks
+- Filter eligible + unblocked tasks
 - Greedy grouping by `affectedPaths` (legacy field name)
 - Return batch without status update
 
@@ -196,7 +196,7 @@ If `metadata.version` starts with "1.":
 |--------|------|---------------|
 | `TASK_SELECTED` | Single mode, task available | Yes |
 | `BATCH_SELECTED` | Batch mode, tasks available | No |
-| `NO_PENDING_TASKS` | All complete | No |
+| `NO_ELIGIBLE_TASKS` | All complete | No |
 | `ALL_TASKS_BLOCKED` | All non-complete blocked | No |
 
 ## Rules

@@ -41,9 +41,9 @@ Spawns the `task-selector` agent in batch mode to:
 
 3. **Receive Batch Result**
 
-   **If NO_PENDING_TASKS**:
+   **If NO_ELIGIBLE_TASKS**:
    ```
-   NO_PENDING_TASKS
+   NO_ELIGIBLE_TASKS
    completedCount: [N]
    totalCount: [N]
    ```

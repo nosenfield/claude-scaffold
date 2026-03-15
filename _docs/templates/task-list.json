@@ -10,7 +10,7 @@
       "title": "[First task - typically environment setup]",
       "description": "[Detailed description of what this task accomplishes]",
       "priority": 1,
-      "status": "pending",
+      "status": "eligible",
       "acceptanceCriteria": [
         "[Criterion 1]",
         "[Criterion 2]",
@@ -26,7 +26,7 @@
       "title": "[Feature or task name]",
       "description": "[Detailed description of what this task accomplishes]",
       "priority": 2,
-      "status": "pending",
+      "status": "eligible",
       "acceptanceCriteria": [
         "[Criterion 1]",
         "[Criterion 2]"
@@ -49,7 +49,7 @@
       "title": "string - Brief task name",
       "description": "string - Detailed task description",
       "priority": "number - Lower number = higher priority",
-      "status": "string - One of: pending, in-progress, complete",
+      "status": "string - One of: eligible, in-progress, complete",
       "acceptanceCriteria": "array - List of criteria that define done",
       "references": "array - Paths to relevant documentation sections for agent context",
       "affectedPaths": "array - File paths this task will create or modify. Used for batch parallelization. Tasks with overlapping paths cannot run in parallel.",

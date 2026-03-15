@@ -15,7 +15,7 @@ This command orchestrates the complete development cycle:
 ## Prerequisites
 
 - Repository must be initialized (run `/init-repo` first if not)
-- `task-list.json` must contain pending tasks
+- `task-list.json` must contain eligible tasks
 
 ## Workflow
 
@@ -23,7 +23,7 @@ This command orchestrates the complete development cycle:
 
 Execute `/next-from-task-list` to select the highest-priority unblocked task.
 
-**If NO_PENDING_TASKS**: Report completion and stop.
+**If NO_ELIGIBLE_TASKS**: Report completion and stop.
 **If ALL_TASKS_BLOCKED**: Report blocked state and stop.
 **If TASK_SELECTED**: Continue to Phase 2.
 

@@ -54,7 +54,7 @@ While wave has eligible tasks:
 
 Execute `/next-batch-from-list` to get parallelizable tasks from current wave.
 
-**If NO_PENDING_TASKS or ALL_TASKS_BLOCKED in current wave**: Wave complete, exit inner loop.
+**If NO_ELIGIBLE_TASKS or ALL_TASKS_BLOCKED in current wave**: Wave complete, exit inner loop.
 
 #### 3b. Claim Tasks
 

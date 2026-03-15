@@ -43,7 +43,7 @@ Identify and select the highest-priority unblocked task.
    Ready to plan implementation. Run `/plan-task` to continue.
    ```
 
-   **If NO_PENDING_TASKS:**
+   **If NO_ELIGIBLE_TASKS:**
    ```
    ## All Tasks Complete
 
@@ -54,7 +54,7 @@ Identify and select the highest-priority unblocked task.
 
    **If ALL_TASKS_BLOCKED:**
    ```
-   ## All Pending Tasks Blocked
+   ## All Tasks Blocked
 
    The following tasks are waiting on dependencies:
 

@@ -144,7 +144,7 @@ Same as single mode with these differences:
 | Session Log | ONE entry for entire batch listing all completed/failed tasks |
 | Decisions | Aggregate from all tasks; tag each with `(from [taskId])` |
 | task-list.json | Update all tasks with result objects |
-| Failed Tasks | Set `status: "failed"` with result object (do NOT reset to pending) |
+| Failed Tasks | Set `status: "failed"` with result object (do NOT reset to eligible) |
 | Commit Amend | **Skip** - each teammate already committed; no single SHA to amend |
 | Wave Advancement | **Skip** - task-selector agent handles blocked → eligible at wave boundaries |
 
