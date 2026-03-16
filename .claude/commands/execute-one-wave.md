@@ -92,6 +92,17 @@ _scripts/poll-inbox.sh "wave-[currentWave]" [number of spawned teammates]
 
 This polls every 30 seconds until all teammates report, then prints all results. Parse each result and proceed to 3e.
 
+**After collecting results**, purge the inbox so the next batch starts with a clean count:
+
+```bash
+python3 -c "
+import json
+inbox = '$HOME/.claude/teams/wave-[currentWave]/inboxes/team-lead.json'
+with open(inbox, 'w') as f:
+    json.dump([], f)
+"
+```
+
 #### 3e. Handle Results
 
 Separate results into successes and failures.

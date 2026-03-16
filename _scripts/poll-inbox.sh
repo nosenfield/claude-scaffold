@@ -9,6 +9,10 @@
 # Optional max-wait-seconds (default: 1200 = 20 minutes). On timeout,
 # exits with code 1 so the caller can mark remaining tasks as failed.
 #
+# IMPORTANT: The caller must clear the inbox between batches to avoid
+# counting stale messages from prior batches. See execute-one-wave.md
+# Phase 3e for the purge step.
+#
 # NOTE: Depends on Agent Teams internal inbox path (~/.claude/teams/<name>/inboxes/).
 # This path is not part of a public API and may change in future Claude Code versions.
 
