@@ -83,6 +83,7 @@ rm -f .claude/subagent.log         # Session log
 # Copy _scripts directory (poll-inbox.sh, etc.)
 mkdir -p _scripts
 cp "$SCAFFOLD_DIR"/_scripts/poll-inbox.sh _scripts/
+cp "$SCAFFOLD_DIR"/_scripts/bootstrap-worktree.sh _scripts/
 chmod +x _scripts/*
 
 # Copy configuration files
@@ -94,6 +95,11 @@ cp "$SCAFFOLD_DIR/CLAUDE.template.md" CLAUDE.md
 
 # Copy _docs structure (excluding templates directory)
 rsync -a --exclude='templates' "$SCAFFOLD_DIR/_docs/" _docs/
+
+# Persist templates for reference when creating additional task lists, etc.
+mkdir -p _docs/templates
+cp "$SCAFFOLD_DIR"/_docs/templates/task-list.json _docs/templates/
+cp "$SCAFFOLD_DIR"/_docs/templates/task-list-parallel.json _docs/templates/
 
 # Copy templates to target locations
 cp "$SCAFFOLD_DIR/_docs/templates/prd.md" _docs/

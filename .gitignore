@@ -21,6 +21,9 @@ subagent.log
 .claude/.git-commit-lock.d/
 .claude/.test-writing-mode*
 
+# Worktree directories (managed by /worktree command)
+.claude/worktrees/
+
 # dim .git directory in the explorer
 .git/
 

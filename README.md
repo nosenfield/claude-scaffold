@@ -38,7 +38,8 @@ scaffold/
 │   └── notes/               # Scaffold dev notes
 ├── _scripts/
 │   ├── setup-project.sh     # Creates new projects
-│   └── poll-inbox.sh        # Batch workflow utility
+│   ├── poll-inbox.sh        # Batch workflow utility
+│   └── bootstrap-worktree.sh # Worktree dependency installer (project-customizable)
 ├── CLAUDE.md                # Scaffold dev instructions
 ├── CLAUDE.template.md       # Template for new projects (becomes CLAUDE.md)
 ├── QUICKSTART.md            # Getting started guide
@@ -65,7 +66,8 @@ my-project/
 │   ├── best-practices.md    # From templates/ -- customize coding standards
 │   └── backlog.json         # From templates/ -- initially empty
 ├── _scripts/
-│   └── poll-inbox.sh        # Batch workflow teammate inbox polling
+│   ├── poll-inbox.sh        # Batch workflow teammate inbox polling
+│   └── bootstrap-worktree.sh # Worktree dependency installer
 ├── _logs/                   # Empty -- populated by git hooks
 ├── CLAUDE.md                # From CLAUDE.template.md -- customize for project
 └── .mcp.json                # MCP server configuration
@@ -230,6 +232,13 @@ For batch/parallel execution, `/compute-waves` extends the task list with wave a
 | `/execute-one-wave` | Execute one wave in a `claude -p` subprocess (used by `/batch-execute-chained`) |
 | `/execute-task-from-batch` | Full dev cycle for a single task (teammate workflow) |
 
+### Commands -- Worktree (Ad-hoc Isolation)
+
+| Command | Purpose |
+|---------|---------|
+| `/worktree <name>` | Find or create named worktree and switch session into it |
+| `/worktree-cleanup [name]` | Merge or discard a worktree (interactive) |
+
 ## Development Workflow
 
 ### Task-List Workflow (Structured)
@@ -260,6 +269,23 @@ Use for unplanned work or when task list doesn't apply:
 6. `/commit-task` - Commit changes
 
 The ad-hoc workflow skips `/next-from-task-list` (no task selection). `/plan-task` accepts a description argument directly, runs `/map` exploration, and invokes the task-planner agent without requiring a task-list entry. Both workflows share the same TDD cycle from `/write-task-tests` onward.
+
+### Worktree-Isolated Ad-hoc (Parallel)
+
+Use when performing ad-hoc work alongside batch execution or another active session:
+
+1. Open a **new Claude Code instance**
+2. `/worktree <name>` - Find or create isolated worktree from default branch
+3. `/plan-task <description>` - Plan implementation
+4. `/write-task-tests` - Write failing tests
+5. `/implement-task` - Make tests pass
+6. `/review-task` - Code review
+7. `/commit-task` - Commit changes (commits to worktree branch)
+8. `/worktree-cleanup` - Merge into default branch and clean up
+
+The original instance continues undisturbed in the primary working tree.
+
+To resume work in a worktree from a new session, run `/worktree <name>` again -- it detects the existing worktree and enters it.
 
 ### Batch Workflow (Parallel Execution)
 

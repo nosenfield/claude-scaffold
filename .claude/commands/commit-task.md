@@ -27,7 +27,19 @@ If review isn't approved, run `/review-task` first.
    filesCommitted: [from result]
    ```
 
-2. **Prepare Memory Update Payload**
+2. **Check for Worktree Context**
+
+   ```bash
+   if [[ "$PWD" == *"/.claude/worktrees/"* ]]; then
+     IN_WORKTREE=true
+   fi
+   ```
+
+   **If in worktree**: Skip steps 3-4. Memory files in the worktree are stale. The orchestrator's conversation context carries all task details. Memory update happens after `/worktree-cleanup` returns to the main tree. Go to step 5.
+
+   **If not in worktree**: Continue to step 3.
+
+3. **Prepare Memory Update Payload**
    ```
    taskId: [currentTask.id]
    taskTitle: [currentTask.title]
@@ -38,7 +50,7 @@ If review isn't approved, run `/review-task` first.
    notes: [any additional context]
    ```
 
-3. **Spawn memory-updater Subagent**
+4. **Spawn memory-updater Subagent**
    Invoke the `memory-updater` agent with the payload.
 
    The subagent will:
@@ -49,10 +61,11 @@ If review isn't approved, run `/review-task` first.
 
    **Note:** For task-list workflow, the commit will be amended with `--no-verify` to include the task-list.json update. This ensures task completion tracking travels with the work itself. The final SHA (post-amend) will be reported.
 
-4. **Receive Update Confirmation**
-   Confirm memory bank files were updated.
+5. **Receive Update Confirmation**
+   If not in worktree: confirm memory bank files were updated.
+   If in worktree: skip (memory update deferred).
 
-5. **Clear Session Context**
+6. **Clear Session Context**
    Remove task-specific state:
    - `currentTask`
    - `implementationPlan`
@@ -62,7 +75,9 @@ If review isn't approved, run `/review-task` first.
    - `reviewFeedback`
    - `previousReviewIssues`
 
-6. **Report Completion**
+7. **Report Completion**
+
+   **Standard (not in worktree)**:
    ```
    ## Task Complete
 
@@ -81,6 +96,22 @@ If review isn't approved, run `/review-task` first.
    ```
 
    For ad-hoc workflow (no taskId), report original SHA without amend note.
+
+   **Worktree**:
+   ```
+   ## Task Committed (Worktree)
+
+   **Task**: [taskTitle]
+   **Commit**: [SHA]
+   **Branch**: [worktree branch name]
+   **Status**: Committed to worktree branch
+
+   Memory update deferred -- will persist after `/worktree-cleanup`.
+
+   ---
+
+   Continue working, or run `/worktree-cleanup` to merge and update memory.
+   ```
 
 ## Post-Commit Verification
 

@@ -91,6 +91,11 @@ Spawns teammate agents for each task in the current wave. Good for smaller task 
 /dev -> /plan-task <description> -> /write-task-tests -> /implement-task -> /review-task -> /commit-task
 ```
 
+**Ad-hoc in worktree (parallel-safe)**:
+```
+(new instance) /worktree <name> -> /plan-task <description> -> ... -> /commit-task -> /worktree-cleanup
+```
+
 ---
 
 ### Commit Distinction
