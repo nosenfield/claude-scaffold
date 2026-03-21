@@ -273,18 +273,19 @@ Use for unplanned work or when task list doesn't apply:
 
 The ad-hoc workflow skips `/next-from-task-list` (no task selection). `/plan-task` accepts a description argument directly, runs `/map` exploration, and invokes the task-planner agent without requiring a task-list entry. Both workflows share the same TDD cycle from `/write-task-tests` onward.
 
-### Worktree-Isolated Ad-hoc (Parallel)
+### Worktree-Isolated Ad-hoc
 
 Use when performing ad-hoc work alongside batch execution or another active session:
 
 1. Open a **new Claude Code instance**
-2. `/worktree <name>` - Find or create isolated worktree from default branch
-3. `/plan-task <description>` - Plan implementation
-4. `/write-task-tests` - Write failing tests
-5. `/implement-task` - Make tests pass
-6. `/review-task` - Code review
-7. `/commit-task` - Commit changes (commits to worktree branch)
-8. `/worktree-cleanup` - Merge into default branch and clean up
+2. `/dev` - Start development session
+3. `/worktree <name>` - Find or create isolated worktree from default branch
+4. `/plan-task <description>` - Plan implementation
+5. `/write-task-tests` - Write failing tests
+6. `/implement-task` - Make tests pass
+7. `/review-task` - Code review
+8. `/commit-task` - Commit changes (commits to worktree branch)
+9. `/worktree-cleanup` - Merge into default branch and clean up
 
 The original instance continues undisturbed in the primary working tree.
 
