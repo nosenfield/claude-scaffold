@@ -98,14 +98,14 @@ rsync -a --exclude='templates' "$SCAFFOLD_DIR/_docs/" _docs/
 
 # Persist templates for reference when creating additional task lists, etc.
 mkdir -p _docs/templates
-cp "$SCAFFOLD_DIR"/_docs/templates/task-list.json _docs/templates/
+cp "$SCAFFOLD_DIR"/_docs/templates/task-list-linear.json _docs/templates/
 cp "$SCAFFOLD_DIR"/_docs/templates/task-list-parallel.json _docs/templates/
 
 # Copy templates to target locations
 cp "$SCAFFOLD_DIR/_docs/templates/prd.md" _docs/
 cp "$SCAFFOLD_DIR/_docs/templates/architecture.md" _docs/
 cp "$SCAFFOLD_DIR/_docs/templates/best-practices.md" _docs/
-cp "$SCAFFOLD_DIR/_docs/templates/task-list.json" _docs/
+cp "$SCAFFOLD_DIR/_docs/templates/task-list-linear.json" _docs/task-list.json
 cp "$SCAFFOLD_DIR/_docs/templates/backlog.json" _docs/
 cp "$SCAFFOLD_DIR/_docs/templates/progress.md" _docs/memory/
 cp "$SCAFFOLD_DIR/_docs/templates/decisions.md" _docs/memory/

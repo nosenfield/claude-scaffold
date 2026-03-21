@@ -23,7 +23,7 @@ Add project-specific documentation to `_docs/`, using the corresponding template
 
 - `prd.md` - Product requirements (supports Features, User Stories, or Systems structure)
 - `architecture.md` - System design (tech stack, components, data models)
-- `task-list.json` - Development tasks (see template for required schema fields)
+- `task-list.json` - Development tasks (see `_docs/templates/task-list-linear.json` for required schema fields)
 - `best-practices.md` - Coding standards and project conventions
 
 Update `CLAUDE.md` with project-specific instructions.

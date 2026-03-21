@@ -47,7 +47,7 @@ See `_docs/templates/` for document templates and schema documentation.
 cat _docs/task-list.json | head -20
 ```
 
-Confirm the file contains valid JSON with a `tasks` array. The expected schema is documented in `_docs/templates/task-list.json`.
+Confirm the file contains valid JSON with a `tasks` array. The expected schema is documented in `_docs/templates/task-list-linear.json`.
 
 ### 3. Validate Memory Files
 

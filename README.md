@@ -25,7 +25,7 @@ scaffold/
 │   ├── templates/           # Source-of-truth document templates
 │   │   ├── prd.md
 │   │   ├── architecture.md
-│   │   ├── task-list.json
+│   │   ├── task-list-linear.json
 │   │   ├── best-practices.md
 │   │   ├── backlog.json
 │   │   ├── progress.md
@@ -62,6 +62,9 @@ my-project/
 │   │   └── decisions.md     # From templates/ -- initialized by /init-repo
 │   ├── prd.md               # From templates/ -- customize with project requirements
 │   ├── architecture.md      # From templates/ -- customize with system design
+│   ├── templates/
+│   │   ├── task-list-linear.json    # Linear task schema reference
+│   │   └── task-list-parallel.json  # Parallel/batch task schema reference
 │   ├── task-list.json       # From templates/ -- populate with project tasks
 │   ├── best-practices.md    # From templates/ -- customize coding standards
 │   └── backlog.json         # From templates/ -- initially empty
@@ -114,7 +117,7 @@ Templates provide:
 |----------|---------|------------------|
 | `prd.md` | Product requirements structure | None (guidance only) |
 | `architecture.md` | System design structure | task-planner, implementer, code-reviewer |
-| `task-list.json` | Task schema with `_schema` documentation | **task-selector** (strict format) |
+| `task-list-linear.json` | Task schema with `_schema` documentation | **task-selector** (strict format) |
 | `best-practices.md` | Coding standards skeleton | test-writer, implementer, code-reviewer, task-planner |
 | `backlog.json` | Deferred issues schema | code-reviewer |
 | `progress.md` | Memory file structure | memory-updater |
@@ -144,7 +147,7 @@ The `task-selector` agent expects tasks in this exact format:
 
 Required fields: `id`, `title`, `description`, `priority`, `status`, `acceptanceCriteria`, `references`, `blockedBy`, `completedAt`
 
-See `_docs/templates/task-list.json` for full schema documentation.
+See `_docs/templates/task-list-linear.json` for full schema documentation.
 
 ### Batch Schema (v2.0)
 
