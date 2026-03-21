@@ -1,0 +1,1 @@
+QA test file for worktree lifecycle validation.
