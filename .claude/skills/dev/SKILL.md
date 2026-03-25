@@ -167,8 +167,8 @@ Note uncommitted changes. Git log is verification only; trust memory files as au
 
 ### Recommended Action
 [If Current Task has specific next steps, use those. Otherwise:
-  - If batchMode = true: "Run `/batch-execute-task-auto` for parallel task execution"
-  - If batchMode = false: "Run `/next-from-task-list` to select a task"]
+  - If batchMode = true: "Run `/batch-execute-task-auto` for parallel execution, or `/batch-execute-chained` for large task lists (5+ waves)"
+  - If batchMode = false: "Run `/execute-all-tasks` for automated execution, or `/next-from-task-list` for manual step-by-step"]
 ```
 
 ## Notes

@@ -93,8 +93,15 @@ cp "$SCAFFOLD_DIR/.mcp.json" .
 # Copy CLAUDE.template.md as CLAUDE.md
 cp "$SCAFFOLD_DIR/CLAUDE.template.md" CLAUDE.md
 
-# Copy _docs structure (excluding templates directory)
-rsync -a --exclude='templates' "$SCAFFOLD_DIR/_docs/" _docs/
+# Copy _docs structure (excluding templates and scaffold dev artifacts)
+rsync -a \
+  --exclude='templates' \
+  --exclude='context-summaries/*.md' \
+  --exclude='maps/*.md' \
+  --exclude='memory/*.md' \
+  --exclude='notes/' \
+  --exclude='plans/' \
+  "$SCAFFOLD_DIR/_docs/" _docs/
 
 # Persist templates for reference when creating additional task lists, etc.
 mkdir -p _docs/templates

@@ -15,8 +15,6 @@ cd /path/to/claude-project-template/scaffold
 
 Creates a new project directory with scaffold infrastructure (commands, agents, hooks, rules, settings).
 
----
-
 ### Step 2: Add Core Documentation
 
 Add project-specific documentation to `_docs/`, using the corresponding template in `_docs/templates/` as a starting point:
@@ -30,8 +28,6 @@ Update `CLAUDE.md` with project-specific instructions.
 
 Commit changes.
 
----
-
 ### Step 3: Run /init-repo
 
 ```bash
@@ -42,73 +38,162 @@ Initializes scaffold memory files (`_docs/memory/progress.md`, `_docs/memory/dec
 
 ---
 
-## Phase 2: Development Workflow
+## Phase 2: Choose Your Workflow
 
-### Step 4: Start Development Session
+Use the decision flowchart to select the right workflow for your situation.
 
-```bash
-/dev
+### Decision Flowchart
+
+```
+Q1: Do you have a task list?
+|
++-- No
+|   |
+|   Q4: Working on other tasks in this repo at the same time?
+|   |
+|   +-- No ... #1  Ad-hoc manual
+|   +-- Yes .. #2  Ad-hoc manual (worktree)
+|
++-- Yes
+    |
+    Q2: Do you want parallel execution?
+    |
+    +-- No (Linear)
+    |   |
+    |   Q3: Manual or automated?
+    |   |
+    |   +-- Manual
+    |   |   |
+    |   |   Q4: Concurrent?
+    |   |   +-- No ... #3  Linear manual
+    |   |   +-- Yes .. #4  Linear manual (worktree)
+    |   |
+    |   +-- Automated
+    |       |
+    |       Q4: Concurrent?
+    |       +-- No ... #5  Linear automated
+    |       +-- Yes .. #6  Linear automated (worktree)
+    |
+    +-- Yes (Parallel)
+        |
+        Q3: Manual or automated?
+        |
+        +-- Manual
+        |   |
+        |   Q4: Concurrent?
+        |   +-- No ... #7  Parallel manual
+        |   +-- Yes .. #8  Parallel manual (worktree)
+        |
+        +-- Automated
+            |
+            Q5: Project size?
+            +-- Small (< 5 waves) ... #9   Parallel auto (single orchestrator)
+            +-- Large (5+ waves) .... #10  Parallel auto (multi-orchestrator)
 ```
 
-Loads memory files, reports session status, and recommends next action.
+### Workflow Reference
 
-To resume from a prior session:
-```bash
-/dev _docs/context-summaries/<timestamp>.md
-```
+#### #1 Ad-hoc Manual
 
----
+No task list. Full manual control over each step.
 
-### Step 5: Execute Tasks
-
-**Single task (autonomous)**:
-```
-/dev -> /execute-task-auto
-```
-Or `/execute-task` for autonomous execution with pauses for plan approval and non-blocking code review issues.
-
-**Single task (manual steps)**:
-```
-/dev -> /next-from-task-list -> /plan-task -> /write-task-tests -> /implement-task -> /review-task -> /commit-task
-```
-
-**Batch (session-chained, for large task lists)**:
-```
-/dev -> /compute-waves -> /batch-execute-chained
-```
-Launches a fresh `claude -p` subprocess per wave, avoiding context overflow. Recommended for 28+ tasks / 5+ waves.
-
-**Batch (parallel execution)**:
-```
-/dev -> /compute-waves -> /batch-execute-task-auto
-```
-`/compute-waves` converts the linear task list into a wave-based parallel schema (v2.0) by computing a dependency graph from `blockedBy` fields. You can run it manually to review parallelization before execution, or skip it -- the batch orchestrator will run it automatically if needed.
-
-Spawns teammate agents for each task in the current wave. Good for smaller task lists (up to ~5 waves).
-
-**Ad-hoc (no task list)**:
 ```
 /dev -> /plan-task <description> -> /write-task-tests -> /implement-task -> /review-task -> /commit-task
 ```
 
-**Ad-hoc in worktree (parallel-safe)**:
+#### #2 Ad-hoc Manual (Worktree)
+
+Same as #1, isolated in a worktree for concurrent work.
+
 ```
-(new instance) /worktree <name> -> /plan-task <description> -> ... -> /commit-task -> /worktree-cleanup
+/dev -> /worktree <name> -> /plan-task <description> -> ... -> /commit-task -> /worktree-cleanup
 ```
 
----
+#### #3 Linear Manual
+
+Step-by-step execution from a linear task list. Repeat for each task.
+
+```
+/dev -> /next-from-task-list -> /plan-task -> /write-task-tests -> /implement-task -> /review-task -> /commit-task
+```
+
+#### #4 Linear Manual (Worktree)
+
+Same as #3, isolated in a worktree.
+
+```
+/dev -> /worktree <name> -> /next-from-task-list -> /plan-task -> ... -> /commit-task -> /worktree-cleanup
+```
+
+#### #5 Linear Automated
+
+Single command executes entire linear task list. Session-chained (one `claude -p` per task).
+
+```
+/dev -> /execute-all-tasks
+```
+
+#### #6 Linear Automated (Worktree)
+
+Same as #5, isolated in a worktree.
+
+```
+/dev -> /worktree <name> -> /execute-all-tasks -> /worktree-cleanup
+```
+
+#### #7 Parallel Manual
+
+Step-by-step execution from a parallel task list. Execute each task in the current wave, then advance.
+
+**Prerequisite**: Run `/compute-waves` once to compute dependency graph.
+
+```
+/dev -> /compute-waves -> /next-batch-from-list -> (execute each task manually) -> repeat per wave
+```
+
+#### #8 Parallel Manual (Worktree)
+
+Same as #7, isolated in a worktree.
+
+```
+/dev -> /worktree <name> -> /compute-waves -> /next-batch-from-list -> ... -> /worktree-cleanup
+```
+
+#### #9 Parallel Auto (Single Orchestrator)
+
+Single session spawns teammate agents per wave. Good for smaller task lists (< ~5 waves).
+
+**Prerequisite**: Run `/compute-waves` once (or let the orchestrator run it automatically).
+
+```
+/dev -> /compute-waves -> /batch-execute-task-auto
+```
+
+Worktrees are created automatically per teammate -- no manual `/worktree` needed.
+
+#### #10 Parallel Auto (Multi-Orchestrator)
+
+Session-chained: fresh `claude -p` per wave. Recommended for large task lists (5+ waves / 28+ tasks).
+
+**Prerequisite**: Run `/compute-waves` once (or let the orchestrator run it automatically).
+
+```
+/dev -> /compute-waves -> /batch-execute-chained
+```
+
+Worktrees are created automatically per teammate -- no manual `/worktree` needed.
 
 ### Commit Distinction
 
 | Command | Scope | Used By |
 |---------|-------|---------|
-| `/commit-task` | Commit + memory update | Single-task orchestrator |
-| `/commit-implementation` | Commit only (no memory update) | Batch teammates |
+| `/commit-task` | Commit + memory update | Single-task workflows (#1-#8) |
+| `/commit-implementation` | Commit only (no memory update) | Batch teammates (#9, #10) |
 
 In batch workflows, teammates use `/commit-implementation`. The orchestrator handles memory updates centrally after collecting results.
 
 ---
 
-## Context Management
+## Phase 3: Context Management
 
 When context fills (~70%), run `/summarize` to hand off to a new session. Resume with `/dev _docs/context-summaries/<timestamp>.md`.

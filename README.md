@@ -11,9 +11,245 @@ This scaffold provides a structured workflow for greenfield project development 
 - **Memory persistence**: Session history and architectural decisions across context windows
 - **Quality gates**: Hook-based enforcement at workflow boundaries
 
-## Scaffold Structure
+## Getting Started
 
-This repository is a **template**, not a project. Run `setup-project.sh` to create a new project from it.
+This repository is a **template**, not a project. See [QUICKSTART.md](QUICKSTART.md) for setup instructions:
+
+1. Run `setup-project.sh` to create a new project
+2. Add core documentation (prd.md, architecture.md, task-list.json, best-practices.md)
+3. Run `/init-repo` to initialize scaffold memory
+4. Choose a workflow (see Decision Guide below)
+
+---
+
+## Workflows
+
+### Decision Guide
+
+Use this flowchart to choose the right workflow. Five questions lead to 10 workflows.
+
+```
+Q1: Do you have a task list?
+|
++-- No
+|   |
+|   Q4: Working on other tasks in this repo at the same time?
+|   |
+|   +-- No ... #1  Ad-hoc manual
+|   +-- Yes .. #2  Ad-hoc manual (worktree)
+|
++-- Yes
+    |
+    Q2: Do you want parallel execution?
+    |
+    +-- No (Linear)
+    |   |
+    |   Q3: Manual or automated?
+    |   |
+    |   +-- Manual
+    |   |   |
+    |   |   Q4: Concurrent?
+    |   |   +-- No ... #3  Linear manual
+    |   |   +-- Yes .. #4  Linear manual (worktree)
+    |   |
+    |   +-- Automated
+    |       |
+    |       Q4: Concurrent?
+    |       +-- No ... #5  Linear automated
+    |       +-- Yes .. #6  Linear automated (worktree)
+    |
+    +-- Yes (Parallel)
+        |
+        Q3: Manual or automated?
+        |
+        +-- Manual
+        |   |
+        |   Q4: Concurrent?
+        |   +-- No ... #7  Parallel manual
+        |   +-- Yes .. #8  Parallel manual (worktree)
+        |
+        +-- Automated
+            |
+            Q5: Project size?
+            +-- Small (< 5 waves) ... #9   Parallel auto (single orchestrator)
+            +-- Large (5+ waves) .... #10  Parallel auto (multi-orchestrator)
+```
+
+### Workflow Reference
+
+#### #1 Ad-hoc Manual
+
+No task list. Full manual control over each step.
+
+```
+/dev -> /plan-task <description> -> /write-task-tests -> /implement-task -> /review-task -> /commit-task
+```
+
+#### #2 Ad-hoc Manual (Worktree)
+
+Same as #1, isolated in a worktree for concurrent work.
+
+```
+/dev -> /worktree <name> -> /plan-task <description> -> ... -> /commit-task -> /worktree-cleanup
+```
+
+#### #3 Linear Manual
+
+Step-by-step execution from a linear task list. Repeat for each task.
+
+```
+/dev -> /next-from-task-list -> /plan-task -> /write-task-tests -> /implement-task -> /review-task -> /commit-task
+```
+
+Or with plan approval pause: `/execute-task` (runs the full cycle for one task, pauses at plan approval and code review).
+
+#### #4 Linear Manual (Worktree)
+
+Same as #3, isolated in a worktree.
+
+```
+/dev -> /worktree <name> -> /next-from-task-list -> /plan-task -> ... -> /commit-task -> /worktree-cleanup
+```
+
+#### #5 Linear Automated
+
+Single command executes entire linear task list. Session-chained: one `claude -p` subprocess per task, fresh context each time. No Agent Teams required.
+
+```
+/dev -> /execute-all-tasks
+```
+
+#### #6 Linear Automated (Worktree)
+
+Same as #5, isolated in a worktree.
+
+```
+/dev -> /worktree <name> -> /execute-all-tasks -> /worktree-cleanup
+```
+
+#### #7 Parallel Manual
+
+Step-by-step execution from a parallel task list. Execute each task in the current wave, then advance to the next wave.
+
+**Prerequisite**: Run `/compute-waves` once to compute dependency graph and assign execution waves.
+
+```
+/dev -> /compute-waves -> /next-batch-from-list -> (execute each task manually) -> repeat per wave
+```
+
+#### #8 Parallel Manual (Worktree)
+
+Same as #7, isolated in a worktree.
+
+```
+/dev -> /worktree <name> -> /compute-waves -> /next-batch-from-list -> ... -> /worktree-cleanup
+```
+
+#### #9 Parallel Auto (Single Orchestrator)
+
+Single session spawns teammate agents per wave. Good for smaller task lists (< ~5 waves). Requires Agent Teams.
+
+**Prerequisite**: `/compute-waves` (orchestrator runs it automatically if needed).
+
+```
+/dev -> /batch-execute-task-auto
+```
+
+Teammate lifecycle per wave:
+```
+TeamCreate -> Spawn workers -> Workers run /execute-task-from-batch
+  -> SendMessage delivers result -> Shutdown handshake -> TeamDelete
+```
+
+Worktrees are created automatically per teammate -- no manual `/worktree` needed.
+
+#### #10 Parallel Auto (Multi-Orchestrator)
+
+Session-chained: fresh `claude -p` per wave. Recommended for large task lists (5+ waves / 28+ tasks). Requires Agent Teams.
+
+**Prerequisite**: `/compute-waves` (orchestrator runs it automatically if needed).
+
+```
+/dev -> /batch-execute-chained
+```
+
+Each subprocess runs `/execute-one-wave`, which creates a team, spawns teammates, collects results, updates memory, then exits. The super-orchestrator monitors completion and advances to the next wave.
+
+Worktrees are created automatically per teammate -- no manual `/worktree` needed.
+
+### Worktree Isolation
+
+Worktrees provide git index isolation -- separate staging areas and working directories.
+
+**When automatic**: Parallel automated workflows (#9, #10) create worktrees per teammate to prevent staging contamination during concurrent commits.
+
+**When manual**: Use `/worktree <name>` before starting any workflow when you need to work on something alongside an existing session. This applies to workflows #2, #4, #6, #8.
+
+**How it works**:
+- `/worktree <name>` creates a new git worktree branched from the default branch at `.claude/worktrees/<name>/`
+- Work proceeds normally inside the worktree (all commands work the same)
+- `/worktree-cleanup` merges (or discards) the worktree branch back to the default branch
+- Memory updates happen after cleanup returns to the main tree
+- To resume a worktree from a new session, run `/worktree <name>` again -- it detects and enters the existing worktree
+
+### Commit Distinction
+
+| Command | Scope | Used By |
+|---------|-------|---------|
+| `/commit-task` | Commit + memory update | Single-task workflows (#1-#8) |
+| `/commit-implementation` | Commit only (no memory update) | Batch teammates (#9, #10) |
+
+In batch workflows, teammates use `/commit-implementation`. The orchestrator handles memory updates centrally after collecting all teammate results.
+
+---
+
+## Command Reference
+
+### Skills (User-Invocable)
+
+| Skill | Purpose |
+|-------|---------|
+| `/dev [summary]` | Start development session; optionally resume from context summary |
+| `/init-repo` | One-time scaffold initialization (validates docs, creates memory files) |
+| `/map <target>` | Codebase exploration with artifact output (runs in forked context) |
+| `/summarize` | Session handoff summary for context window management |
+
+### Single-Task Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/next-from-task-list` | Select next task via task-selector subagent |
+| `/plan-task [description]` | Plan implementation (task-list mode or ad-hoc with argument) |
+| `/write-task-tests` | Write failing tests from implementation plan |
+| `/implement-task` | Implement code to pass tests |
+| `/review-task` | Code review via code-reviewer subagent |
+| `/commit-task` | Commit implementation + update memory |
+| `/commit-implementation` | Commit implementation only (no memory update; used by batch teammates) |
+| `/execute-task` | Full single-task workflow with plan approval pause |
+| `/execute-task-auto` | Full single-task workflow autonomously (no pauses) |
+| `/execute-all-tasks` | Execute entire linear task list (session-chained, one `claude -p` per task) |
+
+### Batch Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/compute-waves` | Compute execution waves from dependency graph |
+| `/next-batch-from-list` | Select parallelizable tasks from current wave |
+| `/batch-execute-task-auto` | Single-session batch orchestrator (spawns teammates per wave) |
+| `/batch-execute-chained` | Multi-session super-orchestrator (launches `claude -p` per wave) |
+| `/execute-one-wave` | Execute one wave in a `claude -p` subprocess (internal, used by `/batch-execute-chained`) |
+| `/execute-task-from-batch` | Full dev cycle for a single task (teammate workflow) |
+
+### Worktree Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/worktree <name>` | Find or create named worktree and switch session into it |
+| `/worktree-cleanup [name]` | Merge or discard a worktree (interactive) |
+
+---
+
+## Scaffold Structure
 
 ### Scaffold source (this repo)
 
@@ -77,27 +313,16 @@ my-project/
 ```
 
 **Key differences**:
-- `_docs/templates/` is not copied -- templates are placed at their target locations
 - Scaffold development files (memory, maps, context-summaries, notes) are not copied
 - `CLAUDE.template.md` becomes the project's `CLAUDE.md`
 - `setup-project.sh`, `README.md`, and `QUICKSTART.md` stay in the scaffold
 - Placeholders (`[PROJECT_NAME]`, `[ISO_TIMESTAMP]`) are replaced during setup
 
-### Claude Code Hooks
+---
 
-Configured in `.claude/settings.json`:
+## Architecture Reference
 
-| Event | Script | Matcher | Mode |
-|-------|--------|---------|------|
-| `PostToolUse` | `quality-gate.sh` | `Write\|Edit\|MultiEdit` | Advisory (warns, does not block) |
-| `PreToolUse` | `test-file-guard.sh` | `Write\|Edit\|MultiEdit` | Blocking (denies test file edits outside test-writer) |
-| `SubagentStop` | `log-subagent.sh` | All | Logs agent completion with prompt/output excerpts |
-| `TeammateIdle` | `log-subagent.sh` | All | Logs teammate idle events |
-| `TaskCompleted` | `log-subagent.sh` | All | Logs task completion events |
-
-Git hooks use `core.hooksPath .githooks` (configured by `setup-project.sh`).
-
-## Document Templates
+### Document Templates
 
 The `_docs/templates/` directory is the single source of truth for all document templates. When creating a new project with `setup-project.sh`:
 
@@ -105,13 +330,6 @@ The `_docs/templates/` directory is the single source of truth for all document 
 2. Placeholders (`[PROJECT_NAME]`, `[ISO_TIMESTAMP]`) are replaced
 3. User customizes the copied files
 4. `/init-repo` validates and creates memory files
-
-Templates provide:
-- Structure and placeholder guidance
-- Schema documentation (critical for `task-list.json` and `backlog.json`)
-- Reference for expected formats
-
-### Template Files
 
 | Template | Purpose | Agent Dependency |
 |----------|---------|------------------|
@@ -123,7 +341,7 @@ Templates provide:
 | `progress.md` | Memory file structure | memory-updater |
 | `decisions.md` | Decision log structure | memory-updater |
 
-### Critical: task-list.json Schema
+### Task List Schema (Linear v1.0)
 
 The `task-selector` agent expects tasks in this exact format:
 
@@ -149,7 +367,7 @@ Required fields: `id`, `title`, `description`, `priority`, `status`, `acceptance
 
 See `_docs/templates/task-list-linear.json` for full schema documentation.
 
-### Batch Schema (v2.0)
+### Task List Schema (Parallel v2.0)
 
 For batch/parallel execution, `/compute-waves` extends the task list with wave assignments:
 
@@ -199,161 +417,37 @@ For batch/parallel execution, `/compute-waves` extends the task list with wave a
 | `complete` | Successfully finished |
 | `failed` | Execution failed |
 
-## Commands and Skills
+### Hooks
 
-### Skills (User-Invocable)
+Configured in `.claude/settings.json`:
 
-| Skill | Purpose |
-|-------|---------|
-| `/dev [summary]` | Start development session; optionally resume from context summary |
-| `/init-repo` | One-time scaffold initialization (validates docs, creates memory files) |
-| `/map <target>` | Codebase exploration with artifact output (runs in forked context) |
-| `/summarize` | Session handoff summary for context window management |
+| Event | Script | Matcher | Mode |
+|-------|--------|---------|------|
+| `PostToolUse` | `quality-gate.sh` | `Write\|Edit\|MultiEdit` | Advisory (warns, does not block) |
+| `PreToolUse` | `test-file-guard.sh` | `Write\|Edit\|MultiEdit` | Blocking (denies test file edits outside test-writer) |
+| `SubagentStop` | `log-subagent.sh` | All | Logs agent completion with prompt/output excerpts |
+| `TeammateIdle` | `log-subagent.sh` | All | Logs teammate idle events |
+| `TaskCompleted` | `log-subagent.sh` | All | Logs task completion events |
 
-### Commands — Single-Task Workflow
+Git hooks use `core.hooksPath .githooks` (configured by `setup-project.sh`).
 
-| Command | Purpose |
-|---------|---------|
-| `/next-from-task-list` | Select next task via task-selector subagent |
-| `/plan-task [description]` | Plan implementation (task-list mode or ad-hoc with argument) |
-| `/write-task-tests` | Write failing tests from implementation plan |
-| `/implement-task` | Implement code to pass tests |
-| `/review-task` | Code review via code-reviewer subagent |
-| `/commit-task` | Commit implementation + update memory |
-| `/commit-implementation` | Commit implementation only (no memory update; used by batch teammates) |
-| `/execute-task` | Run full single-task workflow with plan approval pause |
-| `/execute-task-auto` | Run full single-task workflow autonomously (no pauses) |
-
-### Commands — Batch Workflow
-
-| Command | Purpose |
-|---------|---------|
-| `/compute-waves` | Compute execution waves from dependency graph (prerequisite for batch) |
-| `/next-batch-from-list` | Select parallelizable tasks from current wave |
-| `/batch-execute-task-auto` | Single-session batch orchestrator (spawns teammate agents per wave) |
-| `/batch-execute-chained` | Multi-session super-orchestrator (launches `claude -p` per wave) |
-| `/execute-one-wave` | Execute one wave in a `claude -p` subprocess (used by `/batch-execute-chained`) |
-| `/execute-task-from-batch` | Full dev cycle for a single task (teammate workflow) |
-
-### Commands -- Worktree (Ad-hoc Isolation)
-
-| Command | Purpose |
-|---------|---------|
-| `/worktree <name>` | Find or create named worktree and switch session into it |
-| `/worktree-cleanup [name]` | Merge or discard a worktree (interactive) |
-
-## Development Workflow
-
-### Task-List Workflow (Structured)
-
-Use when working through predefined tasks in `task-list.json`:
-
-1. `/dev [summary]` - Start development session (optionally resume from summary)
-2. `/next-from-task-list` - Select next task from task list
-3. `/plan-task` - Plan implementation
-4. `/write-task-tests` - Write failing tests
-5. `/implement-task` - Make tests pass
-6. `/review-task` - Code review
-7. `/commit-task` - Commit and update memory
-
-Or use shorthand commands:
-- `/execute-task` - Runs steps 2-7 with a plan approval pause
-- `/execute-task-auto` - Runs steps 2-7 fully autonomously (no pauses)
-
-### Ad-hoc Workflow (Exploratory)
-
-Use for unplanned work or when task list doesn't apply:
-
-1. `/dev [summary]` - Start development session
-2. `/plan-task <description>` - Plan implementation (runs `/map` internally, then invokes task-planner)
-3. `/write-task-tests` - Write failing tests
-4. `/implement-task` - Make tests pass
-5. `/review-task` - Code review
-6. `/commit-task` - Commit changes
-
-The ad-hoc workflow skips `/next-from-task-list` (no task selection). `/plan-task` accepts a description argument directly, runs `/map` exploration, and invokes the task-planner agent without requiring a task-list entry. Both workflows share the same TDD cycle from `/write-task-tests` onward.
-
-### Worktree-Isolated Ad-hoc
-
-Use when performing ad-hoc work alongside batch execution or another active session:
-
-1. Open a **new Claude Code instance**
-2. `/dev` - Start development session
-3. `/worktree <name>` - Find or create isolated worktree from default branch
-4. `/plan-task <description>` - Plan implementation
-5. `/write-task-tests` - Write failing tests
-6. `/implement-task` - Make tests pass
-7. `/review-task` - Code review
-8. `/commit-task` - Commit changes (commits to worktree branch)
-9. `/worktree-cleanup` - Merge into default branch and clean up
-
-The original instance continues undisturbed in the primary working tree.
-
-To resume work in a worktree from a new session, run `/worktree <name>` again -- it detects the existing worktree and enters it.
-
-### Batch Workflow (Parallel Execution)
-
-Use when executing multiple tasks in parallel from a wave-based task list (v2.0 schema with `waveSummary`):
-
-**Prerequisites**: Run `/compute-waves` once after creating `task-list.json` to compute the dependency graph and assign execution waves.
-
-**Option A — Single-session** (up to ~5 waves):
-```
-/dev -> /compute-waves -> /batch-execute-task-auto
-```
-Spawns teammate agents within the current session. Each teammate runs `/execute-task-from-batch` (plan -> tests -> implement -> review -> commit). Good for smaller task lists where context overflow is not a concern.
-
-**Option B — Session-chained** (any number of waves):
-```
-/dev -> /compute-waves -> /batch-execute-chained
-```
-Launches a fresh `claude -p` subprocess per wave. Each subprocess runs `/execute-one-wave`, which creates a team, spawns teammates, collects results, updates memory, then exits. The super-orchestrator monitors completion and advances to the next wave. Recommended for large task lists (28+ tasks / 5+ waves) to avoid context overflow.
-
-**Teammate lifecycle** (within each wave):
-```
-TeamCreate -> Spawn worker teammates -> Workers execute /execute-task-from-batch
-  -> SendMessage delivers result -> Shutdown handshake -> TeamDelete
-```
-
-**Commit distinction**: Teammates use `/commit-implementation` (commit only, no memory update). The orchestrator handles memory updates centrally after collecting all teammate results.
-
-### Setup Note
-
-Run `/init-repo` once after placing project documentation to initialize memory files (`_docs/memory/progress.md`, `_docs/memory/decisions.md`) and validate core docs. Environment setup (dependency installation, dev server configuration) is handled through the first tasks in `task-list.json`.
-
-## Context Management
+### Context Management
 
 Claude Code has a 200k token context limit. When context fills, use `/summarize` to hand off to a new agent.
 
-### Monitoring Context
+**Monitoring**: Run `/context` periodically. Recommended handoff threshold: 70%.
 
-Run `/context` periodically to check usage. Recommended handoff threshold: 70%.
-
-### Handoff Workflow
-
+**Handoff**:
 1. Run `/summarize` when context is filling
 2. Skill captures: completed work, in-progress state, decisions, files modified, key resources
 3. Spawn new agent
 4. Run `/dev _docs/context-summaries/[timestamp].md` to resume
 
-### Session Chaining
+**Session Chaining**: `/summarize` automatically detects prior summaries. Resources carry forward with lineage tracking, session chain history is preserved, stale resources are pruned.
 
-The `/summarize` skill automatically detects if the current session resumed from a prior summary. When chaining sessions:
+**Why not auto-compaction?** Auto-compaction is lossy and may discard task-specific state. Manual `/summarize` ensures explicit control, preserved resource links, and traceable session chains.
 
-- Resources are carried forward with lineage tracking
-- Session chain history is preserved
-- Stale resources are pruned
-- Full chain table maintained in each summary
-
-### Why Not Auto-Compaction?
-
-Auto-compaction is lossy and may discard task-specific state. Manual `/summarize` ensures:
-- Explicit control over what persists
-- Resource links preserved
-- Session chain traceable
-- Clean handoff to new agent
-
-## Best Practices Alignment
+### Best Practices Alignment
 
 This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Key alignments:
 
@@ -366,6 +460,8 @@ This scaffold follows the AI-Assisted Development Best Practices Manual (v2). Ke
 | Test immutability | Triple enforcement: rule + hook + agent instruction |
 | Persistent memory | _docs/memory/progress.md (Active Context replaced; Session Log appended) and _docs/memory/decisions.md (appended) |
 | Hook-based quality gates | Git pre-commit (enforcement) + PostToolUse (advisory) + PreToolUse (test guard) + SubagentStop/TeammateIdle/TaskCompleted (logging) |
+
+---
 
 ## Personal Overrides (CLAUDE.local.md)
 
@@ -382,6 +478,7 @@ Create a `CLAUDE.local.md` file in the project root for personal project-specifi
 # In CLAUDE.md
 @~/.claude/my-project-preferences.md
 ```
+
 ## References
 
 - [AI-Assisted Development Best Practices Manual](../ai-development-best-practices-manual-v2.md)
