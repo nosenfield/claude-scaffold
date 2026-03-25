@@ -2,7 +2,7 @@
 
 Find or create a named worktree and switch the session into it.
 
-Creates an isolated git worktree branched from the repository's default branch. If the worktree already exists (e.g., resuming from a previous session), enters it without re-creating.
+Creates an isolated git worktree branched from the primary tree's current branch. If the worktree already exists (e.g., resuming from a previous session), enters it without re-creating.
 
 ## Usage
 
@@ -25,8 +25,12 @@ Usage: /worktree <name>
 
 ```bash
 MAIN_ROOT=$(git worktree list --porcelain | head -1 | sed 's/worktree //')
-DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
-DEFAULT_BRANCH="${DEFAULT_BRANCH:-main}"
+SOURCE_BRANCH=$(git -C "$MAIN_ROOT" branch --show-current)
+# Fallback to default branch if primary tree is in detached HEAD
+if [ -z "$SOURCE_BRANCH" ]; then
+  SOURCE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+  SOURCE_BRANCH="${SOURCE_BRANCH:-main}"
+fi
 WORKTREE_PATH="$MAIN_ROOT/.claude/worktrees/<name>"
 BRANCH_NAME="worktree-<name>"
 ```
@@ -57,13 +61,20 @@ This may be from incomplete cleanup. To fix:
 Then retry /worktree <name>
 ```
 
-**4b.** Create the worktree from the default branch:
+**4b.** Create the worktree from the source branch:
 
 ```bash
-git worktree add "$WORKTREE_PATH" -b "$BRANCH_NAME" "$DEFAULT_BRANCH"
+git worktree add "$WORKTREE_PATH" -b "$BRANCH_NAME" "$SOURCE_BRANCH"
 ```
 
 This creates a new directory and branch without touching the primary tree's HEAD or checked-out branch.
+
+Store the source branch for later cleanup (requires `worktreeConfig` extension):
+
+```bash
+git config extensions.worktreeConfig true
+git -C "$WORKTREE_PATH" config --worktree worktree.sourceBranch "$SOURCE_BRANCH"
+```
 
 **4c.** Switch the session directory:
 
@@ -85,7 +96,7 @@ If the script does not exist, skip silently. Pre-existing projects without the s
 
 ```
 Worktree "<name>" created.
-Branch: worktree-<name> (from <default-branch>)
+Branch: worktree-<name> (from <SOURCE_BRANCH>)
 Directory: .claude/worktrees/<name>/
 
 Your session is now in the worktree. Run your workflow normally.
@@ -131,5 +142,6 @@ No bootstrap during enter -- dependencies were installed during creation.
 
 - Worktree directories: `.claude/worktrees/<name>/`
 - Worktree branches: `worktree-<name>`
-- Default branch detection falls back to `main` if `origin/HEAD` is not set
+- Source branch is the primary tree's current branch at creation time; falls back to default branch (then `main`) if in detached HEAD
+- Source branch is stored in git config (`worktree.sourceBranch`) for cleanup to read
 - To resume work in a worktree from a new session, run `/worktree <name>` again -- it detects the existing worktree and enters it

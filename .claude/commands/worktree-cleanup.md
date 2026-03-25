@@ -46,13 +46,21 @@ git worktree list --porcelain | grep "worktree.*\.claude/worktrees/<name>$"
 
 If not found, report error with `git worktree list` output.
 
+Read the source branch (the branch the worktree was created from):
+
+```bash
+SOURCE_BRANCH=$(git -C "$WORKTREE_PATH" config --worktree worktree.sourceBranch 2>/dev/null || echo "$DEFAULT_BRANCH")
+```
+
+Falls back to `DEFAULT_BRANCH` for worktrees created before this config was introduced.
+
 ### Step 3: Show Summary and Prompt User
 
 Display worktree state:
 
 ```bash
 LAST_COMMIT=$(git -C "$WORKTREE_PATH" log -1 --oneline)
-DIFF_STAT=$(git diff --stat "$DEFAULT_BRANCH"..."worktree-<name>")
+DIFF_STAT=$(git diff --stat "$SOURCE_BRANCH"..."worktree-<name>")
 ```
 
 Present options:
@@ -62,11 +70,11 @@ Present options:
 
 Branch: worktree-<name>
 Last commit: <LAST_COMMIT>
-Changes vs <default-branch>:
+Changes vs <SOURCE_BRANCH>:
 <DIFF_STAT>
 
 Options:
-1. Merge -- merge worktree-<name> into <default-branch> and remove worktree
+1. Merge -- merge worktree-<name> into <SOURCE_BRANCH> and remove worktree
 2. Discard -- remove worktree and delete branch (all changes lost)
 3. Cancel -- do nothing
 ```
@@ -91,16 +99,16 @@ if ! git -C "$MAIN_ROOT" diff --quiet || ! git -C "$MAIN_ROOT" diff --cached --q
 fi
 ```
 
-**4a-3.** Check whether the primary tree has the default branch checked out:
+**4a-3.** Check whether the primary tree has the source branch checked out:
 
 ```bash
 PRIMARY_BRANCH=$(git -C "$MAIN_ROOT" branch --show-current)
 ```
 
-**4a-4.** If the primary tree is on the default branch (common case):
+**4a-4.** If the primary tree is on the source branch (common case):
 
 ```bash
-git -C "$MAIN_ROOT" merge "worktree-<name>" --no-ff -m "Merge worktree-<name> into <default-branch>"
+git -C "$MAIN_ROOT" merge "worktree-<name>" --no-ff -m "Merge worktree-<name> into $SOURCE_BRANCH"
 ```
 
 **4a-5.** If the primary tree is on a different branch (another session may be using it):
@@ -108,8 +116,8 @@ git -C "$MAIN_ROOT" merge "worktree-<name>" --no-ff -m "Merge worktree-<name> in
 Create a temporary worktree to perform the merge without touching the primary tree's checked-out branch:
 
 ```bash
-git worktree add "$MAIN_ROOT/.claude/worktrees/_merge-tmp" "$DEFAULT_BRANCH"
-git -C "$MAIN_ROOT/.claude/worktrees/_merge-tmp" merge "worktree-<name>" --no-ff -m "Merge worktree-<name> into <default-branch>"
+git worktree add "$MAIN_ROOT/.claude/worktrees/_merge-tmp" "$SOURCE_BRANCH"
+git -C "$MAIN_ROOT/.claude/worktrees/_merge-tmp" merge "worktree-<name>" --no-ff -m "Merge worktree-<name> into $SOURCE_BRANCH"
 git worktree remove "$MAIN_ROOT/.claude/worktrees/_merge-tmp"
 ```
 
@@ -151,7 +159,7 @@ status: "complete"
 commitSha: [merge commit SHA]
 filesModified: [files changed in worktree, from diff stat]
 decisions: [decisions made during worktree session]
-notes: "Worktree: <name>. Merged into <default-branch>."
+notes: "Worktree: <name>. Merged into <SOURCE_BRANCH>."
 ```
 
 Omit `taskId` (worktree work is ad-hoc).
@@ -159,7 +167,7 @@ Omit `taskId` (worktree work is ad-hoc).
 **4a-10.** Report:
 
 ```
-Merged worktree-<name> into <default-branch>.
+Merged worktree-<name> into <SOURCE_BRANCH>.
 Worktree and branch removed.
 Memory updated.
 ```
