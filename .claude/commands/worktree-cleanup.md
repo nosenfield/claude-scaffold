@@ -99,29 +99,10 @@ if ! git -C "$MAIN_ROOT" diff --quiet || ! git -C "$MAIN_ROOT" diff --cached --q
 fi
 ```
 
-**4a-3.** Check whether the primary tree has the source branch checked out:
+**4a-3.** Execute the **Merge Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+- name: `<name>`
 
-```bash
-PRIMARY_BRANCH=$(git -C "$MAIN_ROOT" branch --show-current)
-```
-
-**4a-4.** If the primary tree is on the source branch (common case):
-
-```bash
-git -C "$MAIN_ROOT" merge "worktree-<name>" --no-ff -m "Merge worktree-<name> into $SOURCE_BRANCH"
-```
-
-**4a-5.** If the primary tree is on a different branch (another session may be using it):
-
-Create a temporary worktree to perform the merge without touching the primary tree's checked-out branch:
-
-```bash
-git worktree add "$MAIN_ROOT/.claude/worktrees/_merge-tmp" "$SOURCE_BRANCH"
-git -C "$MAIN_ROOT/.claude/worktrees/_merge-tmp" merge "worktree-<name>" --no-ff -m "Merge worktree-<name> into $SOURCE_BRANCH"
-git worktree remove "$MAIN_ROOT/.claude/worktrees/_merge-tmp"
-```
-
-**4a-6.** On merge conflict, stop and report:
+**4a-4.** On `MERGE_CONFLICT`, stop and report:
 
 ```
 Merge conflict detected. Conflicting files:
@@ -136,14 +117,7 @@ Stashed changes remain in stash. After resolving conflicts:
 
 Do not roll back. The user resolves conflicts and cleans up manually.
 
-**4a-7.** On success, clean up worktree and branch:
-
-```bash
-git worktree remove "$WORKTREE_PATH"
-git branch -d "worktree-<name>"
-```
-
-**4a-8.** Restore stashed changes:
+**4a-5.** Restore stashed changes:
 
 ```bash
 if [ "$STASHED" = true ]; then
@@ -151,7 +125,7 @@ if [ "$STASHED" = true ]; then
 fi
 ```
 
-**4a-9.** Update memory. The session is back in the main tree where `_docs/memory/` files are current. Spawn the memory-updater subagent with accumulated worktree session work:
+**4a-6.** Update memory. The session is back in the main tree where `_docs/memory/` files are current. Spawn the memory-updater subagent with accumulated worktree session work:
 
 ```
 taskTitle: [summary of worktree work]
@@ -164,7 +138,7 @@ notes: "Worktree: <name>. Merged into <SOURCE_BRANCH>."
 
 Omit `taskId` (worktree work is ad-hoc).
 
-**4a-10.** Report:
+**4a-7.** Report:
 
 ```
 Merged worktree-<name> into <SOURCE_BRANCH>.
@@ -180,12 +154,8 @@ Memory updated.
 cd "$MAIN_ROOT"
 ```
 
-**4b-2.** Force-remove worktree and branch:
-
-```bash
-git worktree remove "$WORKTREE_PATH" --force
-git branch -D "worktree-<name>"
-```
+**4b-2.** Execute the **Remove Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+- name: `<name>`
 
 **4b-3.** Update memory. The session is back in the main tree. Spawn the memory-updater subagent to record the discarded worktree session:
 

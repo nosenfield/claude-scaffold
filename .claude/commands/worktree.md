@@ -21,78 +21,40 @@ Error: Worktree name required.
 Usage: /worktree <name>
 ```
 
-### Step 2: Determine Repository State
+### Step 2: Detect Existing Worktree
+
+Compute `MAIN_ROOT` and `WORKTREE_PATH`:
 
 ```bash
 MAIN_ROOT=$(git worktree list --porcelain | head -1 | sed 's/worktree //')
-SOURCE_BRANCH=$(git -C "$MAIN_ROOT" branch --show-current)
-# Fallback to default branch if primary tree is in detached HEAD
-if [ -z "$SOURCE_BRANCH" ]; then
-  SOURCE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
-  SOURCE_BRANCH="${SOURCE_BRANCH:-main}"
-fi
 WORKTREE_PATH="$MAIN_ROOT/.claude/worktrees/<name>"
-BRANCH_NAME="worktree-<name>"
 ```
 
-### Step 3: Detect Existing Worktree
+Check whether the worktree already exists:
 
 ```bash
 git worktree list --porcelain | grep "worktree.*\.claude/worktrees/<name>$"
 ```
 
-- **Match found** --> Go to Step 5 (Enter)
-- **No match** --> Go to Step 4 (Create)
+- **Match found** --> Go to Step 4 (Enter)
+- **No match** --> Go to Step 3 (Create)
 
-### Step 4: Create Worktree
+### Step 3: Create Worktree
 
-**4a.** Validate that branch `worktree-<name>` does not already exist (orphan from prior incomplete cleanup):
+Execute the **Create Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+- name: `<name>` (from `$ARGUMENTS`)
 
-```bash
-git branch --list "worktree-<name>"
-```
+If the procedure reports a branch-exists error, stop and surface the error to the user.
 
-If it exists, report error and stop:
+On success, the procedure returns `WORKTREE_PATH`, `BRANCH_NAME`, and `SOURCE_BRANCH`.
 
-```
-Branch worktree-<name> already exists but no worktree found.
-This may be from incomplete cleanup. To fix:
-  git branch -D worktree-<name>
-Then retry /worktree <name>
-```
-
-**4b.** Create the worktree from the source branch:
-
-```bash
-git worktree add "$WORKTREE_PATH" -b "$BRANCH_NAME" "$SOURCE_BRANCH"
-```
-
-This creates a new directory and branch without touching the primary tree's HEAD or checked-out branch.
-
-Store the source branch for later cleanup (requires `worktreeConfig` extension):
-
-```bash
-git config extensions.worktreeConfig true
-git -C "$WORKTREE_PATH" config --worktree worktree.sourceBranch "$SOURCE_BRANCH"
-```
-
-**4c.** Switch the session directory:
+Switch into the new worktree:
 
 ```bash
 cd "$WORKTREE_PATH"
 ```
 
-**4d.** Run bootstrap if available:
-
-```bash
-if [ -x "$MAIN_ROOT/_scripts/bootstrap-worktree.sh" ]; then
-  "$MAIN_ROOT/_scripts/bootstrap-worktree.sh" "$WORKTREE_PATH"
-fi
-```
-
-If the script does not exist, skip silently. Pre-existing projects without the script are a normal case.
-
-**4e.** Report:
+Report:
 
 ```
 Worktree "<name>" created.
@@ -103,21 +65,21 @@ Your session is now in the worktree. Run your workflow normally.
 When done: /worktree-cleanup
 ```
 
-### Step 5: Enter Existing Worktree
+### Step 4: Enter Existing Worktree
 
-**5a.** Switch the session directory:
+**4a.** Switch the session directory:
 
 ```bash
 cd "$WORKTREE_PATH"
 ```
 
-**5b.** Get current state:
+**4b.** Get current state:
 
 ```bash
 LAST_COMMIT=$(git log -1 --oneline)
 ```
 
-**5c.** Report:
+**4c.** Report:
 
 ```
 Entered worktree "<name>".

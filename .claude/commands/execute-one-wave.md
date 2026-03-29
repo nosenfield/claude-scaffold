@@ -56,19 +56,32 @@ Execute `/next-batch-from-list` to get parallelizable tasks from current wave.
 
 **If NO_ELIGIBLE_TASKS or ALL_TASKS_BLOCKED in current wave**: Wave complete, exit inner loop.
 
-#### 3b. Claim Tasks
+#### 3b. Create Worktrees
+
+For each task in batch:
+
+Execute the **Create Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+- name: `[taskId]` (e.g., `TASK-007`)
+- source_ref: `$DEFAULT_BRANCH`
+
+Record the mapping: `taskId -> WORKTREE_PATH`
+
+#### 3c. Claim Tasks
 
 For each task in batch, update task-list.json:
 - Set `status: "in-progress"`
 - Set `assignedAgent: "[teammate-name]"`
 
-#### 3c. Spawn Teammates
+#### 3d. Spawn Teammates
 
 For each task, use the Task tool to spawn a teammate with a **self-contained prompt**:
 
 1. Read `.claude/partials/teammate-prompt.md`
 2. Substitute bracketed placeholders with task values from task-list.json
-3. Pass the filled template as the `prompt` parameter
+3. Also substitute:
+   - `[worktreePath]`: absolute path to the teammate's worktree (from `taskId -> WORKTREE_PATH` mapping)
+   - `[mainTreeRoot]`: absolute path to the main tree root (`$MAIN_ROOT`)
+4. Pass the filled template as the `prompt` parameter
 
 Task tool parameters:
 ```
@@ -80,7 +93,7 @@ mode: "bypassPermissions"
 max_turns: 200
 ```
 
-#### 3d. Collect Results (Active Polling)
+#### 3e. Collect Results (Active Polling)
 
 **Do NOT end your turn after spawning teammates.** Actively poll your inbox file to collect results.
 
@@ -90,7 +103,7 @@ Execute immediately after spawning all teammates:
 _scripts/poll-inbox.sh "wave-[currentWave]" [number of spawned teammates]
 ```
 
-This polls every 30 seconds until all teammates report, then prints all results. Parse each result and proceed to 3e.
+This polls every 30 seconds until all teammates report, then prints all results. Parse each result and proceed to 3f.
 
 **After collecting results**, purge the inbox so the next batch starts with a clean count:
 
@@ -103,7 +116,7 @@ with open(inbox, 'w') as f:
 "
 ```
 
-#### 3e. Handle Results
+#### 3f. Handle Results
 
 Separate results into successes and failures.
 
@@ -123,9 +136,9 @@ Separate results into successes and failures.
 
 **Do NOT pause on failure.** The super-orchestrator handles user interaction for failures.
 
-Continue to 3f with whatever results were collected (mix of success and failure is fine).
+Continue to 3g with whatever results were collected (mix of success and failure is fine).
 
-#### 3f. Update Memory
+#### 3g. Update Memory
 
 Spawn `memory-updater` agent with `batchMode: true` and collected results:
 
@@ -135,7 +148,7 @@ tasks: [successful task results]
 failedTasks: [failed task results]
 ```
 
-#### 3g. Append Backlog Items
+#### 3h. Append Backlog Items
 
 Collect `backlog` entries from all teammate results. For each non-empty backlog item, append to `_docs/backlog.json`:
 
@@ -151,11 +164,34 @@ Collect `backlog` entries from all teammate results. For each non-empty backlog 
 
 Skip this step if no teammates reported backlog items.
 
-#### 3h. Report Batch
+#### 3i. Report Batch
 
 Report completed tasks. Loop back to 3a if wave has remaining eligible tasks.
 
-### Phase 4: Commit Wave Progress
+### Phase 4: Merge Worktrees and Commit Wave Progress
+
+#### 4a. Merge Successful Task Worktrees
+
+For each successful task in wave (in task order):
+
+Execute the **Merge Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+- name: `[taskId]`
+
+If `MERGE_CONFLICT`:
+- Set task status: `"failed"`
+- Set task blockers: `["Merge conflict with files: [list]"]`
+- Execute the **Remove Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+  - name: `[taskId]`
+- Continue to next task
+
+#### 4b. Remove Failed Task Worktrees
+
+For each failed task in wave:
+
+Execute the **Remove Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+- name: `[taskId]`
+
+#### 4c. Commit Wave Progress
 
 Commit task-list.json and memory file updates accumulated during the wave:
 

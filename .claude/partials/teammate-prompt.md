@@ -11,16 +11,24 @@ You are a teammate executing a development task. Complete the full cycle below, 
   [each reference path as a bullet, or "None"]
 - **filesTouched**:
   [each file path as a bullet]
+- **worktreePath**: [worktreePath]
+- **mainTreeRoot**: [mainTreeRoot]
 
 ## Workflow
 
 Execute these phases in order. Proceed automatically; do not pause for input.
 For steps 1-5, use the **Skill tool** to invoke each command -- do not perform these steps manually.
 
-0. **Load Context**: Read these files before starting work:
-   - `./_docs/architecture.md` (project structure, tech stack, component boundaries)
-   - `./_docs/memory/decisions.md` (architectural decisions -- do not contradict these)
-   - Each file listed in **references** above (task-specific design constraints)
+0. **Enter Worktree and Load Context**:
+   - If `worktreePath` is provided:
+     - `cd [worktreePath]`
+     - Read `[mainTreeRoot]/_docs/architecture.md` (project structure, tech stack, component boundaries)
+     - Read `[mainTreeRoot]/_docs/memory/decisions.md` (architectural decisions -- do not contradict these)
+     - Read each file listed in **references** above, resolving paths relative to the worktree root
+   - If `worktreePath` is not provided (legacy, no worktree):
+     - Read `./_docs/architecture.md` (project structure, tech stack, component boundaries)
+     - Read `./_docs/memory/decisions.md` (architectural decisions -- do not contradict these)
+     - Read each file listed in **references** above
 1. **Plan**: Use the Skill tool to invoke `/plan-task`. Auto-approve the plan.
 2. **Test**: Use the Skill tool to invoke `/write-task-tests`. Verify tests fail for expected reasons.
 3. **Implement**: Use the Skill tool to invoke `/implement-task`. Verify all tests pass.

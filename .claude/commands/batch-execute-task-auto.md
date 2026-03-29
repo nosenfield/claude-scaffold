@@ -70,7 +70,17 @@ Execute `/next-batch-from-list` to get parallelizable tasks from current wave.
 
 **If NO_ELIGIBLE_TASKS or ALL_TASKS_BLOCKED in current wave**: Wave complete, exit inner loop.
 
-#### 2b. Claim Tasks
+#### 2b. Create Worktrees
+
+For each task in batch:
+
+Execute the **Create Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+- name: `[taskId]` (e.g., `TASK-007`)
+- source_ref: `$DEFAULT_BRANCH`
+
+Record the mapping: `taskId -> WORKTREE_PATH`
+
+#### 2c. Claim Tasks
 
 For each task in batch, update task-list.json:
 - Set `status: "in-progress"`
@@ -85,13 +95,16 @@ This prevents other orchestrators from claiming these tasks.
 }
 ```
 
-#### 2c. Spawn Teammates
+#### 2d. Spawn Teammates
 
 For each task, use the Task tool to spawn a teammate with a **self-contained prompt**:
 
 1. Read `.claude/partials/teammate-prompt.md`
 2. Substitute bracketed placeholders with task values from task-list.json
-3. Pass the filled template as the `prompt` parameter
+3. Also substitute:
+   - `[worktreePath]`: absolute path to the teammate's worktree (from `taskId -> WORKTREE_PATH` mapping)
+   - `[mainTreeRoot]`: absolute path to the main tree root
+4. Pass the filled template as the `prompt` parameter
 
 ```
 Task tool parameters:
@@ -105,7 +118,7 @@ Task tool parameters:
 
 **Why `max_turns: 200`**: A full development cycle (context loading + plan + test + implement + review + commit + report) consumes 50-150 assistant turns depending on task complexity. The default (~25-30) is insufficient. Setting 200 provides headroom without risking runaway execution.
 
-#### 2d. Collect Results (Active Polling)
+#### 2e. Collect Results (Active Polling)
 
 **Do NOT end your turn after spawning teammates.** The automatic inbox delivery mechanism is unreliable for waking idle agents. Instead, actively poll your inbox file to collect results.
 
@@ -115,9 +128,9 @@ Execute immediately after spawning all teammates:
 _scripts/poll-inbox.sh "[team-name]" [number of spawned teammates]
 ```
 
-This polls every 30 seconds until all teammates report, then prints all results. Parse each result and proceed to 2e.
+This polls every 30 seconds until all teammates report, then prints all results. Parse each result and proceed to 2f.
 
-#### 2e. Check for Failures (Pause Point)
+#### 2f. Check for Failures (Pause Point)
 
 After all teammates report (or timeout), check for any TASK_FAILED results.
 
@@ -127,7 +140,7 @@ After all teammates report (or timeout), check for any TASK_FAILED results.
 
 2. **Collect all results**: Gather both success and failure results from the batch.
 
-3. **Update memory**: Spawn `memory-updater` with `batchMode: true` and collected results.
+3. **Update memory**: Spawn `memory-updater` agent with `batchMode: true` and collected results.
 
 4. **Pause for user input**:
 ```
@@ -150,13 +163,13 @@ After all teammates report (or timeout), check for any TASK_FAILED results.
 Wait for user response.
 
 **User response handling**:
-- **Option 1 (Retry)**: Continue to 2g, then loop to 2a
+- **Option 1 (Retry)**: Continue to 2h, then loop to 2a
 - **Option 2 (Skip)**: Failed tasks remain "failed"; exit inner loop to Phase 3
 - **Option 3 (Abort)**: Stop execution, preserve context for manual intervention
 
-**If ALL tasks succeeded**: Continue to 2f (skip pause).
+**If ALL tasks succeeded**: Continue to 2g (skip pause).
 
-#### 2f. Update Memory (Success Path)
+#### 2g. Update Memory (Success Path)
 
 Spawn `memory-updater` with `batchMode: true` and collected results.
 
@@ -181,9 +194,9 @@ After memory update, collect `backlog` entries from all teammate results. For ea
 
 Skip this step if no teammates reported backlog items.
 
-#### 2g. Handle Retry (User-Initiated)
+#### 2h. Handle Retry (User-Initiated)
 
-If user selected "Retry failed tasks" in 2e:
+If user selected "Retry failed tasks" in 2f:
 
 ```
 for each failed task:
@@ -194,7 +207,7 @@ for each failed task:
 
 Loop back to 2a to include retried tasks in next batch selection.
 
-#### 2h. Report Batch
+#### 2i. Report Batch
 
 Report completed tasks. Loop back to 2a if wave has remaining eligible tasks.
 
@@ -204,7 +217,30 @@ Check all tasks in current wave:
 - **All complete**: Continue to Phase 4
 - **Any failed** (user selected "Skip"): Note skipped tasks, continue to Phase 4
 
-### Phase 4: Commit Wave Progress
+### Phase 4: Merge Worktrees and Commit Wave Progress
+
+#### 4a. Merge Successful Task Worktrees
+
+For each successful task in wave (in task order):
+
+Execute the **Merge Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+- name: `[taskId]`
+
+If `MERGE_CONFLICT`:
+- Set task status: `"failed"`
+- Set task blockers: `["Merge conflict with files: [list]"]`
+- Execute the **Remove Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+  - name: `[taskId]`
+- Continue to next task
+
+#### 4b. Remove Failed Task Worktrees
+
+For each failed task in wave:
+
+Execute the **Remove Worktree** procedure from `.claude/partials/worktree-ops.md` with:
+- name: `[taskId]`
+
+#### 4c. Commit Wave Progress
 
 Commit task-list.json and memory file updates accumulated during the wave. This captures all status transitions (eligible -> in-progress -> complete), result objects, and memory updates in a single infrastructure commit per wave.
 
