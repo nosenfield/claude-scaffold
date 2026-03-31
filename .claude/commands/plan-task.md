@@ -80,13 +80,41 @@ Generate an implementation plan for a task.
    - Test scenarios (when tests required)
    - Risk assessment
 
-7. **Present Plan for Approval**
+7. **Proof the Plan**
+
+   Spawn the `plan-proofer` agent with:
+   ```
+   taskTitle: [from step 1]
+   taskDescription: [from step 1]
+   acceptanceCriteria: [from step 1, if available]
+   implementationPlan: [full plan text from step 5]
+   explorationArtifact: [path from step 3]
+   ```
+
+   The proofer independently verifies file existence, internal consistency,
+   criteria coverage, step ordering, and scope alignment.
+
+   **If APPROVE**: Proceed to step 8.
+
+   **If REQUEST_REVISION**: Re-spawn the `task-planner` with the original
+   payload plus an additional field:
+   ```
+   prooferFeedback: [Revisions Needed section from proofer output]
+   ```
+   Run the proofer again on the revised plan. Regardless of the second
+   verdict, proceed to step 8 with the latest plan and proof attached.
+   (Max one retry -- no infinite loops.)
+
+8. **Present Plan for Approval**
    Display the complete implementation plan.
 
+   **If proofer approved (no issues):**
    ```
    ## Implementation Plan Ready
 
    [Display full plan from subagent]
+
+   Plan verified by proofer (no issues).
 
    ---
 
@@ -95,7 +123,26 @@ Generate an implementation plan for a task.
    - Reply with feedback to request plan changes
    ```
 
-8. **Route Next Action**
+   **If proofer found issues (first or second pass):**
+   ```
+   ## Implementation Plan Ready
+
+   [Display full plan from subagent]
+
+   ---
+
+   ## Proofer Findings
+
+   [Display proof output]
+
+   ---
+
+   **Approve this plan?**
+   - Reply "approve" to proceed
+   - Reply with feedback to request plan changes
+   ```
+
+9. **Route Next Action**
    On approval, retain the implementation plan in session context.
 
    **If plan includes `Tests Required: yes`:**
