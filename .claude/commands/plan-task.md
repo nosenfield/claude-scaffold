@@ -101,9 +101,9 @@ Generate an implementation plan for a task.
    ```
    prooferFeedback: [Revisions Needed section from proofer output]
    ```
-   Run the proofer again on the revised plan. Regardless of the second
-   verdict, proceed to step 8 with the latest plan and proof attached.
-   (Max one retry -- no infinite loops.)
+   Re-validate the revised plan (step 6), then run the proofer again.
+   Regardless of the second verdict, proceed to step 8 with the latest
+   plan and proof attached. (Max one retry -- no infinite loops.)
 
 8. **Present Plan for Approval**
    Display the complete implementation plan.

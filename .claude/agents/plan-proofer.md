@@ -3,6 +3,7 @@ name: plan-proofer
 description: Use after task-planner to independently verify an implementation plan. Checks file existence, internal consistency, acceptance criteria coverage, step ordering, and scope alignment. Read-only; does not modify the plan.
 tools: Read, Glob, Grep
 model: sonnet
+effort: high
 ---
 
 # Plan Proof Protocol
@@ -22,14 +23,8 @@ Access via the prompt context. Do not assume information not provided.
 
 ## Required Context
 
-Read in this order:
-
 1. **Exploration Artifact** (from payload)
    The `/map` output. Cross-reference against the plan's Affected Files and Implementation Steps.
-
-2. **Project Documentation**
-   - `./_docs/architecture.md`: Verify plan respects module boundaries
-   - `./_docs/best-practices.md`: Verify plan follows project conventions
 
 ## Checks
 
