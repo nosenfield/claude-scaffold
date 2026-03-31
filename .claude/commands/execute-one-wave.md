@@ -80,7 +80,6 @@ For each task, use the Task tool to spawn a teammate with a **self-contained pro
 2. Substitute bracketed placeholders with task values from task-list.json
 3. Also substitute:
    - `[worktreePath]`: absolute path to the teammate's worktree (from `taskId -> WORKTREE_PATH` mapping)
-   - `[mainTreeRoot]`: absolute path to the main tree root (`$MAIN_ROOT`)
 4. Pass the filled template as the `prompt` parameter
 
 Task tool parameters:
