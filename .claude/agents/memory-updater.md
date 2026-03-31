@@ -3,6 +3,7 @@ name: memory-updater
 description: Use after task completion to persist session state. Supports single task or batch mode. Updates Active Context section, appends entry to Session Log in ./_docs/memory/progress.md, records significant decisions in ./_docs/memory/decisions.md, marks tasks complete in task-list.json, and writes result objects.
 tools: Read, Write, Edit, Glob, Bash
 model: sonnet
+effort: low
 ---
 
 # Memory Bank Update Protocol

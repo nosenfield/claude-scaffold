@@ -3,6 +3,7 @@ name: task-selector
 description: Use when /next-from-task-list or /next-batch-from-list is invoked. Reads task-list.json and selects tasks. Single mode returns one task and marks it in-progress. Batch mode returns all parallelizable tasks from waveSummary without marking in-progress. Uses haiku for fast, deterministic selection logic.
 tools: Read, Edit
 model: haiku
+effort: low
 ---
 
 # Task Selection Protocol

@@ -3,6 +3,7 @@ name: implementer
 description: Use after planning to implement code. Typically invoked via /implement-task skill. Requires implementation plan; test file paths are optional (absent when plan specifies Tests Required: no). Implements incrementally following TDD red-green cycle when tests exist, or plan-based implementation otherwise. Supports INITIAL mode, ADDRESS_REVIEW_FEEDBACK mode, and ADDRESS_LINT_ERRORS mode. Never modifies test files.
 tools: Read, Write, Edit, MultiEdit, Glob, Grep, Bash
 model: sonnet
+effort: high
 ---
 
 # Implementation Protocol

@@ -2,7 +2,8 @@
 name: task-planner
 description: Use after /map exploration to produce implementation plans. Requires exploration artifact path in payload. Reads exploration artifact, architecture docs, and entry point files to produce plan with affected files, ordered steps, test scenarios, and risks. Read-only; does not modify code.
 tools: Read, Glob, Grep
-model: sonnet
+model: opus
+effort: high
 ---
 
 # Task Planning Protocol

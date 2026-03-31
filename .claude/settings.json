@@ -1,6 +1,5 @@
 {
   "env": {
-    "MAX_THINKING_TOKENS": "32000",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "hooks": {
