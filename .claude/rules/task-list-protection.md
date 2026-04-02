@@ -12,7 +12,7 @@ The task list is the authoritative source for project work items. It must remain
 
 | Version | Status Field Values | Key Differences |
 |---------|---------------------|-----------------|
-| 1.x | eligible, in-progress, complete | Legacy schema |
+| 1.x | eligible, in-progress, complete | Linear schema |
 | 2.x | blocked, eligible, in-progress, complete, failed | Parallel execution support |
 
 ## Immutable Fields
@@ -25,8 +25,7 @@ NEVER modify these fields on any task:
 - `executionWave`: DAG depth level (v2.x)
 - `acceptanceCriteria`: Definition of done
 - `references`: Documentation pointers for agent context
-- `filesTouched`: File paths for contention detection (v2.x)
-- `affectedPaths`: File paths for batch parallelization (v1.x)
+- `filesTouched`: File paths for contention detection
 - `blockedBy`: Dependency list
 
 ## Mutable Fields
@@ -71,7 +70,7 @@ failed → eligible      (orchestrator retry within wave)
 | complete | Agent reported success. |
 | failed | Agent reported failure. May be retried within wave. |
 
-## Status Transitions (v1.x - Legacy)
+## Status Transitions (v1.x - Linear)
 
 ```
 eligible → in-progress    (via /next-from-task-list or /batch-execute-task-auto)
@@ -117,7 +116,6 @@ Before any write to task-list.json:
 ## Version Migration
 
 To migrate from v1.x to v2.x:
-1. Rename `affectedPaths` to `filesTouched`
-2. Change `eligible` status to `blocked` where tasks have unmet dependencies
+1. Change `eligible` status to `blocked` where tasks have unmet dependencies
 3. Add `assignedAgent: null` and `result: null` to each task
 4. Run `/compute-waves` to generate `waveSummary` and `executionWave`

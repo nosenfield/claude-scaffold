@@ -27,7 +27,7 @@ Read `./_docs/task-list.json`.
 
 Verify schema version:
 - Version 2.x: Use wave-based selection (this protocol)
-- Version 1.x: Fall back to legacy selection (compute dependencies at runtime)
+- Version 1.x: Use linear selection (compute dependencies at runtime)
 
 ### 2. Handle Edge Cases
 
@@ -176,7 +176,7 @@ warnings:
   - [any tasks with empty filesTouched]
 ```
 
-### 4. Legacy Mode (Version 1.x)
+### 4. Linear Mode (Version 1.x)
 
 If `metadata.version` starts with "1.":
 
@@ -188,7 +188,7 @@ If `metadata.version` starts with "1.":
 
 **Batch Mode**:
 - Filter eligible + unblocked tasks
-- Greedy grouping by `affectedPaths` (legacy field name)
+- Greedy grouping by `filesTouched`
 - Return batch without status update
 
 ## Output
