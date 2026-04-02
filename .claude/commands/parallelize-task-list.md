@@ -2,20 +2,32 @@
 
 Convert a linear (v1.x) task list to a parallel (v2.0) task list with wave computation.
 
+**Usage**: `/parallelize-task-list <path-to-linear-task-list.json>`
+
+The converted file is written to the same directory with `-parallel` appended to the filename.
+Example: `_docs/task-list.json` produces `_docs/task-list-parallel.json`.
+
 ## Prerequisites
 
-- `_docs/task-list.json` must exist
+- Input file must exist at the provided path
 - Tasks must have `filesTouched` arrays (can be empty)
 - Tasks must have `blockedBy` arrays (can be empty)
 
-## Step 1: Validate
+## Step 1: Resolve Paths
 
-Read `_docs/task-list.json`. Check `metadata.version`:
+```
+inputPath = $ARGUMENTS
+outputPath = replace ".json" with "-parallel.json" in inputPath
+```
+
+## Step 2: Validate
+
+Read the input file. Check `metadata.version`:
 
 - If version starts with `2.`: Stop. Report "Task list is already v2.0. Use `/compute-waves` to recompute waves."
 - If version starts with `1.` or is missing: Proceed.
 
-## Step 2: Migrate Fields
+## Step 3: Migrate Fields
 
 For each task, add fields if not present:
 
@@ -24,7 +36,7 @@ task.assignedAgent = null
 task.result = null
 ```
 
-## Step 3: Map Statuses
+## Step 4: Map Statuses
 
 For each task:
 
@@ -39,20 +51,20 @@ else:
     task.status = "eligible"
 ```
 
-## Step 4: Update Metadata
+## Step 5: Update Metadata
 
 ```
 metadata.version = "2.0.0"
 metadata.maxConcurrency = 4
 ```
 
-## Step 5: Update Schema Block
+## Step 6: Update Schema Block
 
 Replace the `_schema` block with the `_schema` from `_docs/templates/task-list-parallel.json`.
 
-## Step 6: Write Migrated File
+## Step 7: Write Output File
 
-Write the updated JSON to `_docs/task-list.json`. Preserve task field ordering:
+Write the converted JSON to `outputPath`. Do NOT modify the input file. Preserve task field ordering:
 
 ```
 id, title, description, priority, executionWave, status, acceptanceCriteria, references, filesTouched, blockedBy, assignedAgent, result, completedAt
@@ -60,15 +72,17 @@ id, title, description, priority, executionWave, status, acceptanceCriteria, ref
 
 Set `executionWave` to `null` on all tasks at this stage. `/compute-waves` will populate it.
 
-## Step 7: Compute Waves
+## Step 8: Compute Waves
 
-Run `/compute-waves` to generate `waveSummary` and populate `executionWave` on each task.
+Run `/compute-waves` against the output file to generate `waveSummary` and populate `executionWave` on each task.
 
-## Step 8: Report
+## Step 9: Report
 
 ```
 ## Task List Parallelized
 
+**Source**: [inputPath]
+**Output**: [outputPath]
 **Version**: 1.x -> 2.0.0
 **Tasks**: [N]
 
